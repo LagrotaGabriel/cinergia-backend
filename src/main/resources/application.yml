@@ -1,0 +1,17 @@
+spring:
+  main:
+    allow-circular-references: true
+  profiles:
+    active: ${ACTIVE_PROFILE}
+  aplication:
+    name: akadia-saas-erp
+  mvc:
+    pathmatch.matching-strategy: ant-path-matcher
+  jpa:
+    show-sql: false
+    generate-ddl: true
+jwt:
+  secret: ${JWT_SECRET}
+  expiration: 604800000
+
+TOKEN_WEBHOOK_ASAAS: ${TOKEN_WEBHOOK_ASAAS}

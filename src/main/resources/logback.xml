@@ -1,0 +1,31 @@
+<configuration>
+
+    <contextName>akd-svc-saas-erp</contextName>
+
+    <appender name="console-stdout" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{0} - %M: %msg %rEx{short} %n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="coverage-stdout" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} %msg %rEx{short} %n</pattern>
+        </encoder>
+    </appender>
+
+
+    <appender name="json-stdout" class="ch.qos.logback.core.ConsoleAppender">
+        <layout class="ch.qos.logback.contrib.json.classic.JsonLayout">
+            <jsonFormatter class="ch.qos.logback.contrib.jackson.JacksonJsonFormatter">
+                <prettyPrint>true</prettyPrint>
+            </jsonFormatter>
+            <timestampFormat>dd/MM/yyyy' 'HH:mm:ss.SSS</timestampFormat>
+        </layout>
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="${std_out}"/>
+    </root>
+
+</configuration>
