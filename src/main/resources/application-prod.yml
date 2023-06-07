@@ -1,15 +1,13 @@
 spring:
   jpa:
-    hibernate.ddl-auto: validate
+    hibernate.ddl-auto: update
     properties:
       hibernate:
         dialect=org:
           hibernate:
-            dialect: MySQL5InnoDBDialect
+            dialect: org.hibernate.dialect.PostgreSQL95Dialect
   datasource:
-    url: ${DB_URL}
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
+    url: ${JDBC_DATASOURCE_URL}
 server:
   port: ${SERVER_PORT}
 
