@@ -1,6 +1,8 @@
 package br.com.backend.models.entities;
 
 import br.com.backend.models.entities.mock.ClienteEntityBuilder;
+import br.com.backend.models.enums.StatusClienteEnum;
+import br.com.backend.models.enums.TipoPessoaEnum;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -31,11 +33,15 @@ class ClienteEntityTest {
     void deveTestarAllArgsConstructor() {
         ClienteEntity clienteEntity = new ClienteEntity(
                 1L,
+                1L,
                 LocalDate.of(2023, 2, 27).toString(),
                 LocalTime.of(17, 40).toString(),
                 "Gabriel Lagrota",
                 "gabrielafonso@mail.com.br",
+                "12345678910",
+                StatusClienteEnum.COMUM,
                 "1998-07-21",
+                TipoPessoaEnum.FISICA,
                 null,
                 null,
                 null,
