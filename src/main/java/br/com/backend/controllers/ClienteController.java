@@ -69,7 +69,7 @@ public class ClienteController {
                                                            @Valid @RequestBody ClienteRequest clienteRequest) {
         log.info("Método controlador de criação de novo cliente acessado");
         return ResponseEntity.status(HttpStatus.CREATED).body(clienteService
-                .criaNovoCliente(jwtUtil.obtemUsuarioAtivo(req), clienteRequest));
+                .criaNovoCliente(jwtUtil.obtemEmpresaAtiva(req), clienteRequest));
     }
 
     @GetMapping
@@ -92,7 +92,7 @@ public class ClienteController {
         log.info("Endpoint de busca paginada por clientes acessado. Filtros de busca: {}",
                 busca == null ? "Nulo" : busca);
         return ResponseEntity.ok().body(clienteService.realizaBuscaPaginadaPorClientes(
-                jwtUtil.obtemUsuarioAtivo(req), pageable, busca));
+                jwtUtil.obtemEmpresaAtiva(req), pageable, busca));
     }
 
     @PostMapping("/verifica-cpfCnpj")
@@ -114,7 +114,7 @@ public class ClienteController {
     public ResponseEntity<?> verificaDuplicidadeCpfCnpj(HttpServletRequest req,
                                                         @RequestBody String cpfCnpj) {
         log.info("Endpoint de validação de duplicidade de CPF/CNPJ acessado. CPF/CNPJ: " + cpfCnpj);
-        clienteService.validaSeCpfCnpjJaExiste(cpfCnpj, jwtUtil.obtemUsuarioAtivo(req).getId());
+        clienteService.validaSeCpfCnpjJaExiste(cpfCnpj, jwtUtil.obtemEmpresaAtiva(req).getId());
         return ResponseEntity.ok().build();
     }
 
@@ -136,7 +136,7 @@ public class ClienteController {
     public ResponseEntity<?> removeClientesEmMassa(HttpServletRequest req,
                                                    @RequestBody List<Long> ids) {
         log.info("Método controlador de remoção de clientes em massa acessado");
-        clienteService.removeClientesEmMassa(jwtUtil.obtemUsuarioAtivo(req), ids);
+        clienteService.removeClientesEmMassa(jwtUtil.obtemEmpresaAtiva(req), ids);
         return ResponseEntity.ok().build();
     }
 
@@ -160,7 +160,7 @@ public class ClienteController {
         log.info("Método controlador de remoção de cliente acessado");
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(clienteService.removeCliente(jwtUtil.obtemUsuarioAtivo(req), id));
+                .body(clienteService.removeCliente(jwtUtil.obtemEmpresaAtiva(req), id));
     }
 
     @PostMapping("/relatorio")
@@ -181,7 +181,7 @@ public class ClienteController {
                           @RequestBody List<Long> ids) throws DocumentException, IOException {
         log.info("Método controlador de obtenção de relatório de clientes em PDF acessado. IDs: {}", ids);
 
-        EmpresaEntity empresaLogada = jwtUtil.obtemUsuarioAtivo(req);
+        EmpresaEntity empresaLogada = jwtUtil.obtemEmpresaAtiva(req);
 
         res.setContentType("application/pdf");
         String headerKey = "Content-Disposition";
@@ -212,7 +212,7 @@ public class ClienteController {
                                                              HttpServletRequest req) {
         log.info("Endpoint de busca de cliente por id acessado. ID recebido: {}", id);
         return ResponseEntity.ok().body(clienteService
-                .realizaBuscaDeClientePorId(jwtUtil.obtemUsuarioAtivo(req), id));
+                .realizaBuscaDeClientePorId(jwtUtil.obtemEmpresaAtiva(req), id));
     }
 
     @PutMapping("/{id}")
@@ -235,7 +235,7 @@ public class ClienteController {
         log.info("Método controlador de atualização de cliente acessado");
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(clienteService.atualizaCliente(jwtUtil.obtemUsuarioAtivo(req), id, clienteRequest));
+                .body(clienteService.atualizaCliente(jwtUtil.obtemEmpresaAtiva(req), id, clienteRequest));
     }
 
 

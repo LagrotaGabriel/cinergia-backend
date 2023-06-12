@@ -1,5 +1,6 @@
 package br.com.backend.config.security;
 
+import br.com.backend.config.security.empresa.CredenciaisRequest;
 import br.com.backend.services.exceptions.UnauthorizedAccessException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -30,9 +31,9 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
             throws AuthenticationException {
         try {
-            CredenciaisDto creds = new ObjectMapper().readValue(request.getInputStream(), CredenciaisDto.class);
+            CredenciaisRequest creds = new ObjectMapper().readValue(request.getInputStream(), CredenciaisRequest.class);
             UsernamePasswordAuthenticationToken authenticationToken =
-                    new UsernamePasswordAuthenticationToken(creds.getCpfCnpj(), creds.getSenha(), new ArrayList<>());
+                    new UsernamePasswordAuthenticationToken(creds.getUsername(), creds.getPassword(), new ArrayList<>());
             return authenticationManager.authenticate(authenticationToken);
         } catch (Exception e) {
             throw new UnauthorizedAccessException(e.getMessage());

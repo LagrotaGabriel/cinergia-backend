@@ -72,7 +72,7 @@ public class JWTUtil {
         return claimsResolver.apply(claims);
     }
 
-    public EmpresaEntity obtemUsuarioAtivo(HttpServletRequest req) {
+    public EmpresaEntity obtemEmpresaAtiva(HttpServletRequest req) {
         String token = req.getHeader("Authorization").replace("Bearer ", "");
         String username = getUsernameFromToken(token);
         Optional<EmpresaEntity> empresaOptional = empresaRepository.buscaPorCpfCnpj(username);

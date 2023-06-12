@@ -1,4 +1,4 @@
-package br.com.backend.config.security;
+package br.com.backend.config.security.empresa;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CredenciaisDto {
-    private String cpfCnpj;
-    private String senha;
+public class CredenciaisRequest {
+    private String username;
+    private String password;
 }
