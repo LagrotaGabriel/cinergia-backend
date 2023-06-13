@@ -28,8 +28,9 @@ public class ClienteTypeConverter {
                 .statusCliente(cliente.getStatusCliente())
                 .dataNascimento(cliente.getDataNascimento())
                 .tipoPessoa(cliente.getTipoPessoa())
+                .acessoSistema(cliente.getAcessoSistema())
                 .endereco(cliente.getEndereco())
-                .telefone(cliente.getTelefone())
+                .telefones(cliente.getTelefones())
                 .build();
         log.debug("Objeto ClienteResponse buildado com sucesso. Retornando...");
         return clienteResponse;

@@ -3,11 +3,12 @@ package br.com.backend.services.cliente;
 import br.com.backend.models.dto.cliente.request.ClienteRequest;
 import br.com.backend.models.dto.cliente.response.ClientePageResponse;
 import br.com.backend.models.dto.cliente.response.ClienteResponse;
+import br.com.backend.models.entities.AcessoSistemaEntity;
 import br.com.backend.models.entities.ClienteEntity;
 import br.com.backend.models.entities.EmpresaEntity;
 import br.com.backend.models.entities.ExclusaoEntity;
 import br.com.backend.models.entities.global.EnderecoEntity;
-import br.com.backend.models.entities.global.TelefoneEntity;
+import br.com.backend.models.enums.PerfilEnum;
 import br.com.backend.repositories.cliente.ClienteRepository;
 import br.com.backend.repositories.cliente.impl.ClienteRepositoryImpl;
 import br.com.backend.services.exceptions.InvalidRequestException;
@@ -16,12 +17,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Slf4j
 @Service
@@ -46,6 +50,9 @@ public class ClienteService {
         log.debug("Iniciando acesso ao método de validação de chave única...");
         clienteValidationService.validaSeChavesUnicasJaExistemParaNovoCliente(empresaLogada, clienteRequest);
 
+        Set<PerfilEnum> acessoCliente = new HashSet<>();
+        acessoCliente.add(PerfilEnum.CLIENTE);
+
         log.debug("Iniciando criação do objeto ClienteEntity...");
         ClienteEntity clienteEntity = ClienteEntity.builder()
                 .idEmpresaResponsavel(empresaLogada.getId())
@@ -57,6 +64,12 @@ public class ClienteService {
                 .statusCliente(clienteRequest.getStatusCliente())
                 .dataNascimento(clienteRequest.getDataNascimento())
                 .tipoPessoa(clienteRequest.getTipoPessoa())
+                .acessoSistema(clienteRequest.getAcessoSistema() != null
+                        ? AcessoSistemaEntity.builder()
+                        .senha(new BCryptPasswordEncoder().encode(clienteRequest.getAcessoSistema().getSenha()))
+                        .perfis(acessoCliente)
+                        .build()
+                        : null)
                 .exclusao(null)
                 .endereco(clienteRequest.getEndereco() == null
                         ? null
@@ -69,13 +82,7 @@ public class ClienteService {
                         .complemento(clienteRequest.getEndereco().getComplemento())
                         .estado(clienteRequest.getEndereco().getEstado())
                         .build())
-                .telefone(clienteRequest.getTelefone() == null
-                        ? null
-                        : TelefoneEntity.builder()
-                        .prefixo(clienteRequest.getTelefone().getPrefixo())
-                        .numero(clienteRequest.getTelefone().getNumero())
-                        .tipoTelefone(clienteRequest.getTelefone().getTipoTelefone())
-                        .build())
+                .telefones(clienteRequest.getTelefones())
                 .planos(new ArrayList<>())
                 .cartoes(new ArrayList<>())
                 .build();
@@ -154,8 +161,9 @@ public class ClienteService {
                 .email(clienteExcluido.getEmail())
                 .statusCliente(clienteExcluido.getStatusCliente())
                 .tipoPessoa(clienteExcluido.getTipoPessoa())
+                .acessoSistema(clienteExcluido.getAcessoSistema())
                 .endereco(clienteExcluido.getEndereco())
-                .telefone(clienteExcluido.getTelefone())
+                .telefones(clienteExcluido.getTelefones())
                 .build();
     }
 
@@ -230,6 +238,9 @@ public class ClienteService {
         log.debug("Iniciando acesso ao método de validação de chave única...");
         clienteValidationService.validaSeChavesUnicasJaExistemParaClienteAtualizado(clienteRequest, clienteEncontrado, empresaLogada);
 
+        Set<PerfilEnum> acessoCliente = new HashSet<>();
+        acessoCliente.add(PerfilEnum.CLIENTE);
+
         log.debug("Iniciando criação do objeto ClienteEntity...");
         ClienteEntity novoClienteAtualizado = ClienteEntity.builder()
                 .idEmpresaResponsavel(clienteEncontrado.getIdEmpresaResponsavel())
@@ -242,9 +253,15 @@ public class ClienteService {
                 .statusCliente(clienteRequest.getStatusCliente())
                 .dataNascimento(clienteRequest.getDataNascimento())
                 .tipoPessoa(clienteRequest.getTipoPessoa())
+                .acessoSistema(clienteRequest.getAcessoSistema() != null
+                        ? AcessoSistemaEntity.builder()
+                        .senha(realizaTratamentoSenha(clienteRequest, clienteEncontrado))
+                        .perfis(acessoCliente)
+                        .build()
+                        : null)
                 .exclusao(clienteEncontrado.getExclusao())
                 .endereco(clienteRequest.getEndereco())
-                .telefone(clienteRequest.getTelefone())
+                .telefones(clienteRequest.getTelefones())
                 .planos(clienteEncontrado.getPlanos())
                 .cartoes(clienteEncontrado.getCartoes())
                 .build();
@@ -258,6 +275,18 @@ public class ClienteService {
 
         log.info("Cliente atualizado com sucesso");
         return clienteResponse;
+    }
+
+    private String realizaTratamentoSenha(ClienteRequest clienteRequest, ClienteEntity clienteEncontrado) {
+        if (clienteEncontrado.getAcessoSistema() == null)
+            return new BCryptPasswordEncoder().encode(clienteRequest.getAcessoSistema().getSenha());
+        else {
+            if (clienteEncontrado.getAcessoSistema().getSenha().equals(clienteRequest.getAcessoSistema().getSenha())) {
+                return clienteEncontrado.getAcessoSistema().getSenha();
+            } else {
+                return new BCryptPasswordEncoder().encode(clienteRequest.getAcessoSistema().getSenha());
+            }
+        }
     }
 
 }

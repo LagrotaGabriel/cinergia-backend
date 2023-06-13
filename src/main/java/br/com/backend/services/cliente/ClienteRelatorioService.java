@@ -135,9 +135,9 @@ public class ClienteRelatorioService {
             cell.setPhrase(new Phrase(endereco, font));
             table.addCell(cell);
 
-            String telefone = cliente.getTelefone() == null
+            String telefone = cliente.getTelefones() == null
                     ? "Sem telefone"
-                    : "(" + cliente.getTelefone().getPrefixo() + ") " + cliente.getTelefone().getNumero();
+                    : "(" + cliente.getTelefones().get(0).getPrefixo() + ") " + cliente.getTelefones().get(0).getNumero();
             cell.setPhrase(new Phrase(telefone, font));
             table.addCell(cell);
 

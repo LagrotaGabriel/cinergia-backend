@@ -23,7 +23,7 @@ public class ClienteEntityBuilder {
         builder.clienteEntity.setEmail("fulano@gmail.com");
         builder.clienteEntity.setDataNascimento("2023-02-03");
         builder.clienteEntity.setExclusao(null);
-        builder.clienteEntity.setTelefone(null);
+        builder.clienteEntity.setTelefones(null);
         builder.clienteEntity.setEndereco(null);
         builder.clienteEntity.setPlanos(new ArrayList<>());
         builder.clienteEntity.setCartoes(new ArrayList<>());

@@ -45,6 +45,7 @@ class ClienteEntityTest {
                 null,
                 null,
                 null,
+                null,
                 new ArrayList<>(),
                 new ArrayList<>()
         );
@@ -68,7 +69,7 @@ class ClienteEntityTest {
                 .email("gabrielafonso@mail.com.br")
                 .dataNascimento("1998-07-21")
                 .exclusao(null)
-                .telefone(null)
+                .telefones(null)
                 .endereco(null)
                 .planos(new ArrayList<>())
                 .cartoes(new ArrayList<>())

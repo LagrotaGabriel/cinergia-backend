@@ -42,11 +42,11 @@ public class ClienteEntity {
     @Enumerated(EnumType.STRING)
     private TipoPessoaEnum tipoPessoa;
 
+    @OneToOne(targetEntity = AcessoSistemaEntity.class, orphanRemoval = true, cascade = CascadeType.ALL)
+    private AcessoSistemaEntity acessoSistema;
+
     @OneToOne(targetEntity = ExclusaoEntity.class, orphanRemoval = true, cascade = CascadeType.ALL)
     private ExclusaoEntity exclusao;
-
-    @OneToOne(targetEntity = TelefoneEntity.class, orphanRemoval = true, cascade = CascadeType.ALL)
-    private TelefoneEntity telefone;
 
     @OneToOne(targetEntity = EnderecoEntity.class, orphanRemoval = true, cascade = CascadeType.ALL)
     private EnderecoEntity endereco;
@@ -58,5 +58,9 @@ public class ClienteEntity {
     @OneToMany(targetEntity = CartaoEntity.class, orphanRemoval = true, cascade = CascadeType.ALL)
     @ToString.Exclude
     private List<CartaoEntity> cartoes;
+
+    @OneToMany(targetEntity = TelefoneEntity.class, orphanRemoval = true, cascade = CascadeType.ALL)
+    @ToString.Exclude
+    private List<TelefoneEntity> telefones;
 
 }
