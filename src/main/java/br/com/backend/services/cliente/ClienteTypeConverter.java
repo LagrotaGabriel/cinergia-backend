@@ -30,6 +30,7 @@ public class ClienteTypeConverter {
                 .tipoPessoa(cliente.getTipoPessoa())
                 .acessoSistema(cliente.getAcessoSistema())
                 .endereco(cliente.getEndereco())
+                .fotoPerfil(cliente.getFotoPerfil())
                 .telefones(cliente.getTelefones())
                 .build();
         log.debug("Objeto ClienteResponse buildado com sucesso. Retornando...");

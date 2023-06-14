@@ -82,6 +82,7 @@ public class ClienteService {
                         .complemento(clienteRequest.getEndereco().getComplemento())
                         .estado(clienteRequest.getEndereco().getEstado())
                         .build())
+                .fotoPerfil(null)
                 .telefones(clienteRequest.getTelefones())
                 .planos(new ArrayList<>())
                 .cartoes(new ArrayList<>())
@@ -163,6 +164,7 @@ public class ClienteService {
                 .tipoPessoa(clienteExcluido.getTipoPessoa())
                 .acessoSistema(clienteExcluido.getAcessoSistema())
                 .endereco(clienteExcluido.getEndereco())
+                .fotoPerfil(clienteExcluido.getFotoPerfil())
                 .telefones(clienteExcluido.getTelefones())
                 .build();
     }
@@ -261,6 +263,7 @@ public class ClienteService {
                         : null)
                 .exclusao(clienteEncontrado.getExclusao())
                 .endereco(clienteRequest.getEndereco())
+                .fotoPerfil(clienteEncontrado.getFotoPerfil())
                 .telefones(clienteRequest.getTelefones())
                 .planos(clienteEncontrado.getPlanos())
                 .cartoes(clienteEncontrado.getCartoes())

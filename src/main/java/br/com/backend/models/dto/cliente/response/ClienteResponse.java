@@ -1,6 +1,7 @@
 package br.com.backend.models.dto.cliente.response;
 
 import br.com.backend.models.entities.AcessoSistemaEntity;
+import br.com.backend.models.entities.global.ArquivoEntity;
 import br.com.backend.models.entities.global.EnderecoEntity;
 import br.com.backend.models.entities.global.TelefoneEntity;
 import br.com.backend.models.enums.StatusClienteEnum;
@@ -27,6 +28,7 @@ public class ClienteResponse {
     private TipoPessoaEnum tipoPessoa;
     private AcessoSistemaEntity acessoSistema;
     private EnderecoEntity endereco;
+    private ArquivoEntity fotoPerfil;
     private List<TelefoneEntity> telefones;
 
 }

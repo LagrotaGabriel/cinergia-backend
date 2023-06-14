@@ -3,8 +3,8 @@ package br.com.backend.services.cliente;
 import br.com.backend.models.entities.ClienteEntity;
 import br.com.backend.models.entities.EmpresaEntity;
 import br.com.backend.repositories.cliente.impl.ClienteRepositoryImpl;
-import com.lowagie.text.*;
 import com.lowagie.text.Font;
+import com.lowagie.text.*;
 import com.lowagie.text.pdf.PdfPCell;
 import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
@@ -137,7 +137,8 @@ public class ClienteRelatorioService {
 
             String telefone = cliente.getTelefones() == null
                     ? "Sem telefone"
-                    : "(" + cliente.getTelefones().get(0).getPrefixo() + ") " + cliente.getTelefones().get(0).getNumero();
+                    : obtemTelefoneCliente(cliente);
+
             cell.setPhrase(new Phrase(telefone, font));
             table.addCell(cell);
 
@@ -147,6 +148,12 @@ public class ClienteRelatorioService {
 
             contador++;
         }
+    }
+
+    private String obtemTelefoneCliente(ClienteEntity cliente) {
+        return !cliente.getTelefones().isEmpty()
+                ? "(" + cliente.getTelefones().get(0).getPrefixo() + ") " + cliente.getTelefones().get(0).getNumero()
+                : "Sem telefone";
     }
 
     public Paragraph constroiParagrafoTitulo() {

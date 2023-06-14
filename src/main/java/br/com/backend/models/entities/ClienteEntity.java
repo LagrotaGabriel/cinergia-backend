@@ -1,5 +1,6 @@
 package br.com.backend.models.entities;
 
+import br.com.backend.models.entities.global.ArquivoEntity;
 import br.com.backend.models.entities.global.EnderecoEntity;
 import br.com.backend.models.entities.global.TelefoneEntity;
 import br.com.backend.models.enums.StatusClienteEnum;
@@ -50,6 +51,9 @@ public class ClienteEntity {
 
     @OneToOne(targetEntity = EnderecoEntity.class, orphanRemoval = true, cascade = CascadeType.ALL)
     private EnderecoEntity endereco;
+
+    @OneToOne(targetEntity = ArquivoEntity.class, orphanRemoval = true, cascade = CascadeType.ALL)
+    private ArquivoEntity fotoPerfil;
 
     @OneToMany(targetEntity = PlanoEntity.class, orphanRemoval = true, cascade = CascadeType.ALL)
     @ToString.Exclude
