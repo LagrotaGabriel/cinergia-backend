@@ -1,13 +1,13 @@
 package br.com.backend.models.entities;
 
-import br.com.backend.models.entities.global.ArquivoEntity;
 import br.com.backend.models.entities.global.EnderecoEntity;
+import br.com.backend.models.entities.global.ImagemEntity;
 import br.com.backend.models.entities.global.TelefoneEntity;
 import br.com.backend.models.enums.StatusClienteEnum;
 import br.com.backend.models.enums.TipoPessoaEnum;
-import javax.persistence.*;
 import lombok.*;
 
+import javax.persistence.*;
 import java.util.List;
 
 @Entity
@@ -52,8 +52,8 @@ public class ClienteEntity {
     @OneToOne(targetEntity = EnderecoEntity.class, orphanRemoval = true, cascade = CascadeType.ALL)
     private EnderecoEntity endereco;
 
-    @OneToOne(targetEntity = ArquivoEntity.class, orphanRemoval = true, cascade = CascadeType.ALL)
-    private ArquivoEntity fotoPerfil;
+    @OneToOne(targetEntity = ImagemEntity.class, orphanRemoval = true, cascade = CascadeType.ALL)
+    private ImagemEntity fotoPerfil;
 
     @OneToMany(targetEntity = PlanoEntity.class, orphanRemoval = true, cascade = CascadeType.ALL)
     @ToString.Exclude

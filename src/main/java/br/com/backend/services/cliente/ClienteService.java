@@ -7,10 +7,10 @@ import br.com.backend.models.entities.AcessoSistemaEntity;
 import br.com.backend.models.entities.ClienteEntity;
 import br.com.backend.models.entities.EmpresaEntity;
 import br.com.backend.models.entities.ExclusaoEntity;
-import br.com.backend.models.entities.global.ArquivoEntity;
 import br.com.backend.models.entities.global.EnderecoEntity;
+import br.com.backend.models.entities.global.ImagemEntity;
 import br.com.backend.models.enums.PerfilEnum;
-import br.com.backend.models.enums.global.TipoArquivoEnum;
+import br.com.backend.models.enums.global.TipoImagemEnum;
 import br.com.backend.repositories.cliente.ClienteRepository;
 import br.com.backend.repositories.cliente.impl.ClienteRepositoryImpl;
 import br.com.backend.services.exceptions.InvalidRequestException;
@@ -26,10 +26,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -303,10 +300,10 @@ public class ClienteService {
         log.debug("Método de serviço de atualização de foto de perfil de cliente acessado");
 
         log.debug("Iniciando construção do objeto ArquivoEntity da foto de perfil do cliente...");
-        ArquivoEntity fotoPerfilEntity = fotoPerfil != null
-                ? ArquivoEntity.builder()
+        ImagemEntity fotoPerfilEntity = fotoPerfil != null
+                ? ImagemEntity.builder()
                 .nome(fotoPerfil.getOriginalFilename())
-                .tipo(realizaTratamentoTipoDeArquivo(fotoPerfil.getContentType()))
+                .tipo(realizaTratamentoTipoDeImagem(Objects.requireNonNull(fotoPerfil.getContentType())))
                 .tamanho(fotoPerfil.getSize())
                 .arquivo(fotoPerfil.getBytes())
                 .build()
@@ -330,20 +327,12 @@ public class ClienteService {
                 id, empresaLogada.getId()).getArquivo();
     }
 
-    protected TipoArquivoEnum realizaTratamentoTipoDeArquivo(String tipoArquivo) {
-
-        if (tipoArquivo == null) return TipoArquivoEnum.PDF;
-
-        switch (tipoArquivo) {
-            case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
-                return TipoArquivoEnum.DOCX;
-            case "image/png":
-                return TipoArquivoEnum.PNG;
-            case "image/jpeg":
-                return TipoArquivoEnum.JPG;
-            default:
-                return TipoArquivoEnum.PDF;
+    protected TipoImagemEnum realizaTratamentoTipoDeImagem(String tipoImagem) {
+        if (tipoImagem.equals("image/png")) {
+            return TipoImagemEnum.PNG;
         }
+
+        return TipoImagemEnum.JPG;
     }
 
 }
