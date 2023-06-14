@@ -37,6 +37,9 @@ public class ClienteEntity {
     private String nome;
     private String email;
     private String cpfCnpj;
+
+    @Column(length = 300)
+    private String observacao;
     @Enumerated(EnumType.STRING)
     private StatusClienteEnum statusCliente;
     private String dataNascimento;

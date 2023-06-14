@@ -25,6 +25,7 @@ public class ClienteTypeConverter {
                 .nome(cliente.getNome())
                 .email(cliente.getEmail())
                 .cpfCnpj(cliente.getCpfCnpj())
+                .observacao(cliente.getObservacao())
                 .statusCliente(cliente.getStatusCliente())
                 .dataNascimento(cliente.getDataNascimento())
                 .tipoPessoa(cliente.getTipoPessoa())

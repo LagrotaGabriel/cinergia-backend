@@ -23,6 +23,7 @@ public class ClienteResponse {
     private String nome;
     private String email;
     private String cpfCnpj;
+    private String observacao;
     private StatusClienteEnum statusCliente;
     private String dataNascimento;
     private TipoPessoaEnum tipoPessoa;
