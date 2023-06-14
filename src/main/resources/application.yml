@@ -2,6 +2,10 @@ spring:
   sql:
     init:
       mode: never
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
   main:
     allow-circular-references: true
   profiles:
@@ -16,8 +20,5 @@ spring:
 jwt:
   secret: ${JWT_SECRET}
   expiration: 604800000
-
-
-
 
 TOKEN_WEBHOOK_ASAAS: ${TOKEN_WEBHOOK_ASAAS}
