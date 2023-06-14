@@ -39,6 +39,7 @@ class ClienteEntityTest {
                 "Gabriel Lagrota",
                 "gabrielafonso@mail.com.br",
                 "12345678910",
+                "observação",
                 StatusClienteEnum.COMUM,
                 "1998-07-21",
                 TipoPessoaEnum.FISICA,
