@@ -1,7 +1,7 @@
 spring:
   sql:
     init:
-      mode: always
+      mode: never
   main:
     allow-circular-references: true
   profiles:
