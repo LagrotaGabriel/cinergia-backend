@@ -22,7 +22,7 @@ public class ClienteRequest {
     private String nome;
     private String email;
     private String cpfCnpj;
-    private String observacao;
+    private String observacoes;
     @NotNull
     private StatusClienteEnum statusCliente;
     private String dataNascimento;
