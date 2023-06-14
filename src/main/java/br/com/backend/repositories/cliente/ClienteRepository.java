@@ -1,6 +1,7 @@
 package br.com.backend.repositories.cliente;
 
 import br.com.backend.models.entities.ClienteEntity;
+import br.com.backend.models.entities.global.ArquivoEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -32,5 +33,8 @@ public interface ClienteRepository extends JpaRepository<ClienteEntity, Long> {
 
     @Query("SELECT c FROM ClienteEntity c WHERE c.idEmpresaResponsavel = ?1 and c.exclusao IS NULL")
     List<ClienteEntity> buscaTodos(Long id);
+
+    @Query("SELECT c.fotoPerfil FROM ClienteEntity c WHERE c.id=?1 and c.idEmpresaResponsavel = ?2 and c.exclusao IS NULL")
+    Optional<ArquivoEntity> buscaImagemPerfilPorId(Long idColaborador, Long idEmpresa);
 
 }

@@ -21,6 +21,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -50,6 +51,51 @@ public class ClienteController {
 
     @Autowired
     JWTUtil jwtUtil;
+
+    @GetMapping("imagem-perfil/{id}")
+    @ApiOperation(
+            value = "Obtenção de imagem de perfil do cliente",
+            notes = "Esse endpoint tem como objetivo realizar a obtenção da imagem de perfil de um cliente",
+            produces = MediaType.APPLICATION_JSON,
+            consumes = MediaType.APPLICATION_JSON
+    )
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "Imagem de perfil do cliente obtida com sucesso", response = ClienteResponse.class),
+            @ApiResponse(code = 400, message = "Nenhum cliente foi encontrado com o id informado", response = ObjectNotFoundException.class)
+    })
+    @PreAuthorize("hasAnyRole('EMPRESA', 'ADMIN')")
+    public ResponseEntity<byte[]> obtemImagemDePerfilDoCliente(HttpServletRequest req,
+                                                               @PathVariable("id") Long id) {
+        log.info("Método controlador de obtenção de imagem de perfil de cliente acessado");
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(clienteService.obtemImagemPerfilCliente(jwtUtil.obtemEmpresaAtiva(req), id));
+    }
+
+    @PutMapping("imagem-perfil/{id}")
+    @ApiOperation(
+            value = "Atualização de imagem de perfil do cliente",
+            notes = "Esse endpoint tem como objetivo realizar a atualização da imagem de perfil de um cliente",
+            produces = MediaType.APPLICATION_JSON,
+            consumes = MediaType.APPLICATION_JSON
+    )
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "Cliente atualizado com sucesso", response = ClienteResponse.class),
+            @ApiResponse(code = 400, message = "Nenhum cliente foi encontrado com o id informado", response = ObjectNotFoundException.class)
+    })
+    @PreAuthorize("hasAnyRole('EMPRESA', 'ADMIN')")
+    public ResponseEntity<ClienteResponse> atualizaImagemPerfilCliente(HttpServletRequest req,
+                                                                       @RequestParam(value = "imagemPerfil", required = false) MultipartFile imagemPerfil,
+                                                                       @PathVariable("id") Long id) throws IOException {
+        log.info("Método controlador de atualização de imagem de perfil de cliente acessado");
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(clienteService.atualizaImagemPerfilCliente(
+                        jwtUtil.obtemEmpresaAtiva(req),
+                        id,
+                        imagemPerfil));
+    }
+
 
     @PostMapping
     @ApiOperation(

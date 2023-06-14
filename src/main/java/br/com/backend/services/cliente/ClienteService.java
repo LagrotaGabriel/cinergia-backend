@@ -7,8 +7,10 @@ import br.com.backend.models.entities.AcessoSistemaEntity;
 import br.com.backend.models.entities.ClienteEntity;
 import br.com.backend.models.entities.EmpresaEntity;
 import br.com.backend.models.entities.ExclusaoEntity;
+import br.com.backend.models.entities.global.ArquivoEntity;
 import br.com.backend.models.entities.global.EnderecoEntity;
 import br.com.backend.models.enums.PerfilEnum;
+import br.com.backend.models.enums.global.TipoArquivoEnum;
 import br.com.backend.repositories.cliente.ClienteRepository;
 import br.com.backend.repositories.cliente.impl.ClienteRepositoryImpl;
 import br.com.backend.services.exceptions.InvalidRequestException;
@@ -19,7 +21,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -289,6 +293,56 @@ public class ClienteService {
             } else {
                 return new BCryptPasswordEncoder().encode(clienteRequest.getAcessoSistema().getSenha());
             }
+        }
+    }
+
+    public ClienteResponse atualizaImagemPerfilCliente(EmpresaEntity empresaLogada,
+                                                       Long id,
+                                                       MultipartFile fotoPerfil) throws IOException {
+
+        log.debug("Método de serviço de atualização de foto de perfil de cliente acessado");
+
+        log.debug("Iniciando construção do objeto ArquivoEntity da foto de perfil do cliente...");
+        ArquivoEntity fotoPerfilEntity = fotoPerfil != null
+                ? ArquivoEntity.builder()
+                .nome(fotoPerfil.getOriginalFilename())
+                .tipo(realizaTratamentoTipoDeArquivo(fotoPerfil.getContentType()))
+                .tamanho(fotoPerfil.getSize())
+                .arquivo(fotoPerfil.getBytes())
+                .build()
+                : null;
+
+        log.debug("Acessando repositório de busca de cliente por ID...");
+        ClienteEntity cliente =
+                clienteRepositoryImpl.implementaBuscaPorId(id, empresaLogada.getId());
+
+        log.debug("Acoplando foto de perfil ao objeto do cliente...");
+        cliente.setFotoPerfil(fotoPerfilEntity);
+
+        log.debug(Constantes.INICIANDO_IMPL_PERSISTENCIA_CLIENTE);
+        ClienteEntity clientePersistido = clienteRepositoryImpl.implementaPersistencia(cliente);
+
+        return clienteTypeConverter.converteClienteEntityParaClienteResponse(clientePersistido);
+    }
+
+    public byte[] obtemImagemPerfilCliente(EmpresaEntity empresaLogada, Long id) {
+        return clienteRepositoryImpl.implementaBuscaDeImagemDePerfilPorId(
+                id, empresaLogada.getId()).getArquivo();
+    }
+
+    protected TipoArquivoEnum realizaTratamentoTipoDeArquivo(String tipoArquivo) {
+
+        if (tipoArquivo == null) return TipoArquivoEnum.PDF;
+
+        switch (tipoArquivo) {
+            case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+                return TipoArquivoEnum.DOCX;
+            case "image/png":
+                return TipoArquivoEnum.PNG;
+            case "image/jpeg":
+                return TipoArquivoEnum.JPG;
+            default:
+                return TipoArquivoEnum.PDF;
         }
     }
 

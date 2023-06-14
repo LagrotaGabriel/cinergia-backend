@@ -1,6 +1,7 @@
 package br.com.backend.repositories.cliente.impl;
 
 import br.com.backend.models.entities.ClienteEntity;
+import br.com.backend.models.entities.global.ArquivoEntity;
 import br.com.backend.repositories.cliente.ClienteRepository;
 import br.com.backend.services.exceptions.ObjectNotFoundException;
 import lombok.extern.slf4j.Slf4j;
@@ -70,6 +71,23 @@ public class ClienteRepositoryImpl {
         }
         log.debug("Retornando os clientes encontrados...");
         return clientes;
+    }
+
+    public ArquivoEntity implementaBuscaDeImagemDePerfilPorId(Long id, Long idEmpresa) {
+        log.debug("Método que implementa busca de imagem de perfil de cliente por id acessado. Id: {}", id);
+
+        Optional<ArquivoEntity> arquivoEntityOptional = repository.buscaImagemPerfilPorId(id, idEmpresa);
+
+        ArquivoEntity arquivoEntity;
+        if (arquivoEntityOptional.isPresent()) {
+            arquivoEntity = arquivoEntityOptional.get();
+            log.debug("Imagem de perfil encontrada: {}", arquivoEntity.getNome());
+        } else {
+            log.warn("Nenhuma imagem de perfil foi encontrada com o id {}", id);
+            throw new ObjectNotFoundException("Nenhuma imagem de perfil foi encontrada com o id informado");
+        }
+        log.debug("Retornando a imagem de perfil encontrada...");
+        return arquivoEntity;
     }
 
 }
