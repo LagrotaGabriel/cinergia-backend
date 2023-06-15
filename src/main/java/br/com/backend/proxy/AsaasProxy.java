@@ -22,7 +22,7 @@ public interface AsaasProxy {
     @GetMapping(value = "api/v3/accounts?5bf81f2a-1295-4a41-be18-b32e945667cb")
     ResponseEntity<ConsultaSubContaResponse> consultaSubConta(@RequestHeader(value = "access_token") String accessToken);
 
-    @PostMapping(value = "api/v3/accounts")
+    @PostMapping(value = "api/v3/customers")
     ResponseEntity<CriaClienteAsaasResponse> cadastraNovoCliente(@RequestBody CriaClienteAsaasRequest criaClienteAsaasRequest,
                                                                  @RequestHeader(value = "access_token") String accessToken);
 
