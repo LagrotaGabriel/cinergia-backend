@@ -5,7 +5,7 @@ import br.com.backend.models.dto.cliente.response.ClientePageResponse;
 import br.com.backend.models.dto.cliente.response.ClienteResponse;
 import br.com.backend.models.entities.AcessoSistemaEntity;
 import br.com.backend.models.entities.ClienteEntity;
-import br.com.backend.models.entities.EmpresaEntity;
+import br.com.backend.models.entities.empresa.EmpresaEntity;
 import br.com.backend.models.entities.ExclusaoEntity;
 import br.com.backend.models.entities.global.EnderecoEntity;
 import br.com.backend.models.entities.global.ImagemEntity;

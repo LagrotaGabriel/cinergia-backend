@@ -1,6 +1,6 @@
 package br.com.backend.repositories.empresa.impl;
 
-import br.com.backend.models.entities.EmpresaEntity;
+import br.com.backend.models.entities.empresa.EmpresaEntity;
 import br.com.backend.repositories.empresa.EmpresaRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

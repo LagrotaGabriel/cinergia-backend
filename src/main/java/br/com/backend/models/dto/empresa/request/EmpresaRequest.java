@@ -3,10 +3,9 @@ package br.com.backend.models.dto.empresa.request;
 import br.com.backend.models.entities.AcessoSistemaEntity;
 import br.com.backend.models.entities.global.EnderecoEntity;
 import br.com.backend.models.entities.global.TelefoneEntity;
-import br.com.backend.models.enums.TipoPessoaEnum;
 import lombok.*;
 
-import javax.persistence.Column;
+import javax.validation.constraints.NotNull;
 
 @Builder
 @ToString
@@ -17,22 +16,27 @@ import javax.persistence.Column;
 public class EmpresaRequest {
     private Long id;
 
-    @Column(nullable = false)
+    @NotNull
     private String nomeEmpresa;
 
-    @Column(nullable = false)
+    @NotNull
     private String email;
 
-    @Column(nullable = false, unique = true)
+    @NotNull
     private String cpfCnpj;
 
-    @Column(nullable = false)
-    private TipoPessoaEnum tipoPessoaEnum;
+    @NotNull
+    private String dataNascimento;
 
+    @NotNull
     private EnderecoEntity endereco;
 
+    @NotNull
     private TelefoneEntity telefone;
 
-    @Column(nullable = false)
+    @NotNull
+    private TelefoneEntity celular;
+
+    @NotNull
     private AcessoSistemaEntity acessoSistema;
 }

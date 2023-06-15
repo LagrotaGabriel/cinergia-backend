@@ -1,9 +1,11 @@
-package br.com.backend.models.entities;
+package br.com.backend.models.entities.empresa;
 
+import br.com.backend.models.entities.AcessoSistemaEntity;
+import br.com.backend.models.entities.ClienteEntity;
+import br.com.backend.models.entities.ModeloPlanoEntity;
 import br.com.backend.models.entities.global.ArquivoEntity;
 import br.com.backend.models.entities.global.EnderecoEntity;
 import br.com.backend.models.entities.global.TelefoneEntity;
-import br.com.backend.models.enums.TipoPessoaEnum;
 import lombok.*;
 
 import javax.persistence.*;
@@ -38,14 +40,19 @@ public class EmpresaEntity {
     @Column(unique = true)
     private String cpfCnpj;
 
-    @Enumerated(EnumType.STRING)
-    private TipoPessoaEnum tipoPessoaEnum;
+    private String dataNascimento;
+
+    @OneToOne(targetEntity = ContaEmpresaAsaasEntity.class, orphanRemoval = true, cascade = CascadeType.ALL)
+    private ContaEmpresaAsaasEntity contaEmpresaAsaas;
 
     @OneToOne(targetEntity = EnderecoEntity.class, orphanRemoval = true, cascade = CascadeType.ALL)
     private EnderecoEntity endereco;
 
     @OneToOne(targetEntity = TelefoneEntity.class, orphanRemoval = true, cascade = CascadeType.ALL)
     private TelefoneEntity telefone;
+
+    @OneToOne(targetEntity = TelefoneEntity.class, orphanRemoval = true, cascade = CascadeType.ALL)
+    private TelefoneEntity celular;
 
     @OneToOne(targetEntity = AcessoSistemaEntity.class, orphanRemoval = true, cascade = CascadeType.ALL)
     private AcessoSistemaEntity acessoSistema;

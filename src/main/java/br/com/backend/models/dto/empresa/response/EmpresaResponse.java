@@ -2,7 +2,6 @@ package br.com.backend.models.dto.empresa.response;
 
 import br.com.backend.models.entities.global.EnderecoEntity;
 import br.com.backend.models.entities.global.TelefoneEntity;
-import br.com.backend.models.enums.TipoPessoaEnum;
 import lombok.*;
 
 @Builder
@@ -22,7 +21,7 @@ public class EmpresaResponse {
 
     private String cpfCnpj;
 
-    private TipoPessoaEnum tipoPessoaEnum;
+    private String dataNascimento;
 
     private EnderecoEntity endereco;
 

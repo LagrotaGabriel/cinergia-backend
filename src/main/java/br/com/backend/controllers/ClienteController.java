@@ -4,7 +4,7 @@ import br.com.backend.config.security.JWTUtil;
 import br.com.backend.models.dto.cliente.request.ClienteRequest;
 import br.com.backend.models.dto.cliente.response.ClientePageResponse;
 import br.com.backend.models.dto.cliente.response.ClienteResponse;
-import br.com.backend.models.entities.EmpresaEntity;
+import br.com.backend.models.entities.empresa.EmpresaEntity;
 import br.com.backend.services.cliente.ClienteRelatorioService;
 import br.com.backend.services.cliente.ClienteService;
 import br.com.backend.services.exceptions.InvalidRequestException;

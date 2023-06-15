@@ -9,7 +9,8 @@ public enum FormaPagamentoEnum {
     BOLETO (0, "Boleto"),
     CARTAO_CREDITO (1, "Cartão de crédito"),
     CARTAO_DEBITO (2, "Cartão de débito"),
-    PIX (3, "PIX");
+    PIX (3, "PIX"),
+    DEFINIR(4, "Definir");
 
     private final int code;
     private final String desc;
