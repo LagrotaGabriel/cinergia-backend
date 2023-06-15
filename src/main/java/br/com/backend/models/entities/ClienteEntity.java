@@ -36,6 +36,8 @@ public class ClienteEntity {
     @Column(nullable = false)
     private String nome;
     private String email;
+
+    @Column(nullable = false)
     private String cpfCnpj;
 
     @Column(length = 300)
