@@ -37,7 +37,9 @@ public class EmpresaTypeConverter {
         ContaEmpresaAsaasEntity contaEmpresaAsaasEntity = ContaEmpresaAsaasEntity.builder()
                 .accountId(subContaAsaasResponse.getId())
                 .walletId(subContaAsaasResponse.getWalletId())
-                .asaasApiKey(subContaAsaasResponse.getApiKey())
+                .asaasApiKey(System.getenv("ACTIVE_PROFILE").equals("dev")
+                        ? "$aact_YTU5YTE0M2M2N2I4MTliNzk0YTI5N2U5MzdjNWZmNDQ6OjAwMDAwMDAwMDAwMDAwNTcxMzk6OiRhYWNoX2E1MmUxODI2LTQ0YmItNDc2MS1hNGYzLWNjMjA0YzljZTA5Nw=="
+                        : subContaAsaasResponse.getApiKey())
                 .agencia(subContaAsaasResponse.getAccountNumber().getAgency())
                 .numeroConta(subContaAsaasResponse.getAccountNumber().getAccount())
                 .digitoConta(subContaAsaasResponse.getAccountNumber().getAccountDigit())

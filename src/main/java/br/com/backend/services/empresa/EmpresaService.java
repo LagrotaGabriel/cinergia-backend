@@ -9,6 +9,7 @@ import br.com.backend.models.entities.global.EnderecoEntity;
 import br.com.backend.models.enums.PerfilEnum;
 import br.com.backend.proxy.AsaasProxy;
 import br.com.backend.proxy.empresa.request.SubContaAsaasRequest;
+import br.com.backend.proxy.empresa.response.ConsultaSubContaResponse;
 import br.com.backend.proxy.empresa.response.SubContaAsaasResponse;
 import br.com.backend.repositories.empresa.impl.EmpresaRepositoryImpl;
 import br.com.backend.services.exceptions.InvalidRequestException;
@@ -56,7 +57,9 @@ public class EmpresaService {
         EmpresaEntity empresaEntity = EmpresaEntity.builder()
                 .dataCadastro(LocalDate.now().toString())
                 .horaCadastro(LocalTime.now().toString())
-                .contaEmpresaAsaas(realizaCriacaoSubContaAsaas(empresaRequest))
+                .contaEmpresaAsaas(System.getenv("ACTIVE_PROFILE").equals("dev")
+                        ? realizaSetagemSubContaDeTestes()
+                        : realizaCriacaoSubContaAsaas(empresaRequest))
                 .nomeEmpresa(empresaRequest.getNomeEmpresa())
                 .email(empresaRequest.getEmail())
                 .cpfCnpj(empresaRequest.getCpfCnpj()
@@ -114,8 +117,7 @@ public class EmpresaService {
             log.debug("Realizando envio de requisição de criação de subconta de empresa para a integradora ASAAS...");
             responseAsaas =
                     asaasProxy.cadastraNovaSubConta(subContaAsaasRequest, System.getenv("TOKEN_ASAAS"));
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             log.error(Constantes.ERRO_CRIACAO_SUBCONTA
                     + e.getMessage());
             throw new InvalidRequestException(Constantes.ERRO_CRIACAO_SUBCONTA
@@ -123,8 +125,8 @@ public class EmpresaService {
         }
 
         if (responseAsaas == null) {
-            log.error("O valor retornado pela integradora na criação da subconta é nulo");
-            throw new InvalidRequestException("O retorno da integradora é nulo");
+            log.error(Constantes.VALOR_RETORNADO_INTEGRADORA_NULO);
+            throw new InvalidRequestException(Constantes.VALOR_RETORNADO_INTEGRADORA_NULO);
         }
 
         if (responseAsaas.getStatusCodeValue() != 200) {
@@ -138,12 +140,53 @@ public class EmpresaService {
         SubContaAsaasResponse subContaAsaasResponse = responseAsaas.getBody();
 
         if (subContaAsaasResponse == null) {
-            log.error("O valor retornado pela integradora na criação da subconta é nulo");
-            throw new InvalidRequestException("O retorno da integradora é nulo");
+            log.error(Constantes.VALOR_RETORNADO_INTEGRADORA_NULO);
+            throw new InvalidRequestException(Constantes.VALOR_RETORNADO_INTEGRADORA_NULO);
         }
 
         log.debug("Iniciando acesso ao método de conversão de objeto SubContaAsaasResponse para ContaEmpresaAsaasEntity...");
         return empresaTypeConverter.converteSubContaAsaasResponseParaContaEmpresaAsaasEntity(subContaAsaasResponse);
+    }
+
+    private ContaEmpresaAsaasEntity realizaSetagemSubContaDeTestes() {
+
+        log.debug("Método de serviço responsável pela setagem de subconta de testes na integradora ASAAS acessado");
+
+        ResponseEntity<ConsultaSubContaResponse> responseAsaas;
+
+        try {
+            log.debug("Realizando envio de requisição de consulta de subconta de testes para a integradora ASAAS...");
+            responseAsaas =
+                    asaasProxy.consultaSubConta(System.getenv("TOKEN_ASAAS"));
+        } catch (Exception e) {
+            log.error(Constantes.ERRO_CONSULTA_SUBCONTA_TESTES
+                    + e.getMessage());
+            throw new InvalidRequestException(Constantes.ERRO_CONSULTA_SUBCONTA_TESTES
+                    + e.getMessage());
+        }
+
+        if (responseAsaas == null) {
+            log.error("O valor retornado pela integradora na consulta da subconta de testes é nulo");
+            throw new InvalidRequestException(Constantes.VALOR_RETORNADO_INTEGRADORA_NULO);
+        }
+
+        if (responseAsaas.getStatusCodeValue() != 200) {
+            log.error("Ocorreu um erro no processo de consulta da subconta de testes na integradora de pagamentos: {}",
+                    responseAsaas.getBody());
+            throw new InvalidRequestException(Constantes.ERRO_CONSULTA_SUBCONTA_TESTES
+                    + responseAsaas.getBody());
+        }
+        log.debug("Consulta da subconta de testes ASAAS realizada com sucesso");
+
+        ConsultaSubContaResponse subContaAsaasResponse = responseAsaas.getBody();
+
+        if (subContaAsaasResponse == null) {
+            log.error(Constantes.VALOR_RETORNADO_INTEGRADORA_NULO);
+            throw new InvalidRequestException(Constantes.VALOR_RETORNADO_INTEGRADORA_NULO);
+        }
+
+        log.debug("Iniciando acesso ao método de conversão de objeto SubContaAsaasResponse para ContaEmpresaAsaasEntity...");
+        return empresaTypeConverter.converteSubContaAsaasResponseParaContaEmpresaAsaasEntity(subContaAsaasResponse.getData().get(0));
     }
 
 }
