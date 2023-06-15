@@ -12,6 +12,7 @@ import br.com.backend.proxy.empresa.request.SubContaAsaasRequest;
 import br.com.backend.proxy.empresa.response.SubContaAsaasResponse;
 import br.com.backend.repositories.empresa.impl.EmpresaRepositoryImpl;
 import br.com.backend.services.exceptions.InvalidRequestException;
+import br.com.backend.util.Constantes;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -107,14 +108,29 @@ public class EmpresaService {
                 .postalCode(endereco.getCodigoPostal())
                 .build();
 
-        log.debug("Realizando envio de requisição de criação de subconta de empresa para a integradora ASAAS...");
-        ResponseEntity<SubContaAsaasResponse> responseAsaas =
-                asaasProxy.cadastraNovaSubConta(subContaAsaasRequest, System.getenv("TOKEN_ASAAS"));
+        ResponseEntity<SubContaAsaasResponse> responseAsaas;
+
+        try {
+            log.debug("Realizando envio de requisição de criação de subconta de empresa para a integradora ASAAS...");
+            responseAsaas =
+                    asaasProxy.cadastraNovaSubConta(subContaAsaasRequest, System.getenv("TOKEN_ASAAS"));
+        }
+        catch (Exception e) {
+            log.error(Constantes.ERRO_CRIACAO_SUBCONTA
+                    + e.getMessage());
+            throw new InvalidRequestException(Constantes.ERRO_CRIACAO_SUBCONTA
+                    + e.getMessage());
+        }
+
+        if (responseAsaas == null) {
+            log.error("O valor retornado pela integradora na criação da subconta é nulo");
+            throw new InvalidRequestException("O retorno da integradora é nulo");
+        }
 
         if (responseAsaas.getStatusCodeValue() != 200) {
             log.error("Ocorreu um erro no processo de criação da subconta da empresa na integradora de pagamentos: {}",
                     responseAsaas.getBody());
-            throw new InvalidRequestException("Ocorreu um erro no processo de criação da subconta da empresa: "
+            throw new InvalidRequestException(Constantes.ERRO_CRIACAO_SUBCONTA
                     + responseAsaas.getBody());
         }
         log.debug("Criação da subconta ASAAS realizada com sucesso");
