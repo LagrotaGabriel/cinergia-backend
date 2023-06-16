@@ -1,11 +1,13 @@
 package br.com.backend.models.entities;
 
-import br.com.backend.models.enums.FormaPagamentoEnum;
-import br.com.backend.models.enums.StatusPlanoEnum;
+import br.com.backend.models.enums.*;
+
 import javax.persistence.*;
 import lombok.*;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Builder
@@ -24,17 +26,30 @@ public class PlanoEntity {
     private Long idEmpresaResponsavel;
     @Column(nullable = false)
     private Long idClienteResponsavel;
+    @Column(nullable = false)
     private String dataCadastro;
+    @Column(nullable = false)
     private String horaCadastro;
+    private String dataInicio;
     private String descricao;
+    @Column(nullable = false)
     private Double valor;
-    private String dataVencimento;
 
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private FormaPagamentoEnum formaPagamento;
 
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private StatusPlanoEnum statusPlano;
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private PeriodicidadeEnum periodicidade;
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "NOTIFICACOES")
+    protected Set<NotificacaoEnum> notificacoes = new HashSet<>();
 
     @OneToMany(targetEntity = PagamentoEntity.class, orphanRemoval = true, cascade = CascadeType.ALL)
     @ToString.Exclude

@@ -1,8 +1,12 @@
 package br.com.backend.models.dto.plano.request;
 
 import br.com.backend.models.enums.FormaPagamentoEnum;
-import br.com.backend.models.enums.StatusPlanoEnum;
+import br.com.backend.models.enums.NotificacaoEnum;
+import br.com.backend.models.enums.PeriodicidadeEnum;
 import lombok.*;
+
+import java.util.HashSet;
+import java.util.Set;
 
 @Builder
 @ToString
@@ -13,9 +17,10 @@ import lombok.*;
 public class PlanoRequest {
     private Long id;
     private Long idClienteResponsavel;
+    private String dataInicio;
     private String descricao;
     private Double valor;
-    private String dataVencimento;
     private FormaPagamentoEnum formaPagamento;
-    private StatusPlanoEnum statusPlano;
+    private PeriodicidadeEnum periodicidade;
+    protected Set<NotificacaoEnum> notificacoes = new HashSet<>();
 }
