@@ -20,9 +20,12 @@ public class PlanoEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(nullable = false)
+    private Long idEmpresaResponsavel;
+    @Column(nullable = false)
+    private Long idClienteResponsavel;
     private String dataCadastro;
     private String horaCadastro;
-    private Boolean ativo;
     private String descricao;
     private Double valor;
     private String dataVencimento;
