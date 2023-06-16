@@ -18,10 +18,12 @@ public class PlanoEntityBuilder {
         PlanoEntityBuilder builder = new PlanoEntityBuilder();
         builder.planoEntity = new PlanoEntity();
         builder.planoEntity.setId(1L);
+        builder.planoEntity.setIdEmpresaResponsavel(1L);
+        builder.planoEntity.setIdClienteResponsavel(1L);
         builder.planoEntity.setDataCadastro(LocalDate.of(2023, 2, 3).toString());
         builder.planoEntity.setHoraCadastro(LocalTime.of(10, 57).toString());
-        builder.planoEntity.setAtivo(true);
         builder.planoEntity.setDescricao("Assinatura de plano Basic");
+        builder.planoEntity.setValor(100.0);
         builder.planoEntity.setDataVencimento("2023-02-03");
         builder.planoEntity.setFormaPagamento(FormaPagamentoEnum.BOLETO);
         builder.planoEntity.setStatusPlano(StatusPlanoEnum.INATIVO);

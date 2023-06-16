@@ -20,9 +20,10 @@ class ClienteEntityTest {
     @DisplayName("Deve testar dataBuilder")
     void deveTestarDataBuilder() {
         Assertions.assertEquals(
-                "ClienteEntity(id=1, dataCadastro=2023-02-03, horaCadastro=10:40, nome=Fulano, " +
-                        "email=fulano@gmail.com, dataNascimento=2023-02-03, exclusao=null, telefone=null, " +
-                        "endereco=null)",
+                "ClienteEntity(id=1, idEmpresaResponsavel=null, asaasId=null, dataCadastro=2023-02-03, " +
+                        "horaCadastro=10:40, nome=Fulano, email=fulano@gmail.com, cpfCnpj=null, observacoes=null, " +
+                        "statusCliente=null, dataNascimento=2023-02-03, tipoPessoa=null, acessoSistema=null, " +
+                        "exclusao=null, endereco=null, fotoPerfil=null)",
                 ClienteEntityBuilder.builder().build().toString()
         );
 
@@ -34,6 +35,7 @@ class ClienteEntityTest {
         ClienteEntity clienteEntity = new ClienteEntity(
                 1L,
                 1L,
+                "cus_123456",
                 LocalDate.of(2023, 2, 27).toString(),
                 LocalTime.of(17, 40).toString(),
                 "Gabriel Lagrota",
@@ -47,14 +49,15 @@ class ClienteEntityTest {
                 null,
                 null,
                 null,
-                null,
+                new ArrayList<>(),
                 new ArrayList<>(),
                 new ArrayList<>()
         );
         Assertions.assertEquals(
-                "ClienteEntity(id=1, dataCadastro=2023-02-27, horaCadastro=17:40, nome=Gabriel Lagrota, " +
-                        "email=gabrielafonso@mail.com.br, dataNascimento=1998-07-21, exclusao=null, telefone=null, " +
-                        "endereco=null)",
+                "ClienteEntity(id=1, idEmpresaResponsavel=1, asaasId=cus_123456, dataCadastro=2023-02-27, " +
+                        "horaCadastro=17:40, nome=Gabriel Lagrota, email=gabrielafonso@mail.com.br, " +
+                        "cpfCnpj=12345678910, observacoes=observação, statusCliente=COMUM, dataNascimento=1998-07-21, " +
+                        "tipoPessoa=FISICA, acessoSistema=null, exclusao=null, endereco=null, fotoPerfil=null)",
                 clienteEntity.toString()
         );
 
@@ -77,9 +80,10 @@ class ClienteEntityTest {
                 .cartoes(new ArrayList<>())
                 .build();
         Assertions.assertEquals(
-                "ClienteEntity(id=1, dataCadastro=2023-02-27, horaCadastro=17:40, nome=Gabriel Lagrota, " +
-                        "email=gabrielafonso@mail.com.br, dataNascimento=1998-07-21, exclusao=null, telefone=null, " +
-                        "endereco=null)",
+                "ClienteEntity(id=1, idEmpresaResponsavel=null, asaasId=null, dataCadastro=2023-02-27, " +
+                        "horaCadastro=17:40, nome=Gabriel Lagrota, email=gabrielafonso@mail.com.br, cpfCnpj=null, " +
+                        "observacoes=null, statusCliente=null, dataNascimento=1998-07-21, tipoPessoa=null, " +
+                        "acessoSistema=null, exclusao=null, endereco=null, fotoPerfil=null)",
                 clienteEntity.toString()
         );
     }

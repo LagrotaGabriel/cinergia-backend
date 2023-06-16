@@ -1,7 +1,6 @@
 package br.com.backend.models.entities.mock;
 
-import br.com.backend.models.entities.EmpresaEntity;
-import br.com.backend.models.enums.TipoPessoaEnum;
+import br.com.backend.models.entities.empresa.EmpresaEntity;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -23,7 +22,7 @@ public class EmpresaEntityBuilder {
         builder.empresaEntity.setNomeEmpresa("Akadia Solutions");
         builder.empresaEntity.setEmail("akadia@gmail.com");
         builder.empresaEntity.setCpfCnpj("12345678000112");
-        builder.empresaEntity.setTipoPessoaEnum(TipoPessoaEnum.JURIDICA);
+        builder.empresaEntity.setDataNascimento("1998-07-21");
         builder.empresaEntity.setEndereco(null);
         builder.empresaEntity.setTelefone(null);
         builder.empresaEntity.setAcessoSistema(null);

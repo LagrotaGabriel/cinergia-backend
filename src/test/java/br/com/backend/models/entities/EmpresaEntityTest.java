@@ -1,7 +1,7 @@
 package br.com.backend.models.entities;
 
+import br.com.backend.models.entities.empresa.EmpresaEntity;
 import br.com.backend.models.entities.mock.EmpresaEntityBuilder;
-import br.com.backend.models.enums.TipoPessoaEnum;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,7 +21,8 @@ class EmpresaEntityTest {
         Assertions.assertEquals(
                 "EmpresaEntity(id=1, dataCadastro=2023-02-03, horaCadastro=10:48, " +
                         "nomeEmpresa=Akadia Solutions, email=akadia@gmail.com, cpfCnpj=12345678000112, " +
-                        "tipoPessoaEnum=JURIDICA, endereco=null, telefone=null, acessoSistema=null, logoEmpresa=null)",
+                        "dataNascimento=1998-07-21, contaEmpresaAsaas=null, endereco=null, telefone=null, " +
+                        "celular=null, acessoSistema=null, logoEmpresa=null)",
                 EmpresaEntityBuilder.builder().build().toString()
         );
     }
@@ -36,7 +37,9 @@ class EmpresaEntityTest {
                 "Organizações Tabajara",
                 "tabajara@gmail.com",
                 "12345678000150",
-                TipoPessoaEnum.JURIDICA,
+                "1998-07-21",
+                null,
+                null,
                 null,
                 null,
                 null,
@@ -48,7 +51,8 @@ class EmpresaEntityTest {
         Assertions.assertEquals(
                 "EmpresaEntity(id=1, dataCadastro=2023-02-03, horaCadastro=15:27, " +
                         "nomeEmpresa=Organizações Tabajara, email=tabajara@gmail.com, cpfCnpj=12345678000150, " +
-                        "tipoPessoaEnum=JURIDICA, endereco=null, telefone=null, acessoSistema=null, logoEmpresa=null)",
+                        "dataNascimento=1998-07-21, contaEmpresaAsaas=null, endereco=null, telefone=null, celular=null, " +
+                        "acessoSistema=null, logoEmpresa=null)",
                 empresaEntity.toString()
         );
 
@@ -64,18 +68,20 @@ class EmpresaEntityTest {
                 .nomeEmpresa("Organizações Tabajara")
                 .email("tabajara@gmail.com")
                 .cpfCnpj("12345678000150")
-                .tipoPessoaEnum(TipoPessoaEnum.JURIDICA)
+                .dataNascimento("1998-07-21")
                 .endereco(null)
                 .telefone(null)
                 .acessoSistema(null)
                 .logoEmpresa(null)
+                .contaEmpresaAsaas(null)
                 .modelosPlano(new ArrayList<>())
                 .clientes(new ArrayList<>())
                 .build();
         Assertions.assertEquals(
                 "EmpresaEntity(id=1, dataCadastro=2023-02-27, horaCadastro=17:40, " +
                         "nomeEmpresa=Organizações Tabajara, email=tabajara@gmail.com, cpfCnpj=12345678000150, " +
-                        "tipoPessoaEnum=JURIDICA, endereco=null, telefone=null, acessoSistema=null, logoEmpresa=null)",
+                        "dataNascimento=1998-07-21, contaEmpresaAsaas=null, endereco=null, telefone=null, " +
+                        "celular=null, acessoSistema=null, logoEmpresa=null)",
                 empresaEntity.toString()
         );
     }

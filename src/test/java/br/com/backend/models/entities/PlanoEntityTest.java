@@ -20,9 +20,9 @@ class PlanoEntityTest {
     @DisplayName("Deve testar dataBuilder")
     void deveTestarDataBuilder() {
         Assertions.assertEquals(
-                "PlanoEntity(id=1, dataCadastro=2023-02-03, horaCadastro=10:57, ativo=true, " +
-                        "descricao=Assinatura de plano Basic, valor=null, dataVencimento=2023-02-03, " +
-                        "formaPagamento=BOLETO, statusPlano=INATIVO)",
+                "PlanoEntity(id=1, idEmpresaResponsavel=1, idClienteResponsavel=1, dataCadastro=2023-02-03, " +
+                        "horaCadastro=10:57, descricao=Assinatura de plano Basic, valor=100.0, " +
+                        "dataVencimento=2023-02-03, formaPagamento=BOLETO, statusPlano=INATIVO)",
                 PlanoEntityBuilder.builder().build().toString()
         );
     }
@@ -32,9 +32,10 @@ class PlanoEntityTest {
     void deveTestarAllArgsConstructor() {
         PlanoEntity planoEntity = new PlanoEntity(
                 1L,
+                1L,
+                1L,
                 LocalDate.of(2023, 2, 3).toString(),
                 LocalTime.of(10, 2).toString(),
-                true,
                 "Plano teste",
                 100.0,
                 LocalDate.of(2023, 2, 3).toString(),
@@ -43,9 +44,9 @@ class PlanoEntityTest {
                 new ArrayList<>()
         );
         Assertions.assertEquals(
-                "PlanoEntity(id=1, dataCadastro=2023-02-03, horaCadastro=10:02, ativo=true, " +
-                        "descricao=Plano teste, valor=100.0, dataVencimento=2023-02-03, formaPagamento=CARTAO_DEBITO, " +
-                        "statusPlano=INATIVO)",
+                "PlanoEntity(id=1, idEmpresaResponsavel=1, idClienteResponsavel=1, dataCadastro=2023-02-03, " +
+                        "horaCadastro=10:02, descricao=Plano teste, valor=100.0, dataVencimento=2023-02-03, " +
+                        "formaPagamento=CARTAO_DEBITO, statusPlano=INATIVO)",
                 planoEntity.toString()
         );
     }
@@ -55,9 +56,10 @@ class PlanoEntityTest {
     void deveTestarBuilder() {
         PlanoEntity planoEntity = PlanoEntity.builder()
                 .id(1L)
+                .idEmpresaResponsavel(1L)
+                .idClienteResponsavel(1L)
                 .dataCadastro(LocalDate.of(2023, 2, 3).toString())
                 .horaCadastro(LocalTime.of(10, 3).toString())
-                .ativo(true)
                 .descricao("Plano teste")
                 .valor(100.0)
                 .dataVencimento(LocalDate.of(2023, 2, 3).toString())
@@ -66,9 +68,9 @@ class PlanoEntityTest {
                 .pagamentos(new ArrayList<>())
                 .build();
         Assertions.assertEquals(
-                "PlanoEntity(id=1, dataCadastro=2023-02-03, horaCadastro=10:03, ativo=true, " +
-                        "descricao=Plano teste, valor=100.0, dataVencimento=2023-02-03, formaPagamento=CARTAO_CREDITO, " +
-                        "statusPlano=INATIVO)",
+                "PlanoEntity(id=1, idEmpresaResponsavel=1, idClienteResponsavel=1, dataCadastro=2023-02-03, " +
+                        "horaCadastro=10:03, descricao=Plano teste, valor=100.0, dataVencimento=2023-02-03, " +
+                        "formaPagamento=CARTAO_CREDITO, statusPlano=INATIVO)",
                 planoEntity.toString()
         );
     }
