@@ -96,7 +96,6 @@ public class ClienteService {
                 .fotoPerfil(null)
                 .telefones(clienteRequest.getTelefones())
                 .planos(new ArrayList<>())
-                .cartoes(new ArrayList<>())
                 .build();
         log.debug("Objeto clienteEntity criado com sucesso");
 
@@ -371,7 +370,6 @@ public class ClienteService {
                 .fotoPerfil(clienteEncontrado.getFotoPerfil())
                 .telefones(clienteRequest.getTelefones())
                 .planos(clienteEncontrado.getPlanos())
-                .cartoes(clienteEncontrado.getCartoes())
                 .build();
         log.debug("Objeto cliente construído com sucesso");
 

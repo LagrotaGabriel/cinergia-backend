@@ -67,10 +67,6 @@ public class ClienteEntity {
     @ToString.Exclude
     private List<PlanoEntity> planos;
 
-    @OneToMany(targetEntity = CartaoEntity.class, orphanRemoval = true, cascade = CascadeType.ALL)
-    @ToString.Exclude
-    private List<CartaoEntity> cartoes;
-
     @OneToMany(targetEntity = TelefoneEntity.class, orphanRemoval = true, cascade = CascadeType.ALL)
     @ToString.Exclude
     private List<TelefoneEntity> telefones;

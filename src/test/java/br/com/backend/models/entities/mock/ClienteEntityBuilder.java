@@ -26,7 +26,6 @@ public class ClienteEntityBuilder {
         builder.clienteEntity.setTelefones(null);
         builder.clienteEntity.setEndereco(null);
         builder.clienteEntity.setPlanos(new ArrayList<>());
-        builder.clienteEntity.setCartoes(new ArrayList<>());
         return builder;
     }
 

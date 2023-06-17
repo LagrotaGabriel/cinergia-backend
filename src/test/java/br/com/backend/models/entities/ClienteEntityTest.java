@@ -50,7 +50,6 @@ class ClienteEntityTest {
                 null,
                 null,
                 new ArrayList<>(),
-                new ArrayList<>(),
                 new ArrayList<>()
         );
         Assertions.assertEquals(
@@ -77,7 +76,6 @@ class ClienteEntityTest {
                 .telefones(null)
                 .endereco(null)
                 .planos(new ArrayList<>())
-                .cartoes(new ArrayList<>())
                 .build();
         Assertions.assertEquals(
                 "ClienteEntity(id=1, idEmpresaResponsavel=null, asaasId=null, dataCadastro=2023-02-27, " +

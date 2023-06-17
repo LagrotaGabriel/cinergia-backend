@@ -20,9 +20,9 @@ public class CartaoEntity {
     private String horaCadastro;
     private Boolean ativo;
     private String nomePortador;
-    private String cpfCnpj;
+    private String cpfCnpjPortador;
     private Long numero;
-    private Integer cvv;
+    private Integer ccv;
     private Integer mesExpiracao;
     private Integer anoExpiracao;
     private String tokenCartao;

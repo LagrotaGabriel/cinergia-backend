@@ -51,6 +51,9 @@ public class PlanoEntity {
     @CollectionTable(name = "NOTIFICACOES")
     protected Set<NotificacaoEnum> notificacoes = new HashSet<>();
 
+    @OneToOne(targetEntity = CartaoEntity.class, orphanRemoval = true, cascade = CascadeType.ALL)
+    private CartaoEntity cartao;
+
     @OneToMany(targetEntity = PagamentoEntity.class, orphanRemoval = true, cascade = CascadeType.ALL)
     @ToString.Exclude
     private List<PagamentoEntity> pagamentos;

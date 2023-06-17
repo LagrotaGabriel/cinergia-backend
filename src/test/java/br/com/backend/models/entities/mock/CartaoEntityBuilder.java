@@ -19,9 +19,9 @@ public class CartaoEntityBuilder {
         builder.cartaoEntity.setHoraCadastro(LocalTime.of(10, 29, 0).toString());
         builder.cartaoEntity.setAtivo(true);
         builder.cartaoEntity.setNomePortador("Gabriel");
-        builder.cartaoEntity.setCpfCnpj("47153427821");
+        builder.cartaoEntity.setCpfCnpjPortador("47153427821");
         builder.cartaoEntity.setNumero(5162306219378829L);
-        builder.cartaoEntity.setCvv(318);
+        builder.cartaoEntity.setCcv(318);
         builder.cartaoEntity.setMesExpiracao(8);
         builder.cartaoEntity.setAnoExpiracao(2025);
         builder.cartaoEntity.setTokenCartao(null);

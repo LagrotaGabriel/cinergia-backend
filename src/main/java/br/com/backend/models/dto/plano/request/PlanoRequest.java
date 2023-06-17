@@ -1,5 +1,6 @@
 package br.com.backend.models.dto.plano.request;
 
+import br.com.backend.models.dto.cartao.request.CartaoRequest;
 import br.com.backend.models.enums.FormaPagamentoEnum;
 import br.com.backend.models.enums.NotificacaoEnum;
 import br.com.backend.models.enums.PeriodicidadeEnum;
@@ -22,5 +23,6 @@ public class PlanoRequest {
     private Double valor;
     private FormaPagamentoEnum formaPagamento;
     private PeriodicidadeEnum periodicidade;
-    protected Set<NotificacaoEnum> notificacoes = new HashSet<>();
+    private Set<NotificacaoEnum> notificacoes = new HashSet<>();
+    private CartaoRequest cartao;
 }
