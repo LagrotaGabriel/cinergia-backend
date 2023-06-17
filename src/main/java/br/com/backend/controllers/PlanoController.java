@@ -34,6 +34,28 @@ public class PlanoController {
     @Autowired
     JWTUtil jwtUtil;
 
+    @GetMapping("/cliente/{id}")
+    @ApiOperation(
+            value = "Busca paginada por planos cadastrados",
+            notes = "Esse endpoint tem como objetivo realizar a busca paginada de planos cadastrados na empresa " +
+                    "logada que acionou a requisição com os filtros de busca enviados",
+            produces = MediaType.APPLICATION_JSON,
+            consumes = MediaType.APPLICATION_JSON
+    )
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "A busca paginada de planos foi realizada com sucesso",
+                    response = PlanoPageResponse.class),
+    })
+    @PreAuthorize("hasAnyRole('EMPRESA', 'ADMIN')")
+    public ResponseEntity<PlanoPageResponse> obtemPlanosPaginadosDoCliente(
+            @PathVariable(value = "id") Long id,
+            Pageable pageable,
+            HttpServletRequest req) {
+        log.info("Endpoint de busca paginada por planos acessado");
+        return ResponseEntity.ok().body(planoService.realizaBuscaPaginadaPorPlanosDoCliente(
+                jwtUtil.obtemEmpresaAtiva(req), pageable, id));
+    }
+
     @GetMapping
     @ApiOperation(
             value = "Busca paginada por planos cadastrados",
@@ -51,7 +73,7 @@ public class PlanoController {
             @RequestParam(value = "busca", required = false) String busca,
             Pageable pageable,
             HttpServletRequest req) {
-        log.info("Endpoint de busca paginada por planos acessado. Filtros de busca: {}",
+        log.info("Endpoint de busca paginada por planos do cliente acessado. Filtros de busca: {}",
                 busca == null ? "Nulo" : busca);
         return ResponseEntity.ok().body(planoService.realizaBuscaPaginadaPorPlanos(
                 jwtUtil.obtemEmpresaAtiva(req), pageable, busca));

@@ -17,4 +17,8 @@ public interface PlanoRepository extends JpaRepository<PlanoEntity, Long> {
             "upper(p.descricao) LIKE ?1% and p.idEmpresaResponsavel = ?2")
     Page<PlanoEntity> buscaPorPlanosTypeAhead(Pageable pageable, String busca, Long id);
 
+    @Query("SELECT p FROM PlanoEntity p WHERE " +
+            "p.idClienteResponsavel = ?2 and p.idEmpresaResponsavel = ?1")
+    Page<PlanoEntity> buscaPorPlanosDoCliente(Pageable pageable, Long id, Long idCliente);
+
 }

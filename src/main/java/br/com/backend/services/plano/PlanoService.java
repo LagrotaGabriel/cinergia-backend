@@ -20,6 +20,23 @@ public class PlanoService {
     @Autowired
     PlanoTypeConverter planoTypeConverter;
 
+    public PlanoPageResponse realizaBuscaPaginadaPorPlanosDoCliente(EmpresaEntity empresaLogada,
+                                                           Pageable pageable,
+                                                           Long idCliente) {
+        log.debug("Método de serviço de obtenção paginada de planos do cliente acessado");
+
+        log.debug("Acessando repositório de busca de planos do cliente");
+        Page<PlanoEntity> planoPage = planoRepository.buscaPorPlanosDoCliente(pageable, empresaLogada.getId(), idCliente);
+
+        log.debug("Busca de planos por paginação realizada com sucesso. Acessando método de conversão dos objetos do tipo " +
+                "Entity para objetos do tipo Response...");
+        PlanoPageResponse planoPageResponse = planoTypeConverter.converteListaDePlanosEntityParaPlanosResponse(planoPage);
+        log.debug("Conversão de tipagem realizada com sucesso");
+
+        log.info("A busca paginada de planos foi realizada com sucesso");
+        return planoPageResponse;
+    }
+
     public PlanoPageResponse realizaBuscaPaginadaPorPlanos(EmpresaEntity empresaLogada,
                                                            Pageable pageable,
                                                            String campoBusca) {

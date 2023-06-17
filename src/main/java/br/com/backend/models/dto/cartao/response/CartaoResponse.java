@@ -9,4 +9,10 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CartaoResponse {
+    private String nomePortador;
+    private String cpfCnpjPortador;
+    private Long numero;
+    private Integer mesExpiracao;
+    private Integer anoExpiracao;
+    private Integer ccv;
 }
