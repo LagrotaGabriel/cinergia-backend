@@ -7,12 +7,10 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum PeriodicidadeEnum {
 
-    DIARIO (0, "Diário"),
-    SEMANAL (1, "Semanal"),
-    MENSAL (2, "Mensal"),
-    TRIMESTRAL (3, "Trimestral"),
-    SEMESTRAL (4, "Semestral"),
-    ANUAL (5, "Anual");
+    SEMANAL (0, "Semanal"),
+    MENSAL (1, "Mensal"),
+    SEMESTRAL (2, "Semestral"),
+    ANUAL (3, "Anual");
 
     private final int code;
     private final String desc;

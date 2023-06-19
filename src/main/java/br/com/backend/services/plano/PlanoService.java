@@ -6,15 +6,21 @@ import br.com.backend.models.dto.plano.response.PlanoResponse;
 import br.com.backend.models.entities.ClienteEntity;
 import br.com.backend.models.entities.PlanoEntity;
 import br.com.backend.models.entities.empresa.EmpresaEntity;
+import br.com.backend.models.enums.FormaPagamentoEnum;
 import br.com.backend.models.enums.StatusPlanoEnum;
+import br.com.backend.proxy.AsaasProxy;
+import br.com.backend.proxy.plano.request.CriaPlanoAsaasRequest;
+import br.com.backend.proxy.plano.request.split.SplitRequest;
 import br.com.backend.proxy.plano.response.CriaPlanoAsaasResponse;
 import br.com.backend.repositories.cliente.impl.ClienteRepositoryImpl;
 import br.com.backend.repositories.plano.PlanoRepository;
+import br.com.backend.services.exceptions.InvalidRequestException;
 import br.com.backend.util.Constantes;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -34,6 +40,9 @@ public class PlanoService {
     @Autowired
     PlanoTypeConverter planoTypeConverter;
 
+    @Autowired
+    AsaasProxy asaasProxy;
+
     public PlanoResponse criaNovoPlano(EmpresaEntity empresaLogada, Long idCliente, PlanoRequest planoRequest) {
 
         log.debug("Método de serviço de criação de novo plano acessado");
@@ -46,8 +55,8 @@ public class PlanoService {
         PlanoEntity planoEntity = PlanoEntity.builder()
                 .idEmpresaResponsavel(empresaLogada.getId())
                 .idClienteResponsavel(idCliente)
-                .idAsaas(Constantes.formasPagamentoAsaas.contains(planoRequest.getFormaPagamento())
-                        ? realizaCriacaoDePlanoDeAssinaturaNaIntegradoraAsaas(planoRequest).getId()
+                .idAsaas((planoRequest.getFormaPagamento() == FormaPagamentoEnum.PIX || planoRequest.getFormaPagamento() == FormaPagamentoEnum.BOLETO)
+                        ? realizaCriacaoDePlanoDeAssinaturaNaIntegradoraAsaas(planoRequest, clienteEntity, empresaLogada)
                         : null)
                 .dataCadastro(LocalDate.now().toString())
                 .horaCadastro(LocalTime.now().toString())
@@ -79,8 +88,90 @@ public class PlanoService {
         return planoResponse;
     }
 
-    private CriaPlanoAsaasResponse realizaCriacaoDePlanoDeAssinaturaNaIntegradoraAsaas(PlanoRequest planoRequest) {
-        return null;
+    private String realizaCriacaoDePlanoDeAssinaturaNaIntegradoraAsaas(PlanoRequest planoRequest,
+                                                                       ClienteEntity clienteEntity,
+                                                                       EmpresaEntity empresaEntity) {
+
+
+        log.debug("Método de serviço responsável pela criação de assinatura na integradora ASAAS acessado");
+
+        log.debug("Iniciando construção do objeto CriaPlanoAsaasRequest...");
+        CriaPlanoAsaasRequest criaPlanoAsaasRequest = CriaPlanoAsaasRequest.builder()
+                .customer(clienteEntity.getAsaasId())
+                .billingType(planoRequest.getFormaPagamento())
+                .value(planoRequest.getValor())
+                .nextDueDate(planoRequest.getDataInicio())
+                .discount(null)
+                .interest(null)
+                .fine(null)
+                .cycle(planoTypeConverter.transformaPeriodicidadeEnumEmCycleEnum(planoRequest.getPeriodicidade()))
+                .description(planoRequest.getDescricao())
+                .endDate(null)
+                .maxPayments(null)
+                .externalReference(null)
+                .split(SplitRequest.builder()
+                        .walletId(empresaEntity.getContaEmpresaAsaas().getWalletId())
+                        .fixedValue(calculaRepasseSplitPlano(planoRequest))
+                        .percentualValue(null)
+                        .build())
+                .build();
+
+        ResponseEntity<CriaPlanoAsaasResponse> responseAsaas;
+
+        try {
+            log.debug("Realizando envio de requisição de criação de assinatura para a integradora ASAAS...");
+            responseAsaas =
+                    asaasProxy.cadastraNovaAssinatura(criaPlanoAsaasRequest, System.getenv("TOKEN_ASAAS"));
+        } catch (Exception e) {
+            log.error(Constantes.ERRO_CRIACAO_ASSINATURA_ASAAS
+                    + e.getMessage());
+            throw new InvalidRequestException(Constantes.ERRO_CRIACAO_ASSINATURA_ASAAS
+                    + e.getMessage());
+        }
+
+        if (responseAsaas == null) {
+            log.error("O valor retornado pela integradora na criação da assinatura é nulo");
+            throw new InvalidRequestException("O retorno da integradora é nulo");
+        }
+
+        if (responseAsaas.getStatusCodeValue() != 200) {
+            log.error("Ocorreu um erro no processo de criação da assinatura na integradora de pagamentos: {}",
+                    responseAsaas.getBody());
+            throw new InvalidRequestException(Constantes.ERRO_CRIACAO_ASSINATURA_ASAAS
+                    + responseAsaas.getBody());
+        }
+        log.debug("Criação de assinatura ASAAS realizada com sucesso");
+
+        CriaPlanoAsaasResponse planoAsaasResponse = responseAsaas.getBody();
+
+        if (planoAsaasResponse == null) {
+            log.error("O valor retornado pela integradora na criação da assinatura é nulo");
+            throw new InvalidRequestException("O retorno da integradora é nulo");
+        }
+
+        log.debug("Retornando id da assinatura gerado: {}", planoAsaasResponse.getId());
+        return planoAsaasResponse.getId();
+    }
+
+    private Double calculaRepasseSplitPlano(PlanoRequest planoRequest) {
+
+        double taxaSistema = 2.0;
+        double taxaIntegradora;
+        Double valorPlano = planoRequest.getValor();
+
+        switch (planoRequest.getFormaPagamento()) {
+            case PIX:
+            case BOLETO: {
+                taxaIntegradora = 1.99;
+                break;
+            }
+            default: {
+                taxaIntegradora = 0.49 + ((valorPlano / 100) * 1.99);
+            }
+        }
+
+        return (valorPlano - (taxaIntegradora + taxaSistema));
+
     }
 
     public PlanoPageResponse realizaBuscaPaginadaPorPlanosDoCliente(EmpresaEntity empresaLogada,

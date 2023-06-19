@@ -151,7 +151,7 @@ public class ClienteService {
         }
 
         if (responseAsaas == null) {
-            log.error("O valor retornado pela integradora na criação da subconta é nulo");
+            log.error("O valor retornado pela integradora na criação do cliente é nulo");
             throw new InvalidRequestException("O retorno da integradora é nulo");
         }
 

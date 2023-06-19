@@ -118,9 +118,9 @@ public class EmpresaService {
             responseAsaas =
                     asaasProxy.cadastraNovaSubConta(subContaAsaasRequest, System.getenv("TOKEN_ASAAS"));
         } catch (Exception e) {
-            log.error(Constantes.ERRO_CRIACAO_SUBCONTA
+            log.error(Constantes.ERRO_CRIACAO_SUBCONTA_ASAAS
                     + e.getMessage());
-            throw new InvalidRequestException(Constantes.ERRO_CRIACAO_SUBCONTA
+            throw new InvalidRequestException(Constantes.ERRO_CRIACAO_SUBCONTA_ASAAS
                     + e.getMessage());
         }
 
@@ -132,7 +132,7 @@ public class EmpresaService {
         if (responseAsaas.getStatusCodeValue() != 200) {
             log.error("Ocorreu um erro no processo de criação da subconta da empresa na integradora de pagamentos: {}",
                     responseAsaas.getBody());
-            throw new InvalidRequestException(Constantes.ERRO_CRIACAO_SUBCONTA
+            throw new InvalidRequestException(Constantes.ERRO_CRIACAO_SUBCONTA_ASAAS
                     + responseAsaas.getBody());
         }
         log.debug("Criação da subconta ASAAS realizada com sucesso");

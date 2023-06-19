@@ -3,6 +3,8 @@ package br.com.backend.services.plano;
 import br.com.backend.models.dto.plano.response.PlanoPageResponse;
 import br.com.backend.models.dto.plano.response.PlanoResponse;
 import br.com.backend.models.entities.PlanoEntity;
+import br.com.backend.models.enums.PeriodicidadeEnum;
+import br.com.backend.proxy.plano.request.CycleEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
@@ -62,6 +64,15 @@ public class PlanoTypeConverter {
 
         log.debug("Objeto do tipo PlanoPageResponse criado com sucesso. Retornando objeto...");
         return planoPageResponse;
+    }
+
+    public CycleEnum transformaPeriodicidadeEnumEmCycleEnum(PeriodicidadeEnum periodicidadeEnum) {
+        switch (periodicidadeEnum) {
+            case SEMANAL: return CycleEnum.WEEKLY;
+            case MENSAL: return CycleEnum.MONTHLY;
+            case SEMESTRAL: return CycleEnum.SEMIANNUALY;
+            default: return CycleEnum.YEARLY;
+        }
     }
 
 }
