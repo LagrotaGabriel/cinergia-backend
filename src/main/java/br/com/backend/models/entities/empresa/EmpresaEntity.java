@@ -42,8 +42,7 @@ public class EmpresaEntity {
 
     private String dataNascimento;
 
-    @OneToOne(targetEntity = ContaEmpresaAsaasEntity.class, orphanRemoval = true, cascade = CascadeType.ALL)
-    private ContaEmpresaAsaasEntity contaEmpresaAsaas;
+    private Double saldo;
 
     @OneToOne(targetEntity = EnderecoEntity.class, orphanRemoval = true, cascade = CascadeType.ALL)
     private EnderecoEntity endereco;

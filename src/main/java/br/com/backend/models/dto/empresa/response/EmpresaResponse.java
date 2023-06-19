@@ -22,6 +22,7 @@ public class EmpresaResponse {
     private String cpfCnpj;
 
     private String dataNascimento;
+    private Double saldo;
 
     private EnderecoEntity endereco;
 

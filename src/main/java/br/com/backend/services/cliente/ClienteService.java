@@ -99,6 +99,9 @@ public class ClienteService {
                 .build();
         log.debug("Objeto clienteEntity criado com sucesso");
 
+        log.debug("Inserindo objeto clienteEntity na empresa logada...");
+        empresaLogada.getClientes().add(clienteEntity);
+
         log.debug("Iniciando acesso ao método de implementação da persistência do cliente...");
         ClienteEntity clientePersistido = clienteRepositoryImpl.implementaPersistencia(clienteEntity);
 

@@ -15366,7 +15366,7 @@
 											"fillColor": "#d8d8ff",
 											"font": "Arial;13;0",
 											"left": 1997,
-											"top": 581,
+											"top": 613,
 											"width": 183,
 											"height": 13,
 											"text": "«enumeration»"
@@ -15380,7 +15380,7 @@
 											"fillColor": "#d8d8ff",
 											"font": "Arial;13;1",
 											"left": 1997,
-											"top": 596,
+											"top": 628,
 											"width": 183,
 											"height": 13,
 											"text": "PeriodicidadeEnum"
@@ -15395,7 +15395,7 @@
 											"fillColor": "#d8d8ff",
 											"font": "Arial;13;0",
 											"left": 688,
-											"top": -224,
+											"top": -160,
 											"width": 73.67724609375,
 											"height": 13,
 											"text": "(from Model)"
@@ -15410,7 +15410,7 @@
 											"fillColor": "#d8d8ff",
 											"font": "Arial;13;0",
 											"left": 688,
-											"top": -224,
+											"top": -160,
 											"height": 13,
 											"horizontalAlignment": 1
 										}
@@ -15418,7 +15418,7 @@
 									"fillColor": "#d8d8ff",
 									"font": "Arial;13;0",
 									"left": 1992,
-									"top": 576,
+									"top": 608,
 									"width": 193,
 									"height": 38,
 									"stereotypeLabel": {
@@ -15447,7 +15447,7 @@
 									"fillColor": "#d8d8ff",
 									"font": "Arial;13;0",
 									"left": 344,
-									"top": -112,
+									"top": -80,
 									"width": 10,
 									"height": 10
 								},
@@ -15464,7 +15464,7 @@
 									"fillColor": "#d8d8ff",
 									"font": "Arial;13;0",
 									"left": 344,
-									"top": -112,
+									"top": -80,
 									"width": 10,
 									"height": 10
 								},
@@ -15481,7 +15481,7 @@
 									"fillColor": "#d8d8ff",
 									"font": "Arial;13;0",
 									"left": 344,
-									"top": -112,
+									"top": -80,
 									"width": 10,
 									"height": 10
 								},
@@ -15498,7 +15498,7 @@
 									"fillColor": "#d8d8ff",
 									"font": "Arial;13;0",
 									"left": 344,
-									"top": -112,
+									"top": -80,
 									"width": 10,
 									"height": 10
 								},
@@ -15514,24 +15514,6 @@
 									"subViews": [
 										{
 											"_type": "UMLEnumerationLiteralView",
-											"_id": "AAAAAAGIxYdn7cPdlsQ=",
-											"_parent": {
-												"$ref": "AAAAAAGIxYcICpa+KQE="
-											},
-											"model": {
-												"$ref": "AAAAAAGIxYdnycOGN30="
-											},
-											"fillColor": "#d8d8ff",
-											"font": "Arial;13;0",
-											"left": 1997,
-											"top": 619,
-											"width": 183,
-											"height": 13,
-											"text": "DIARIO",
-											"horizontalAlignment": 0
-										},
-										{
-											"_type": "UMLEnumerationLiteralView",
 											"_id": "AAAAAAGIxYeVFMvEfIo=",
 											"_parent": {
 												"$ref": "AAAAAAGIxYcICpa+KQE="
@@ -15542,28 +15524,10 @@
 											"fillColor": "#d8d8ff",
 											"font": "Arial;13;0",
 											"left": 1997,
-											"top": 634,
+											"top": 651,
 											"width": 183,
 											"height": 13,
 											"text": "SEMANAL",
-											"horizontalAlignment": 0
-										},
-										{
-											"_type": "UMLEnumerationLiteralView",
-											"_id": "AAAAAAGIxaJSKyI3K6o=",
-											"_parent": {
-												"$ref": "AAAAAAGIxYcICpa+KQE="
-											},
-											"model": {
-												"$ref": "AAAAAAGIxaJSDyHg4JM="
-											},
-											"fillColor": "#d8d8ff",
-											"font": "Arial;13;0",
-											"left": 1997,
-											"top": 649,
-											"width": 183,
-											"height": 13,
-											"text": "TRIMESTRAL",
 											"horizontalAlignment": 0
 										},
 										{
@@ -15578,7 +15542,7 @@
 											"fillColor": "#d8d8ff",
 											"font": "Arial;13;0",
 											"left": 1997,
-											"top": 664,
+											"top": 666,
 											"width": 183,
 											"height": 13,
 											"text": "SEMESTRAL",
@@ -15596,7 +15560,7 @@
 											"fillColor": "#d8d8ff",
 											"font": "Arial;13;0",
 											"left": 1997,
-											"top": 679,
+											"top": 681,
 											"width": 183,
 											"height": 13,
 											"text": "MENSAL",
@@ -15614,7 +15578,7 @@
 											"fillColor": "#d8d8ff",
 											"font": "Arial;13;0",
 											"left": 1997,
-											"top": 694,
+											"top": 696,
 											"width": 183,
 											"height": 13,
 											"text": "ANUAL",
@@ -15624,18 +15588,18 @@
 									"fillColor": "#d8d8ff",
 									"font": "Arial;13;0",
 									"left": 1992,
-									"top": 614,
+									"top": 646,
 									"width": 193,
-									"height": 98
+									"height": 68
 								}
 							],
 							"fillColor": "#d8d8ff",
 							"font": "Arial;13;0",
 							"containerChangeable": true,
 							"left": 1992,
-							"top": 576,
+							"top": 608,
 							"width": 193,
-							"height": 136,
+							"height": 106,
 							"nameCompartment": {
 								"$ref": "AAAAAAGIxYcICZa1k1c="
 							},
@@ -19924,27 +19888,11 @@
 					"literals": [
 						{
 							"_type": "UMLEnumerationLiteral",
-							"_id": "AAAAAAGIxYdnycOGN30=",
-							"_parent": {
-								"$ref": "AAAAAAGIxYcICZay6bE="
-							},
-							"name": "DIARIO"
-						},
-						{
-							"_type": "UMLEnumerationLiteral",
 							"_id": "AAAAAAGIxYeU+8ttijo=",
 							"_parent": {
 								"$ref": "AAAAAAGIxYcICZay6bE="
 							},
 							"name": "SEMANAL"
-						},
-						{
-							"_type": "UMLEnumerationLiteral",
-							"_id": "AAAAAAGIxaJSDyHg4JM=",
-							"_parent": {
-								"$ref": "AAAAAAGIxYcICZay6bE="
-							},
-							"name": "TRIMESTRAL"
 						},
 						{
 							"_type": "UMLEnumerationLiteral",
