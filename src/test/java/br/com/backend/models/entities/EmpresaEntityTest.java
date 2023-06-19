@@ -73,7 +73,7 @@ class EmpresaEntityTest {
                 .telefone(null)
                 .acessoSistema(null)
                 .logoEmpresa(null)
-                .contaEmpresaAsaas(null)
+                .saldo(0.0)
                 .modelosPlano(new ArrayList<>())
                 .clientes(new ArrayList<>())
                 .build();

@@ -24,7 +24,6 @@ public class PlanoEntityBuilder {
         builder.planoEntity.setHoraCadastro(LocalTime.of(10, 57).toString());
         builder.planoEntity.setDescricao("Assinatura de plano Basic");
         builder.planoEntity.setValor(100.0);
-        builder.planoEntity.setDataVencimento("2023-02-03");
         builder.planoEntity.setFormaPagamento(FormaPagamentoEnum.BOLETO);
         builder.planoEntity.setStatusPlano(StatusPlanoEnum.INATIVO);
         builder.planoEntity.setPagamentos(new ArrayList<>());
