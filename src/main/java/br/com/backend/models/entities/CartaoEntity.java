@@ -18,7 +18,6 @@ public class CartaoEntity {
     private Long id;
     private String dataCadastro;
     private String horaCadastro;
-    private Boolean ativo;
     private String nomePortador;
     private String cpfCnpjPortador;
     private Long numero;

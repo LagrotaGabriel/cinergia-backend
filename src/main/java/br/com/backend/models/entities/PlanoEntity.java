@@ -26,11 +26,14 @@ public class PlanoEntity {
     private Long idEmpresaResponsavel;
     @Column(nullable = false)
     private Long idClienteResponsavel;
+    private String idAsaas;
     @Column(nullable = false)
     private String dataCadastro;
     @Column(nullable = false)
     private String horaCadastro;
+    @Column(nullable = false)
     private String dataInicio;
+    @Column(nullable = false)
     private String descricao;
     @Column(nullable = false)
     private Double valor;

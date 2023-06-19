@@ -33,7 +33,6 @@ class CartaoEntityTest {
                 1L,
                 LocalDate.of(2023, 6, 2).toString(),
                 LocalTime.of(10, 48, 0).toString(),
-                true,
                 "Fulano",
                 "12345678910",
                 5162306219378829L,
@@ -61,7 +60,6 @@ class CartaoEntityTest {
                 .id(1L)
                 .dataCadastro(LocalDate.of(2023, 6, 2).toString())
                 .horaCadastro(LocalTime.of(10, 48, 0).toString())
-                .ativo(false)
                 .nomePortador("Fulano")
                 .cpfCnpjPortador("12345678910")
                 .numero(5162306219378829L)

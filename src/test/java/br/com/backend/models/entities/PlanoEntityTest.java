@@ -2,6 +2,7 @@ package br.com.backend.models.entities;
 
 import br.com.backend.models.entities.mock.PlanoEntityBuilder;
 import br.com.backend.models.enums.FormaPagamentoEnum;
+import br.com.backend.models.enums.PeriodicidadeEnum;
 import br.com.backend.models.enums.StatusPlanoEnum;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -34,13 +35,17 @@ class PlanoEntityTest {
                 1L,
                 1L,
                 1L,
+                "plano_123",
                 LocalDate.of(2023, 2, 3).toString(),
                 LocalTime.of(10, 2).toString(),
+                "2030-01-01",
                 "Plano teste",
                 100.0,
-                LocalDate.of(2023, 2, 3).toString(),
-                FormaPagamentoEnum.CARTAO_DEBITO,
+                FormaPagamentoEnum.DEBIT_CARD,
                 StatusPlanoEnum.INATIVO,
+                PeriodicidadeEnum.MENSAL,
+                null,
+                null,
                 new ArrayList<>()
         );
         Assertions.assertEquals(
@@ -62,8 +67,7 @@ class PlanoEntityTest {
                 .horaCadastro(LocalTime.of(10, 3).toString())
                 .descricao("Plano teste")
                 .valor(100.0)
-                .dataVencimento(LocalDate.of(2023, 2, 3).toString())
-                .formaPagamento(FormaPagamentoEnum.CARTAO_CREDITO)
+                .formaPagamento(FormaPagamentoEnum.CREDIT_CARD)
                 .statusPlano(StatusPlanoEnum.INATIVO)
                 .pagamentos(new ArrayList<>())
                 .build();

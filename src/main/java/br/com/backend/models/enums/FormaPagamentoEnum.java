@@ -7,8 +7,8 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum FormaPagamentoEnum {
     BOLETO (0, "Boleto"),
-    CARTAO_CREDITO (1, "Cartão de crédito"),
-    CARTAO_DEBITO (2, "Cartão de débito"),
+    CREDIT_CARD(1, "Cartão de crédito"),
+    DEBIT_CARD(2, "Cartão de débito"),
     PIX (3, "PIX"),
     DEFINIR(4, "Definir");
 

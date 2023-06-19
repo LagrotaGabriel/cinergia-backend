@@ -17,7 +17,6 @@ public class CartaoEntityBuilder {
         builder.cartaoEntity.setId(1L);
         builder.cartaoEntity.setDataCadastro(LocalDate.of(2023, 6, 2).toString());
         builder.cartaoEntity.setHoraCadastro(LocalTime.of(10, 29, 0).toString());
-        builder.cartaoEntity.setAtivo(true);
         builder.cartaoEntity.setNomePortador("Gabriel");
         builder.cartaoEntity.setCpfCnpjPortador("47153427821");
         builder.cartaoEntity.setNumero(5162306219378829L);

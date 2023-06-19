@@ -1,7 +1,9 @@
 package br.com.backend.controllers;
 
 import br.com.backend.config.security.JWTUtil;
+import br.com.backend.models.dto.plano.request.PlanoRequest;
 import br.com.backend.models.dto.plano.response.PlanoPageResponse;
+import br.com.backend.models.dto.plano.response.PlanoResponse;
 import br.com.backend.services.plano.PlanoService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -33,6 +35,28 @@ public class PlanoController {
 
     @Autowired
     JWTUtil jwtUtil;
+
+    @PostMapping("/{id}")
+    @ApiOperation(
+            value = "Criação de um novo plano para um determinado cliente",
+            notes = "Esse endpoint tem como objetivo realizar a criação de um novo plano de assinatura para um determinado " +
+                    "cliente",
+            produces = MediaType.APPLICATION_JSON,
+            consumes = MediaType.APPLICATION_JSON
+    )
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "A criação de um novo plano foi realizada com sucesso",
+                    response = PlanoPageResponse.class),
+    })
+    @PreAuthorize("hasAnyRole('EMPRESA', 'ADMIN')")
+    public ResponseEntity<PlanoResponse> criaNovoPlano(
+            @PathVariable(value = "id") Long id,
+            HttpServletRequest req,
+            @RequestBody PlanoRequest planoRequest) {
+        log.info("Endpoint de criação de novo plano acessado");
+        return ResponseEntity.ok().body(planoService.criaNovoPlano(
+                jwtUtil.obtemEmpresaAtiva(req), id, planoRequest));
+    }
 
     @GetMapping("/cliente/{id}")
     @ApiOperation(
