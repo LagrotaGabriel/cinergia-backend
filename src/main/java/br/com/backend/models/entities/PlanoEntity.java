@@ -31,6 +31,7 @@ public class PlanoEntity {
     private String dataCadastro;
     @Column(nullable = false)
     private String horaCadastro;
+    private String dataVencimento;
     @Column(nullable = false)
     private String dataInicio;
     @Column(nullable = false)

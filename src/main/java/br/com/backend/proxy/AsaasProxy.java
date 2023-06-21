@@ -4,11 +4,10 @@ import br.com.backend.proxy.cliente.request.CriaClienteAsaasRequest;
 import br.com.backend.proxy.cliente.response.CriaClienteAsaasResponse;
 import br.com.backend.proxy.plano.request.CriaPlanoAsaasRequest;
 import br.com.backend.proxy.plano.response.CriaPlanoAsaasResponse;
+import br.com.backend.proxy.plano.response.consulta.ConsultaAssinaturaResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.*;
 
 @FeignClient(name = "ASAAS", url = "${URL_ASAAS}")
 public interface AsaasProxy {
@@ -20,5 +19,9 @@ public interface AsaasProxy {
     @PostMapping(value = "api/v3/customers")
     ResponseEntity<CriaClienteAsaasResponse> cadastraNovoCliente(@RequestBody CriaClienteAsaasRequest criaClienteAsaasRequest,
                                                                  @RequestHeader(value = "access_token") String accessToken);
+
+    @GetMapping(value = "/subscriptions/{idAssinatura}")
+    ResponseEntity<ConsultaAssinaturaResponse> consultaAssinatura(@PathVariable String idAssinatura,
+                                                                  @RequestHeader(value = "access_token") String accessToken);
 
 }

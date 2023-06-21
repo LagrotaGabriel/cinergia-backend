@@ -90,4 +90,23 @@ public class ClienteRepositoryImpl {
         return imagemEntity;
     }
 
+    public ClienteEntity implementaBuscaPorCodigoClienteAsaas(String codigoClienteAsaas) {
+        log.debug("Método que implementa busca por cliente Asaas pelo seu código de cliente acessado");
+
+        Optional<ClienteEntity> clienteOptional =
+                repository.findByAsaasId(codigoClienteAsaas);
+
+        ClienteEntity clienteSistema;
+        if (clienteOptional.isPresent()) {
+            clienteSistema = clienteOptional.get();
+            log.debug("Cliente encontrado: {}", clienteSistema);
+        } else {
+            log.warn("Nenhum cliente foi encontrado com o código Asaas informado: {}", codigoClienteAsaas);
+            throw new ObjectNotFoundException("Nenhum cliente foi encontrado com o codigo Asaas informado");
+        }
+
+        log.debug("Retornando cliente...");
+        return clienteSistema;
+    }
+
 }

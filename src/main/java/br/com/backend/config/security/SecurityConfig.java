@@ -24,7 +24,7 @@ import java.util.Arrays;
         jsr250Enabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    private static final String[] PUBLIC_MATCHERS = {"/api/v1/empresa"};
+    private static final String[] PUBLIC_MATCHERS = {"/api/v1/empresa", "/webhook/v1/**"};
 
     @Autowired
     private Environment env;

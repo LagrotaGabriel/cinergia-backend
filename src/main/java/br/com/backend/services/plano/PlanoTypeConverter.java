@@ -24,12 +24,13 @@ public class PlanoTypeConverter {
                 .id(plano.getId())
                 .dataCadastro(plano.getDataCadastro())
                 .horaCadastro(plano.getHoraCadastro())
+                .dataVencimento(plano.getDataVencimento())
                 .dataInicio(plano.getDataInicio())
                 .descricao(plano.getDescricao())
                 .valor(plano.getValor())
-                .formaPagamento(plano.getFormaPagamento())
-                .statusPlano(plano.getStatusPlano())
-                .periodicidade(plano.getPeriodicidade())
+                .formaPagamento(plano.getFormaPagamento().getDesc())
+                .statusPlano(plano.getStatusPlano().getDesc())
+                .periodicidade(plano.getPeriodicidade().getDesc())
                 .build();
         log.debug("Objeto PlanoResponse buildado com sucesso. Retornando...");
         return planoResponse;

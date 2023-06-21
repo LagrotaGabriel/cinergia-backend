@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface PlanoRepository extends JpaRepository<PlanoEntity, Long> {
 
@@ -21,4 +23,8 @@ public interface PlanoRepository extends JpaRepository<PlanoEntity, Long> {
             "p.idClienteResponsavel = ?2 and p.idEmpresaResponsavel = ?1")
     Page<PlanoEntity> buscaPorPlanosDoCliente(Pageable pageable, Long id, Long idCliente);
 
+    @Query("SELECT p FROM PlanoEntity p WHERE p.id=?1 and p.idEmpresaResponsavel = ?2")
+    Optional<PlanoEntity> buscaPorId(Long idPlano, Long idEmpresa);
+
+    Optional<PlanoEntity> findByIdAsaas(String asaasId);
 }

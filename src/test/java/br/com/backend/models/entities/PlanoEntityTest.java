@@ -38,6 +38,7 @@ class PlanoEntityTest {
                 "plano_123",
                 LocalDate.of(2023, 2, 3).toString(),
                 LocalTime.of(10, 2).toString(),
+                LocalDate.of(2023, 2, 3).toString(),
                 "2030-01-01",
                 "Plano teste",
                 100.0,

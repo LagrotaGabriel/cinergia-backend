@@ -37,4 +37,6 @@ public interface ClienteRepository extends JpaRepository<ClienteEntity, Long> {
     @Query("SELECT c.fotoPerfil FROM ClienteEntity c WHERE c.id=?1 and c.idEmpresaResponsavel = ?2 and c.exclusao IS NULL")
     Optional<ImagemEntity> buscaImagemPerfilPorId(Long idColaborador, Long idEmpresa);
 
+    Optional<ClienteEntity> findByAsaasId(String asaasId);
+
 }

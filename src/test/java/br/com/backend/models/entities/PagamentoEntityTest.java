@@ -30,14 +30,17 @@ class PagamentoEntityTest {
     void deveTestarAllArgsConstructor() {
         PagamentoEntity pagamentoEntity = new PagamentoEntity(
                 1L,
+                1L,
+                1L,
+                "123",
+                LocalDate.of(2023, 2, 3).toString(),
+                LocalTime.of(15, 50).toString(),
                 LocalDate.of(2023, 2, 3).toString(),
                 LocalTime.of(15, 50).toString(),
                 650.0,
-                640.0,
-                640.0,
+                650.0,
                 "Assinatura de plano Pro",
                 LocalDate.of(2023, 2, 5).toString(),
-                "123",
                 null,
                 null
         );
@@ -59,11 +62,8 @@ class PagamentoEntityTest {
                 .dataCadastro(LocalDate.of(2023, 2, 3).toString())
                 .horaCadastro(LocalTime.of(15, 50).toString())
                 .valorBruto(650.0)
-                .valorTaxaIntegradora(640.0)
-                .valorTaxaSistema(640.0)
                 .descricao("Assinatura de plano Pro")
                 .dataVencimento(LocalDate.of(2023, 2, 5).toString())
-                .finalCartao("123")
                 .formaPagamento(null)
                 .statusPagamento(null)
                 .build();

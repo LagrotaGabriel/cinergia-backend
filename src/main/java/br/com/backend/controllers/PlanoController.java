@@ -2,8 +2,10 @@ package br.com.backend.controllers;
 
 import br.com.backend.config.security.JWTUtil;
 import br.com.backend.models.dto.plano.request.PlanoRequest;
+import br.com.backend.models.dto.plano.response.DadosPlanoResponse;
 import br.com.backend.models.dto.plano.response.PlanoPageResponse;
 import br.com.backend.models.dto.plano.response.PlanoResponse;
+import br.com.backend.services.exceptions.ObjectNotFoundException;
 import br.com.backend.services.plano.PlanoService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -101,6 +103,48 @@ public class PlanoController {
                 busca == null ? "Nulo" : busca);
         return ResponseEntity.ok().body(planoService.realizaBuscaPaginadaPorPlanos(
                 jwtUtil.obtemEmpresaAtiva(req), pageable, busca));
+    }
+
+    @GetMapping("/{id}")
+    @ApiOperation(
+            value = "Busca de plano por id",
+            notes = "Esse endpoint tem como objetivo realizar a busca de um plano pelo id recebido pelo parâmetro",
+            produces = MediaType.APPLICATION_JSON,
+            consumes = MediaType.APPLICATION_JSON
+    )
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "A busca de plano por id foi realizada com sucesso",
+                    response = PlanoResponse.class),
+            @ApiResponse(code = 400, message = "Nenhum plano foi encontrado com o id informado",
+                    response = ObjectNotFoundException.class),
+    })
+    @PreAuthorize("hasAnyRole('EMPRESA', 'ADMIN')")
+    public ResponseEntity<PlanoResponse> obtemPlanoPorId(@PathVariable(value = "id") Long id,
+                                                         HttpServletRequest req) {
+        log.info("Endpoint de busca de plano por id acessado. ID recebido: {}", id);
+        return ResponseEntity.ok().body(planoService
+                .realizaBuscaDePlanoPorId(jwtUtil.obtemEmpresaAtiva(req), id));
+    }
+
+    @GetMapping("dados/{id}")
+    @ApiOperation(
+            value = "Busca de plano por id",
+            notes = "Esse endpoint tem como objetivo realizar a busca dos dados de um plano pelo id recebido pelo parâmetro",
+            produces = MediaType.APPLICATION_JSON,
+            consumes = MediaType.APPLICATION_JSON
+    )
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "A busca dos dados de um plano por id foi realizada com sucesso",
+                    response = PlanoResponse.class),
+            @ApiResponse(code = 400, message = "Nenhum plano foi encontrado com o id informado",
+                    response = ObjectNotFoundException.class),
+    })
+    @PreAuthorize("hasAnyRole('EMPRESA', 'ADMIN')")
+    public ResponseEntity<DadosPlanoResponse> obtemDadosPlanoPorId(@PathVariable(value = "id") Long id,
+                                                              HttpServletRequest req) {
+        log.info("Endpoint de busca de dados de plano por id acessado. ID recebido: {}", id);
+        return ResponseEntity.ok().body(planoService
+                .realizaBuscaDeDadosDePlanoPorId(jwtUtil.obtemEmpresaAtiva(req), id));
     }
 
 }
