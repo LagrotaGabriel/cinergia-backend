@@ -22,6 +22,8 @@ public class PagamentoEntity {
     private Long idEmpresaResponsavel;
     @Column(nullable = false)
     private Long idPlanoResponsavel;
+    @Column(nullable = false)
+    private Long idClienteResponsavel;
     private String idAsaas;
     @Column(nullable = false)
     private String dataCadastro;
@@ -36,7 +38,8 @@ public class PagamentoEntity {
     private String descricao;
     @Column(nullable = false)
     private String dataVencimento;
-
+    private String linkCobranca;
+    private String linkBoletoAsaas;
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private FormaPagamentoEnum formaPagamento;

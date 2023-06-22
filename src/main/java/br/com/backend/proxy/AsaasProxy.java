@@ -20,7 +20,7 @@ public interface AsaasProxy {
     ResponseEntity<CriaClienteAsaasResponse> cadastraNovoCliente(@RequestBody CriaClienteAsaasRequest criaClienteAsaasRequest,
                                                                  @RequestHeader(value = "access_token") String accessToken);
 
-    @GetMapping(value = "/subscriptions/{idAssinatura}")
+    @GetMapping(value = "api/v3/subscriptions/{idAssinatura}")
     ResponseEntity<ConsultaAssinaturaResponse> consultaAssinatura(@PathVariable String idAssinatura,
                                                                   @RequestHeader(value = "access_token") String accessToken);
 

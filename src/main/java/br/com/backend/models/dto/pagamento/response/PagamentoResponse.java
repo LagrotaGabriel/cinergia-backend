@@ -17,6 +17,8 @@ public class PagamentoResponse {
     private Double valorLiquido;
     private String descricao;
     private String dataVencimento;
+    private String linkCobranca;
+    private String linkBoletoAsaas;
     private String formaPagamento;
     private String statusPagamento;
 }

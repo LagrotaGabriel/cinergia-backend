@@ -34,6 +34,28 @@ public class PagamentoController {
     @Autowired
     JWTUtil jwtUtil;
 
+    @GetMapping("/cliente/{id}")
+    @ApiOperation(
+            value = "Busca paginada por pagamentos cadastrados em um determinado cliente",
+            notes = "Esse endpoint tem como objetivo realizar a busca paginada de pagamentos cadastrados em um cliente " +
+                    "da empresa logada que acionou a requisição com os filtros de busca enviados",
+            produces = MediaType.APPLICATION_JSON,
+            consumes = MediaType.APPLICATION_JSON
+    )
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "A busca paginada de pagamentos do cliente foi realizada com sucesso",
+                    response = PagamentoPageResponse.class),
+    })
+    @PreAuthorize("hasAnyRole('EMPRESA', 'ADMIN')")
+    public ResponseEntity<PagamentoPageResponse> obtemPagamentosPaginadosDoCliente(
+            @PathVariable(value = "id") Long id,
+            Pageable pageable,
+            HttpServletRequest req) {
+        log.info("Endpoint de busca paginada por pagamentos do cliente acessado");
+        return ResponseEntity.ok().body(pagamentoService.realizaBuscaPaginadaPorPagamentosDoCliente(
+                jwtUtil.obtemEmpresaAtiva(req), pageable, id));
+    }
+
     @GetMapping("/{id}")
     @ApiOperation(
             value = "Busca paginada por pagamentos cadastrados",

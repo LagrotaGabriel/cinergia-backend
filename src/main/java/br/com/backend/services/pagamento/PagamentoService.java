@@ -41,6 +41,23 @@ public class PagamentoService {
     @Autowired
     PlanoService planoService;
 
+    public PagamentoPageResponse realizaBuscaPaginadaPorPagamentosDoCliente(EmpresaEntity empresaLogada,
+                                                                            Pageable pageable,
+                                                                            Long idCliente) {
+        log.debug("Método de serviço de obtenção paginada de pagamentos do cliente acessado.");
+
+        log.debug("Acessando repositório de busca de pagamentos do cliente");
+        Page<PagamentoEntity> pagamentoPage = pagamentoRepository.buscaPorPagamentosDoPlano(pageable, empresaLogada.getId(), idCliente);
+
+        log.debug("Busca de pagamentos por paginação realizada com sucesso. Acessando método de conversão dos objetos do tipo " +
+                "Entity para objetos do tipo Response...");
+        PagamentoPageResponse pagamentoPageResponse = pagamentoTypeConverter.converteListaDePagamentosEntityParaPagamentosResponse(pagamentoPage);
+        log.debug("Conversão de tipagem realizada com sucesso");
+
+        log.info("A busca paginada de pagamentos foi realizada com sucesso");
+        return pagamentoPageResponse;
+    }
+
     public PagamentoPageResponse realizaBuscaPaginadaPorPagamentosDoPlano(EmpresaEntity empresaLogada,
                                                                           Pageable pageable,
                                                                           Long idPlano) {
@@ -54,7 +71,7 @@ public class PagamentoService {
         PagamentoPageResponse pagamentoPageResponse = pagamentoTypeConverter.converteListaDePagamentosEntityParaPagamentosResponse(pagamentoPage);
         log.debug("Conversão de tipagem realizada com sucesso");
 
-        log.info("A busca paginada de planos foi realizada com sucesso");
+        log.info("A busca paginada de pagamentos foi realizada com sucesso");
         return pagamentoPageResponse;
     }
 
@@ -110,10 +127,12 @@ public class PagamentoService {
     public void realizaCriacaoDeNovoPagamento(AtualizacaoCobrancaWebHook atualizacaoCobrancaWebHook,
                                               PlanoEntity planoEntity) {
         log.debug("Iniciando construção do objeto PagamentoEntity com valores recebidos pelo ASAAS...");
+
         PagamentoEntity pagamentoEntity = PagamentoEntity.builder()
                 .idEmpresaResponsavel(planoEntity.getIdEmpresaResponsavel())
                 .idPlanoResponsavel(planoEntity.getId())
                 .idAsaas(atualizacaoCobrancaWebHook.getPayment().getId())
+                .idClienteResponsavel(planoEntity.getIdClienteResponsavel())
                 .dataCadastro(LocalDate.now().toString())
                 .horaCadastro(LocalDate.now().toString())
                 .dataPagamento(null)
@@ -122,6 +141,8 @@ public class PagamentoService {
                 .valorLiquidoAsaas(atualizacaoCobrancaWebHook.getPayment().getNetValue())
                 .descricao(atualizacaoCobrancaWebHook.getPayment().getDescription())
                 .dataVencimento(atualizacaoCobrancaWebHook.getPayment().getDueDate())
+                .linkBoletoAsaas(atualizacaoCobrancaWebHook.getPayment().getBankSlipUrl())
+                .linkCobranca(atualizacaoCobrancaWebHook.getPayment().getInvoiceUrl())
                 .formaPagamento(FormaPagamentoEnum.valueOf(atualizacaoCobrancaWebHook
                         .getPayment().getBillingType().getFormaPagamentoResumida()))
                 .statusPagamento(StatusPagamentoEnum.PENDENTE)
@@ -154,10 +175,16 @@ public class PagamentoService {
 
         log.debug("Atualizando variáveis do objeto pagamento...");
         pagamentoEntity.setIdPlanoResponsavel(planoEntity.getId());
+        pagamentoEntity.setIdEmpresaResponsavel(planoEntity.getIdEmpresaResponsavel());
+        pagamentoEntity.setIdAsaas(atualizacaoCobrancaWebHook.getPayment().getId());
+        pagamentoEntity.setIdClienteResponsavel(planoEntity.getIdClienteResponsavel());
+        pagamentoEntity.setIdPlanoResponsavel(planoEntity.getId());
         pagamentoEntity.setDataPagamento(LocalDate.now().toString());
         pagamentoEntity.setHoraPagamento(LocalTime.now().toString());
         pagamentoEntity.setValorBruto(atualizacaoCobrancaWebHook.getPayment().getValue());
         pagamentoEntity.setValorLiquidoAsaas(atualizacaoCobrancaWebHook.getPayment().getNetValue());
+        pagamentoEntity.setLinkBoletoAsaas(atualizacaoCobrancaWebHook.getPayment().getBankSlipUrl());
+        pagamentoEntity.setLinkCobranca(atualizacaoCobrancaWebHook.getPayment().getInvoiceUrl());
         pagamentoEntity.setFormaPagamento(FormaPagamentoEnum.valueOf(atualizacaoCobrancaWebHook
                 .getPayment().getBillingType().getFormaPagamentoResumida()));
         pagamentoEntity.setStatusPagamento(StatusPagamentoEnum.APROVADO);

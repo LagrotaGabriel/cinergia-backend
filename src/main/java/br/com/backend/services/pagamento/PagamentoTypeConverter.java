@@ -58,6 +58,8 @@ public class PagamentoTypeConverter {
                 .valorLiquido(null) //TODO CALCULAR VALOR LÍQUIDO
                 .descricao(pagamento.getDescricao())
                 .dataVencimento(pagamento.getDataVencimento())
+                .linkCobranca(pagamento.getLinkCobranca())
+                .linkBoletoAsaas(pagamento.getLinkBoletoAsaas())
                 .formaPagamento(pagamento.getFormaPagamento().getDesc())
                 .statusPagamento(pagamento.getStatusPagamento().getDesc())
                 .build();
