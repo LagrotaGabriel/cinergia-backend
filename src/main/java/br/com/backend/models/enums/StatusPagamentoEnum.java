@@ -8,7 +8,8 @@ import lombok.Getter;
 public enum StatusPagamentoEnum {
     APROVADO(0, "Aprovado"),
     REPROVADO(1, "Reprovado"),
-    PENDENTE(2, "Pendente");
+    PENDENTE(2, "Pendente"),
+    ATRASADO(3, "Atrasado");
 
     private final int code;
     private final String desc;

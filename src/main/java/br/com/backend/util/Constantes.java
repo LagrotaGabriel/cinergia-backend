@@ -29,4 +29,10 @@ public class Constantes {
     public static final String PLANO_ENCONTRADO =
             "Plano encontrado: {}";
 
+    public static final String INICIANDO_IMPLEMENTACAO_BUSCA_PAGAMENTO_ASAAS =
+            "Iniciando acesso ao método de implementação de busca de pagamento por código ASAAS...";
+
+    public static final String REMOVENDO_PAGAMENTO_DO_PLANO =
+            "Removendo pagamento encontrado do objeto plano: {}";
+
 }

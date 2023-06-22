@@ -84,7 +84,7 @@ public class PagamentoService {
                 break;
             case PAYMENT_OVERDUE:
                 log.debug("Condicional de pagamento VENCIDO acessada");
-                realizaAtualizacaoDePlanoParaPagamentoVencido(plano);
+                realizaAtualizacaoDePlanoParaPagamentoVencido(atualizacaoCobrancaWebHook, plano);
                 log.info("Atualização de plano para pagamento VENCIDO realizada com sucesso");
                 break;
             case PAYMENT_DELETED:
@@ -138,11 +138,11 @@ public class PagamentoService {
 
     public void realizaAtualizacaoDePagamentoRealizado(AtualizacaoCobrancaWebHook atualizacaoCobrancaWebHook,
                                                        PlanoEntity planoEntity) {
-        log.debug("Iniciando acesso ao método de implementação de busca de pagamento por código ASAAS...");
+        log.debug(Constantes.INICIANDO_IMPLEMENTACAO_BUSCA_PAGAMENTO_ASAAS);
         PagamentoEntity pagamentoEntity = pagamentoRepositoryImpl
                 .implementaBuscaPorCodigoPagamentoAsaas(atualizacaoCobrancaWebHook.getPayment().getId());
 
-        log.debug("Removendo pagamento encontrado do objeto plano: {}", pagamentoEntity);
+        log.debug(Constantes.REMOVENDO_PAGAMENTO_DO_PLANO, pagamentoEntity);
         planoEntity.getPagamentos().remove(pagamentoEntity);
 
         log.debug("Iniciando setagem da data de vencimento do plano do cliente para o próximo vencimento...");
@@ -170,7 +170,24 @@ public class PagamentoService {
         planoRepositoryImpl.implementaPersistencia(planoEntity);
     }
 
-    public void realizaAtualizacaoDePlanoParaPagamentoVencido(PlanoEntity planoEntity) {
+    public void realizaAtualizacaoDePlanoParaPagamentoVencido(AtualizacaoCobrancaWebHook atualizacaoCobrancaWebHook,
+                                                              PlanoEntity planoEntity) {
+
+        log.debug("Método de atualização de pagamento e plano como vencidos acessado");
+
+        log.debug(Constantes.INICIANDO_IMPLEMENTACAO_BUSCA_PAGAMENTO_ASAAS);
+        PagamentoEntity pagamentoEntity = pagamentoRepositoryImpl
+                .implementaBuscaPorCodigoPagamentoAsaas(atualizacaoCobrancaWebHook.getPayment().getId());
+
+        log.debug(Constantes.REMOVENDO_PAGAMENTO_DO_PLANO, pagamentoEntity);
+        planoEntity.getPagamentos().remove(pagamentoEntity);
+
+        log.debug("Setando status do pagamento como atrasado...");
+        pagamentoEntity.setStatusPagamento(StatusPagamentoEnum.ATRASADO);
+
+        log.debug("Adicionado pagamento atualizado à lista de pagamentos do plano...");
+        planoEntity.getPagamentos().add(pagamentoEntity);
+
         log.debug("Setando plano do cliente como INATIVO...");
         planoEntity.setStatusPlano(StatusPlanoEnum.INATIVO);
 
@@ -180,11 +197,11 @@ public class PagamentoService {
 
     public void realizaAtualizacaoDePagamentoAlterado(AtualizacaoCobrancaWebHook atualizacaoCobrancaWebHook,
                                                       PlanoEntity planoEntity) {
-        log.debug("Iniciando acesso ao método de implementação de busca de pagamento por código ASAAS...");
+        log.debug(Constantes.INICIANDO_IMPLEMENTACAO_BUSCA_PAGAMENTO_ASAAS);
         PagamentoEntity pagamentoEntity = pagamentoRepositoryImpl
                 .implementaBuscaPorCodigoPagamentoAsaas(atualizacaoCobrancaWebHook.getPayment().getId());
 
-        log.debug("Removendo pagamento encontrado do objeto plano: {}", pagamentoEntity);
+        log.debug(Constantes.REMOVENDO_PAGAMENTO_DO_PLANO, pagamentoEntity);
         planoEntity.getPagamentos().remove(pagamentoEntity);
 
         log.debug("Atualizando variáveis do objeto pagamento...");
