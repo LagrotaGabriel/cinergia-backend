@@ -11,14 +11,17 @@ import br.com.backend.proxy.webhooks.cobranca.AtualizacaoCobrancaWebHook;
 import br.com.backend.repositories.pagamento.PagamentoRepository;
 import br.com.backend.repositories.pagamento.impl.PagamentoRepositoryImpl;
 import br.com.backend.repositories.plano.impl.PlanoRepositoryImpl;
+import br.com.backend.services.empresa.EmpresaService;
 import br.com.backend.services.plano.PlanoService;
 import br.com.backend.util.Constantes;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.beans.Transient;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
@@ -40,6 +43,26 @@ public class PagamentoService {
 
     @Autowired
     PlanoService planoService;
+
+    @Autowired
+    EmpresaService empresaService;
+
+    @Value("${TAXA_SISTEMA_PERCENTUAL}")
+    Double taxaSistemaPercentual;
+    @Value("${TAXA_SISTEMA_FIXA}")
+    Double taxaSistemaFixa;
+    @Value("${TAXA_ASAAS_PERCENTUAL_BOLETO}")
+    Double taxaAsaasBoletoPercentual;
+    @Value("${TAXA_ASAAS_FIXA_BOLETO}")
+    Double taxaAsaasBoletoFixa;
+    @Value("${TAXA_ASAAS_PERCENTUAL_PIX}")
+    Double taxaAsaasPixPercentual;
+    @Value("${TAXA_ASAAS_FIXA_PIX}")
+    Double taxaAsaasPixFixa;
+    @Value("${TAXA_ASAAS_PERCENTUAL_CARTAO_CREDITO}")
+    Double taxaAsaasCartaoCreditoPercentual;
+    @Value("${TAXA_ASAAS_FIXA_CARTAO_CREDITO}")
+    Double taxaAsaasCartaoCreditoFixa;
 
     public PagamentoPageResponse realizaBuscaPaginadaPorPagamentosDoCliente(EmpresaEntity empresaLogada,
                                                                             Pageable pageable,
@@ -89,6 +112,41 @@ public class PagamentoService {
 
         log.info(Constantes.BUSCA_PAGINADA_PAGAMENTOS_SUCESSO);
         return pagamentoPageResponse;
+    }
+
+    public Double calculaValorLiquidoPagamento(PagamentoEntity pagamento) {
+
+        log.debug("Método de cálculo de valor líquido do pagamento acessado");
+
+        log.debug("Iniciando setagem das variáveis do método...");
+        Double valorBrutoPagamento = pagamento.getValorBruto();
+        double taxaTotal = 0.0;
+
+        log.debug("Rodando estrutura condicional para direcionar taxa para sua forma de pagamento correspondente...");
+        switch (pagamento.getFormaPagamento()) {
+            case PIX: {
+                taxaTotal += (((valorBrutoPagamento/100) * taxaAsaasPixPercentual) + taxaAsaasPixFixa);
+                break;
+            }
+            case BOLETO: {
+                taxaTotal += (((valorBrutoPagamento/100) * taxaAsaasBoletoPercentual) + taxaAsaasBoletoFixa);
+                break;
+            }
+            case CREDIT_CARD: {
+                taxaTotal += (((valorBrutoPagamento/100) * taxaAsaasCartaoCreditoPercentual) + taxaAsaasCartaoCreditoFixa);
+                break;
+            }
+            default: {
+                taxaTotal += (((valorBrutoPagamento/100) * taxaAsaasPixPercentual) + taxaAsaasPixFixa);
+            }
+        }
+        log.debug("Taxa da integradora calculada: {}", taxaTotal);
+
+        taxaTotal += (((valorBrutoPagamento/100) * taxaSistemaPercentual) + taxaSistemaFixa);
+        log.debug("Taxa total calculada: {}", taxaTotal);
+
+        log.debug("Método executado com sucesso. Retornando valor líquido: {}...", valorBrutoPagamento - taxaTotal);
+        return (valorBrutoPagamento - taxaTotal);
     }
 
     public void realizaTratamentoWebhookCobranca(AtualizacaoCobrancaWebHook atualizacaoCobrancaWebHook) {
@@ -174,6 +232,7 @@ public class PagamentoService {
         planoRepositoryImpl.implementaPersistencia(planoEntity);
     }
 
+    @Transient
     public void realizaAtualizacaoDePagamentoRealizado(AtualizacaoCobrancaWebHook atualizacaoCobrancaWebHook,
                                                        PlanoEntity planoEntity) {
         log.debug(Constantes.INICIANDO_IMPLEMENTACAO_BUSCA_PAGAMENTO_ASAAS);
@@ -213,6 +272,9 @@ public class PagamentoService {
 
         log.debug(Constantes.INICIANDO_IMPL_PERSISTENCIA_PLANO);
         planoRepositoryImpl.implementaPersistencia(planoEntity);
+
+        log.debug("Iniciando acesso ao método de atualização do saldo da empresa...");
+        empresaService.adicionaSaldoContaEmpresa(pagamentoEntity);
     }
 
     public void realizaAtualizacaoDePlanoParaPagamentoVencido(AtualizacaoCobrancaWebHook atualizacaoCobrancaWebHook,
