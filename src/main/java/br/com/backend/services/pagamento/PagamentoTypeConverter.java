@@ -50,19 +50,21 @@ public class PagamentoTypeConverter {
 
         log.debug("Iniciando construção do objeto PagamentoResponse...");
         PagamentoResponse pagamentoResponse = PagamentoResponse.builder()
+                .id(pagamento.getId())
                 .dataCadastro(pagamento.getDataCadastro())
                 .horaCadastro(pagamento.getHoraCadastro())
                 .dataPagamento(pagamento.getDataPagamento())
                 .horaPagamento(pagamento.getHoraPagamento())
                 .valorBruto(pagamento.getValorBruto())
-                .valorLiquido(null) //TODO CALCULAR VALOR LÍQUIDO
                 .descricao(pagamento.getDescricao())
                 .dataVencimento(pagamento.getDataVencimento())
                 .linkCobranca(pagamento.getLinkCobranca())
                 .linkBoletoAsaas(pagamento.getLinkBoletoAsaas())
+                .linkComprovante(pagamento.getLinkComprovante())
                 .formaPagamento(pagamento.getFormaPagamento().getDesc())
                 .statusPagamento(pagamento.getStatusPagamento().getDesc())
                 .build();
+
         log.debug("Objeto PagamentoResponse buildado com sucesso. Retornando...");
         return pagamentoResponse;
     }

@@ -20,5 +20,11 @@ public interface PagamentoRepository extends JpaRepository<PagamentoEntity, Long
             "p.idEmpresaResponsavel = ?1 and p.idClienteResponsavel = ?2")
     Page<PagamentoEntity> buscaPorPagamentosDoCliente(Pageable pageable, Long idEmpresa, Long idCliente);
 
+    @Query("SELECT p FROM PagamentoEntity p WHERE p.idEmpresaResponsavel = ?1")
+    Page<PagamentoEntity> buscaPorPagamentos(Pageable pageable, Long id);
+
+    @Query("SELECT p FROM PagamentoEntity p WHERE upper(p.descricao) LIKE ?1% and p.idEmpresaResponsavel = ?2")
+    Page<PagamentoEntity> buscaPorPagamentosTypeAhead(Pageable pageable, String busca, Long id);
+
     Optional<PagamentoEntity> findByIdAsaas(String asaasId);
 }

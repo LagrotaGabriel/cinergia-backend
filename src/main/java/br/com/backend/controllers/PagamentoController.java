@@ -78,4 +78,28 @@ public class PagamentoController {
                 jwtUtil.obtemEmpresaAtiva(req), pageable, id));
     }
 
+    @GetMapping
+    @ApiOperation(
+            value = "Busca paginada por pagamentos cadastrados",
+            notes = "Esse endpoint tem como objetivo realizar a busca paginada de pagamentos cadastrados na empresa " +
+                    "logada que acionou a requisição com os filtros de busca enviados",
+            produces = MediaType.APPLICATION_JSON,
+            consumes = MediaType.APPLICATION_JSON
+    )
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "A busca paginada de pagamentos foi realizada com sucesso",
+                    response = PagamentoPageResponse.class),
+    })
+    @PreAuthorize("hasAnyRole('EMPRESA', 'ADMIN')")
+    public ResponseEntity<PagamentoPageResponse> obtemPagamentosPaginados(
+            @RequestParam(value = "busca", required = false) String busca,
+            Pageable pageable,
+            HttpServletRequest req) {
+        log.info("Endpoint de busca paginada por pagamentos do cliente acessado. Filtros de busca: {}",
+                busca == null ? "Nulo" : busca);
+        return ResponseEntity.ok().body(pagamentoService.realizaBuscaPaginadaPorPagamentos(
+                jwtUtil.obtemEmpresaAtiva(req), pageable, busca));
+    }
+
+
 }

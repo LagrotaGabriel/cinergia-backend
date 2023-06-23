@@ -9,6 +9,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PagamentoResponse {
+    private Long id;
     private String dataCadastro;
     private String horaCadastro;
     private String dataPagamento;
@@ -19,6 +20,7 @@ public class PagamentoResponse {
     private String dataVencimento;
     private String linkCobranca;
     private String linkBoletoAsaas;
+    private String linkComprovante;
     private String formaPagamento;
     private String statusPagamento;
 }

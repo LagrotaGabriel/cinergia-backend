@@ -47,14 +47,13 @@ public class PagamentoService {
         log.debug("Método de serviço de obtenção paginada de pagamentos do cliente acessado.");
 
         log.debug("Acessando repositório de busca de pagamentos do cliente");
-        Page<PagamentoEntity> pagamentoPage = pagamentoRepository.buscaPorPagamentosDoPlano(pageable, empresaLogada.getId(), idCliente);
+        Page<PagamentoEntity> pagamentoPage = pagamentoRepository.buscaPorPagamentosDoCliente(pageable, empresaLogada.getId(), idCliente);
 
-        log.debug("Busca de pagamentos por paginação realizada com sucesso. Acessando método de conversão dos objetos do tipo " +
-                "Entity para objetos do tipo Response...");
+        log.debug(Constantes.CONVERTE_PAGAMENTO_DE_ENTITY_PARA_RESPONSE);
         PagamentoPageResponse pagamentoPageResponse = pagamentoTypeConverter.converteListaDePagamentosEntityParaPagamentosResponse(pagamentoPage);
-        log.debug("Conversão de tipagem realizada com sucesso");
+        log.debug(Constantes.CONVERSAO_TIPAGEM_SUCESSO);
 
-        log.info("A busca paginada de pagamentos foi realizada com sucesso");
+        log.info(Constantes.BUSCA_PAGINADA_PAGAMENTOS_SUCESSO);
         return pagamentoPageResponse;
     }
 
@@ -66,12 +65,29 @@ public class PagamentoService {
         log.debug("Acessando repositório de busca de pagamentos");
         Page<PagamentoEntity> pagamentoPage = pagamentoRepository.buscaPorPagamentosDoPlano(pageable, empresaLogada.getId(), idPlano);
 
-        log.debug("Busca de pagamentos por paginação realizada com sucesso. Acessando método de conversão dos objetos do tipo " +
-                "Entity para objetos do tipo Response...");
+        log.debug(Constantes.CONVERTE_PAGAMENTO_DE_ENTITY_PARA_RESPONSE);
         PagamentoPageResponse pagamentoPageResponse = pagamentoTypeConverter.converteListaDePagamentosEntityParaPagamentosResponse(pagamentoPage);
-        log.debug("Conversão de tipagem realizada com sucesso");
+        log.debug(Constantes.CONVERSAO_TIPAGEM_SUCESSO);
 
-        log.info("A busca paginada de pagamentos foi realizada com sucesso");
+        log.info(Constantes.BUSCA_PAGINADA_PAGAMENTOS_SUCESSO);
+        return pagamentoPageResponse;
+    }
+
+    public PagamentoPageResponse realizaBuscaPaginadaPorPagamentos(EmpresaEntity empresaLogada,
+                                                                   Pageable pageable,
+                                                                   String campoBusca) {
+        log.debug("Método de serviço de obtenção paginada de pagamentos acessado.");
+
+        log.debug("Acessando repositório de busca de clientes");
+        Page<PagamentoEntity> pagamentoPage = campoBusca != null && !campoBusca.isEmpty()
+                ? pagamentoRepository.buscaPorPagamentosTypeAhead(pageable, (campoBusca).toUpperCase(), empresaLogada.getId())
+                : pagamentoRepository.buscaPorPagamentos(pageable, empresaLogada.getId());
+
+        log.debug(Constantes.CONVERTE_PAGAMENTO_DE_ENTITY_PARA_RESPONSE);
+        PagamentoPageResponse pagamentoPageResponse = pagamentoTypeConverter.converteListaDePagamentosEntityParaPagamentosResponse(pagamentoPage);
+        log.debug(Constantes.CONVERSAO_TIPAGEM_SUCESSO);
+
+        log.info(Constantes.BUSCA_PAGINADA_PAGAMENTOS_SUCESSO);
         return pagamentoPageResponse;
     }
 
@@ -143,6 +159,7 @@ public class PagamentoService {
                 .dataVencimento(atualizacaoCobrancaWebHook.getPayment().getDueDate())
                 .linkBoletoAsaas(atualizacaoCobrancaWebHook.getPayment().getBankSlipUrl())
                 .linkCobranca(atualizacaoCobrancaWebHook.getPayment().getInvoiceUrl())
+                .linkComprovante(atualizacaoCobrancaWebHook.getPayment().getTransactionReceiptUrl())
                 .formaPagamento(FormaPagamentoEnum.valueOf(atualizacaoCobrancaWebHook
                         .getPayment().getBillingType().getFormaPagamentoResumida()))
                 .statusPagamento(StatusPagamentoEnum.PENDENTE)
@@ -185,6 +202,7 @@ public class PagamentoService {
         pagamentoEntity.setValorLiquidoAsaas(atualizacaoCobrancaWebHook.getPayment().getNetValue());
         pagamentoEntity.setLinkBoletoAsaas(atualizacaoCobrancaWebHook.getPayment().getBankSlipUrl());
         pagamentoEntity.setLinkCobranca(atualizacaoCobrancaWebHook.getPayment().getInvoiceUrl());
+        pagamentoEntity.setLinkComprovante(atualizacaoCobrancaWebHook.getPayment().getTransactionReceiptUrl());
         pagamentoEntity.setFormaPagamento(FormaPagamentoEnum.valueOf(atualizacaoCobrancaWebHook
                 .getPayment().getBillingType().getFormaPagamentoResumida()));
         pagamentoEntity.setStatusPagamento(StatusPagamentoEnum.APROVADO);

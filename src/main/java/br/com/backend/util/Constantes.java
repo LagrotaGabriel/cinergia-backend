@@ -35,4 +35,14 @@ public class Constantes {
     public static final String REMOVENDO_PAGAMENTO_DO_PLANO =
             "Removendo pagamento encontrado do objeto plano: {}";
 
+    public static final String BUSCA_PAGINADA_PAGAMENTOS_SUCESSO =
+            "A busca paginada de pagamentos foi realizada com sucesso";
+
+    public static final String CONVERSAO_TIPAGEM_SUCESSO =
+            "Conversão de tipagem realizada com sucesso";
+
+    public static final String CONVERTE_PAGAMENTO_DE_ENTITY_PARA_RESPONSE =
+            "Busca de pagamentos por paginação realizada com sucesso. Acessando método de conversão dos objetos do tipo " +
+                    "Entity para objetos do tipo Response...";
+
 }

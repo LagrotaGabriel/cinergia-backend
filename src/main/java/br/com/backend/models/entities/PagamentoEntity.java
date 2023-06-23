@@ -40,6 +40,7 @@ public class PagamentoEntity {
     private String dataVencimento;
     private String linkCobranca;
     private String linkBoletoAsaas;
+    private String linkComprovante;
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private FormaPagamentoEnum formaPagamento;
