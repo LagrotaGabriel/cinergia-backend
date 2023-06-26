@@ -24,6 +24,7 @@ public class PagamentoEntity {
     private Long idPlanoResponsavel;
     @Column(nullable = false)
     private Long idClienteResponsavel;
+    @Column(unique = true)
     private String idAsaas;
     @Column(nullable = false)
     private String dataCadastro;

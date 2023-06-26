@@ -3,6 +3,7 @@ package br.com.backend.services.plano;
 import br.com.backend.models.dto.plano.response.PlanoPageResponse;
 import br.com.backend.models.dto.plano.response.PlanoResponse;
 import br.com.backend.models.entities.PlanoEntity;
+import br.com.backend.models.enums.NotificacaoEnum;
 import br.com.backend.models.enums.PeriodicidadeEnum;
 import br.com.backend.proxy.plano.request.CycleEnum;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +20,14 @@ public class PlanoTypeConverter {
     public PlanoResponse convertePlanoEntityParaPlanoResponse(PlanoEntity plano) {
         log.debug("Método de conversão de objeto do tipo PlanoEntity para objeto do tipo PlanoResponse acessado");
 
+        List<String> notificacoesResponse = new ArrayList<>();
+
+        if (!plano.getNotificacoes().isEmpty()) {
+            for (NotificacaoEnum notificacao: plano.getNotificacoes()) {
+                notificacoesResponse.add(notificacao.getDesc());
+            }
+        }
+
         log.debug("Iniciando construção do objeto PlanoResponse...");
         PlanoResponse planoResponse = PlanoResponse.builder()
                 .id(plano.getId())
@@ -31,6 +40,7 @@ public class PlanoTypeConverter {
                 .formaPagamento(plano.getFormaPagamento().getDesc())
                 .statusPlano(plano.getStatusPlano().getDesc())
                 .periodicidade(plano.getPeriodicidade().getDesc())
+                .notificacoes(notificacoesResponse)
                 .build();
         log.debug("Objeto PlanoResponse buildado com sucesso. Retornando...");
         return planoResponse;

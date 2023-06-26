@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import java.text.ParseException;
 
 @Slf4j
 @CrossOrigin
@@ -46,7 +47,8 @@ public class CobrancaWebHook {
     })
     @PostMapping(value = "/pagamento")
     public ResponseEntity<HttpStatus> recebeStatusPagamentoAsaas(@RequestBody AtualizacaoCobrancaWebHook atualizacaoCobrancaWebHook,
-                                                                 @RequestHeader(value = "asaas-access-token") String token) {
+                                                                 @RequestHeader(value = "asaas-access-token") String token)
+            throws ParseException {
         log.info("Webhook ASAAS de atualização do status de cobrança recebido: {}", atualizacaoCobrancaWebHook);
         webHookTokenValidation.realizaValidacaoToken(token);
         pagamentoService.realizaTratamentoWebhookCobranca(atualizacaoCobrancaWebHook);

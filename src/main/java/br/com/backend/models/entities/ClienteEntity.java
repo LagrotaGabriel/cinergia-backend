@@ -27,7 +27,7 @@ public class ClienteEntity {
     @Column(nullable = false)
     private Long idEmpresaResponsavel;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String asaasId;
 
     @Column(nullable = false, updatable = false)

@@ -26,6 +26,7 @@ public class PlanoEntity {
     private Long idEmpresaResponsavel;
     @Column(nullable = false)
     private Long idClienteResponsavel;
+    @Column(unique = true)
     private String idAsaas;
     @Column(nullable = false)
     private String dataCadastro;

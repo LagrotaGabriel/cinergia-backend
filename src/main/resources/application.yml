@@ -1,4 +1,18 @@
 spring:
+  mail:
+    host: email-smtp.us-east-1.amazonaws.com
+    port: 587
+    username: AKIA6JI6XORW2GAQIZFY
+    password: BLpLpiRstB70vn4tScyf17+fv4Q1/LJSIdnq3dgONrbA
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+          connectiontimeout: 5000
+          timeout: 3000
+          writetimeout: 5000
   sql:
     init:
       mode: never
@@ -20,6 +34,11 @@ spring:
 jwt:
   secret: ${JWT_SECRET}
   expiration: 604800000
+
+#AWS
+AWS_ACCESS_KEY: ${AWS_ACCESS}
+AWS_SECRET_KEY: ${AWS_SECRET}
+EMAIL_SUBSY_AWS: ${EMAIL_AWS}
 
 # ASAAS
 URL_ASAAS: {$URL_ASAAS}

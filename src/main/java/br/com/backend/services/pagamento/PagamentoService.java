@@ -1,27 +1,34 @@
 package br.com.backend.services.pagamento;
 
 import br.com.backend.models.dto.pagamento.response.PagamentoPageResponse;
+import br.com.backend.models.entities.ClienteEntity;
 import br.com.backend.models.entities.PagamentoEntity;
 import br.com.backend.models.entities.PlanoEntity;
 import br.com.backend.models.entities.empresa.EmpresaEntity;
 import br.com.backend.models.enums.FormaPagamentoEnum;
+import br.com.backend.models.enums.NotificacaoEnum;
 import br.com.backend.models.enums.StatusPagamentoEnum;
 import br.com.backend.models.enums.StatusPlanoEnum;
 import br.com.backend.proxy.webhooks.cobranca.AtualizacaoCobrancaWebHook;
+import br.com.backend.repositories.cliente.impl.ClienteRepositoryImpl;
 import br.com.backend.repositories.pagamento.PagamentoRepository;
 import br.com.backend.repositories.pagamento.impl.PagamentoRepositoryImpl;
 import br.com.backend.repositories.plano.impl.PlanoRepositoryImpl;
+import br.com.backend.services.email.services.EmailService;
 import br.com.backend.services.empresa.EmpresaService;
 import br.com.backend.services.plano.PlanoService;
 import br.com.backend.util.Constantes;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.beans.Transient;
+import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
@@ -39,6 +46,9 @@ public class PagamentoService {
     PlanoRepositoryImpl planoRepositoryImpl;
 
     @Autowired
+    ClienteRepositoryImpl clienteRepositoryImpl;
+
+    @Autowired
     PagamentoTypeConverter pagamentoTypeConverter;
 
     @Autowired
@@ -46,6 +56,9 @@ public class PagamentoService {
 
     @Autowired
     EmpresaService empresaService;
+
+    @Autowired
+    EmailService emailService;
 
     @Value("${TAXA_SISTEMA_PERCENTUAL}")
     Double taxaSistemaPercentual;
@@ -125,31 +138,31 @@ public class PagamentoService {
         log.debug("Rodando estrutura condicional para direcionar taxa para sua forma de pagamento correspondente...");
         switch (pagamento.getFormaPagamento()) {
             case PIX: {
-                taxaTotal += (((valorBrutoPagamento/100) * taxaAsaasPixPercentual) + taxaAsaasPixFixa);
+                taxaTotal += (((valorBrutoPagamento / 100) * taxaAsaasPixPercentual) + taxaAsaasPixFixa);
                 break;
             }
             case BOLETO: {
-                taxaTotal += (((valorBrutoPagamento/100) * taxaAsaasBoletoPercentual) + taxaAsaasBoletoFixa);
+                taxaTotal += (((valorBrutoPagamento / 100) * taxaAsaasBoletoPercentual) + taxaAsaasBoletoFixa);
                 break;
             }
             case CREDIT_CARD: {
-                taxaTotal += (((valorBrutoPagamento/100) * taxaAsaasCartaoCreditoPercentual) + taxaAsaasCartaoCreditoFixa);
+                taxaTotal += (((valorBrutoPagamento / 100) * taxaAsaasCartaoCreditoPercentual) + taxaAsaasCartaoCreditoFixa);
                 break;
             }
             default: {
-                taxaTotal += (((valorBrutoPagamento/100) * taxaAsaasPixPercentual) + taxaAsaasPixFixa);
+                taxaTotal += (((valorBrutoPagamento / 100) * taxaAsaasPixPercentual) + taxaAsaasPixFixa);
             }
         }
         log.debug("Taxa da integradora calculada: {}", taxaTotal);
 
-        taxaTotal += (((valorBrutoPagamento/100) * taxaSistemaPercentual) + taxaSistemaFixa);
+        taxaTotal += (((valorBrutoPagamento / 100) * taxaSistemaPercentual) + taxaSistemaFixa);
         log.debug("Taxa total calculada: {}", taxaTotal);
 
         log.debug("Método executado com sucesso. Retornando valor líquido: {}...", valorBrutoPagamento - taxaTotal);
         return (valorBrutoPagamento - taxaTotal);
     }
 
-    public void realizaTratamentoWebhookCobranca(AtualizacaoCobrancaWebHook atualizacaoCobrancaWebHook) {
+    public void realizaTratamentoWebhookCobranca(AtualizacaoCobrancaWebHook atualizacaoCobrancaWebHook) throws ParseException {
 
         log.debug("Método 'motor de distruição' de Webhook de atualização de cobrança acessado");
 
@@ -197,11 +210,16 @@ public class PagamentoService {
         }
     }
 
-
     public void realizaCriacaoDeNovoPagamento(AtualizacaoCobrancaWebHook atualizacaoCobrancaWebHook,
-                                              PlanoEntity planoEntity) {
-        log.debug("Iniciando construção do objeto PagamentoEntity com valores recebidos pelo ASAAS...");
+                                              PlanoEntity planoEntity) throws ParseException {
 
+        log.debug("Método de criação de novo pagamento acessado");
+
+        log.debug("Iniciando acesso ao método de implementação de busca de cliente por id...");
+        ClienteEntity cliente = clienteRepositoryImpl.implementaBuscaPorId(planoEntity.getIdClienteResponsavel(),
+                planoEntity.getIdEmpresaResponsavel());
+
+        log.debug("Iniciando construção do objeto PagamentoEntity com valores recebidos pelo ASAAS...");
         PagamentoEntity pagamentoEntity = PagamentoEntity.builder()
                 .idEmpresaResponsavel(planoEntity.getIdEmpresaResponsavel())
                 .idPlanoResponsavel(planoEntity.getId())
@@ -227,9 +245,20 @@ public class PagamentoService {
         log.debug("Adicionando objeto pagamento criado à lista de pagamentos do plano...");
         planoEntity.getPagamentos().add(pagamentoEntity);
 
-        log.debug("Iniciando acesso ao método de implementação de persistência do plano para o persistir com sua lista " +
-                "de pagamentos atualizada...");
-        planoRepositoryImpl.implementaPersistencia(planoEntity);
+        try {
+            log.debug("Iniciando acesso ao método de implementação de persistência do plano para o persistir com sua lista " +
+                    "de pagamentos atualizada...");
+            planoRepositoryImpl.implementaPersistencia(planoEntity);
+
+            if (planoEntity.getNotificacoes().contains(NotificacaoEnum.EMAIL) && cliente.getEmail() != null) {
+                log.debug("Iniciando acesso ao serviço de envio de e-mails...");
+                emailService.enviarEmailCobranca(pagamentoEntity, planoEntity, cliente);
+            }
+        }
+        catch (DataIntegrityViolationException dataIntegrityViolationException) {
+            log.warn("Recebido webhook duplicado para criação de cobrança: {}. Nenhuma persistência foi realizada",
+                    dataIntegrityViolationException.getMessage());
+        }
     }
 
     @Transient

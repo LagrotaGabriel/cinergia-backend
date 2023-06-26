@@ -1,10 +1,8 @@
 package br.com.backend.models.dto.plano.response;
 
-import br.com.backend.models.enums.NotificacaoEnum;
 import lombok.*;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 
 @Builder
 @ToString
@@ -23,6 +21,5 @@ public class PlanoResponse {
     private String formaPagamento;
     private String statusPlano;
     private String periodicidade;
-
-    protected Set<NotificacaoEnum> notificacoes = new HashSet<>();
+    protected List<String> notificacoes;
 }

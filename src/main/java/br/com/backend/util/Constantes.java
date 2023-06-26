@@ -6,7 +6,6 @@ public class Constantes {
     }
 
     public static final String ERRO_CRIACAO_ASSINATURA_ASAAS = "Ocorreu um erro no processo de criação da assinatura: ";
-    public static final String VALOR_RETORNADO_INTEGRADORA_NULO = "O valor retornado pela integradora na criação da subconta é nulo";
     public static final String ERRO_CRIACAO_CLIENTE_ASAAS = "Ocorreu um erro no processo de criação do cliente na integradora: ";
     public static final String CONVERSAO_DE_TIPAGEM_COM_SUCESSO = "Conversão de tipagem realizada com sucesso";
 
@@ -44,5 +43,12 @@ public class Constantes {
     public static final String CONVERTE_PAGAMENTO_DE_ENTITY_PARA_RESPONSE =
             "Busca de pagamentos por paginação realizada com sucesso. Acessando método de conversão dos objetos do tipo " +
                     "Entity para objetos do tipo Response...";
+
+    public static final String UTF_8 = "UTF-8";
+
+    public static final String DEFAULT_LOWER_CASE_PARAGRAPH = "<p style='padding: 0 1rem; color: #19191d; margin: 0'>";
+    public static final String CLOSE_DIV = "</div>";
+    public static final String CLOSE_PARAGRAPH = "</p>";
+    public static final String LINE_BREAK = "<br/>";
 
 }
