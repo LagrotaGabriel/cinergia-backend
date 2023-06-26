@@ -11,6 +11,7 @@ import br.com.backend.models.enums.StatusPagamentoEnum;
 import br.com.backend.models.enums.StatusPlanoEnum;
 import br.com.backend.proxy.webhooks.cobranca.AtualizacaoCobrancaWebHook;
 import br.com.backend.repositories.cliente.impl.ClienteRepositoryImpl;
+import br.com.backend.repositories.empresa.impl.EmpresaRepositoryImpl;
 import br.com.backend.repositories.pagamento.PagamentoRepository;
 import br.com.backend.repositories.pagamento.impl.PagamentoRepositoryImpl;
 import br.com.backend.repositories.plano.impl.PlanoRepositoryImpl;
@@ -25,7 +26,6 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.beans.Transient;
 import java.text.ParseException;
@@ -47,6 +47,9 @@ public class PagamentoService {
 
     @Autowired
     ClienteRepositoryImpl clienteRepositoryImpl;
+
+    @Autowired
+    EmpresaRepositoryImpl empresaRepositoryImpl;
 
     @Autowired
     PagamentoTypeConverter pagamentoTypeConverter;
@@ -215,7 +218,7 @@ public class PagamentoService {
 
         log.debug("Método de criação de novo pagamento acessado");
 
-        log.debug("Iniciando acesso ao método de implementação de busca de cliente por id...");
+        log.debug(Constantes.BUSCA_CLIENTE_POR_ID);
         ClienteEntity cliente = clienteRepositoryImpl.implementaBuscaPorId(planoEntity.getIdClienteResponsavel(),
                 planoEntity.getIdEmpresaResponsavel());
 
@@ -251,11 +254,10 @@ public class PagamentoService {
             planoRepositoryImpl.implementaPersistencia(planoEntity);
 
             if (planoEntity.getNotificacoes().contains(NotificacaoEnum.EMAIL) && cliente.getEmail() != null) {
-                log.debug("Iniciando acesso ao serviço de envio de e-mails...");
+                log.debug(Constantes.INICIA_SERVICO_ENVIO_EMAILS);
                 emailService.enviarEmailCobranca(pagamentoEntity, planoEntity, cliente);
             }
-        }
-        catch (DataIntegrityViolationException dataIntegrityViolationException) {
+        } catch (DataIntegrityViolationException dataIntegrityViolationException) {
             log.warn("Recebido webhook duplicado para criação de cobrança: {}. Nenhuma persistência foi realizada",
                     dataIntegrityViolationException.getMessage());
         }
@@ -267,6 +269,13 @@ public class PagamentoService {
         log.debug(Constantes.INICIANDO_IMPLEMENTACAO_BUSCA_PAGAMENTO_ASAAS);
         PagamentoEntity pagamentoEntity = pagamentoRepositoryImpl
                 .implementaBuscaPorCodigoPagamentoAsaas(atualizacaoCobrancaWebHook.getPayment().getId());
+
+        log.debug(Constantes.BUSCA_CLIENTE_POR_ID);
+        ClienteEntity cliente = clienteRepositoryImpl.implementaBuscaPorId(planoEntity.getIdClienteResponsavel(),
+                planoEntity.getIdEmpresaResponsavel());
+
+        log.debug(Constantes.BUSCA_CLIENTE_POR_ID);
+        EmpresaEntity empresa = empresaRepositoryImpl.implementaBuscaPorId(planoEntity.getIdEmpresaResponsavel());
 
         log.debug(Constantes.REMOVENDO_PAGAMENTO_DO_PLANO, pagamentoEntity);
         planoEntity.getPagamentos().remove(pagamentoEntity);
@@ -304,12 +313,21 @@ public class PagamentoService {
 
         log.debug("Iniciando acesso ao método de atualização do saldo da empresa...");
         empresaService.adicionaSaldoContaEmpresa(pagamentoEntity);
+
+        if (planoEntity.getNotificacoes().contains(NotificacaoEnum.EMAIL) && cliente.getEmail() != null) {
+            log.debug(Constantes.INICIA_SERVICO_ENVIO_EMAILS);
+            emailService.enviarEmailSucessoPagamento(pagamentoEntity, planoEntity, cliente, empresa);
+        }
     }
 
     public void realizaAtualizacaoDePlanoParaPagamentoVencido(AtualizacaoCobrancaWebHook atualizacaoCobrancaWebHook,
                                                               PlanoEntity planoEntity) {
 
         log.debug("Método de atualização de pagamento e plano como vencidos acessado");
+
+        log.debug(Constantes.BUSCA_CLIENTE_POR_ID);
+        ClienteEntity cliente = clienteRepositoryImpl.implementaBuscaPorId(planoEntity.getIdClienteResponsavel(),
+                planoEntity.getIdEmpresaResponsavel());
 
         log.debug(Constantes.INICIANDO_IMPLEMENTACAO_BUSCA_PAGAMENTO_ASAAS);
         PagamentoEntity pagamentoEntity = pagamentoRepositoryImpl
@@ -329,6 +347,11 @@ public class PagamentoService {
 
         log.debug(Constantes.INICIANDO_IMPL_PERSISTENCIA_PLANO);
         planoRepositoryImpl.implementaPersistencia(planoEntity);
+
+        if (planoEntity.getNotificacoes().contains(NotificacaoEnum.EMAIL) && cliente.getEmail() != null) {
+            log.debug(Constantes.INICIA_SERVICO_ENVIO_EMAILS);
+            emailService.enviarEmailAtrasoPagamento(pagamentoEntity, planoEntity, cliente);
+        }
     }
 
     public void realizaAtualizacaoDePagamentoAlterado(AtualizacaoCobrancaWebHook atualizacaoCobrancaWebHook,
