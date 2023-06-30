@@ -21,6 +21,8 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     private final AuthenticationManager authenticationManager;
     private final JWTUtil jwtUtil;
 
+    ObjectMapper mapper = new ObjectMapper();
+
     public JWTAuthenticationFilter(AuthenticationManager authenticationManager, JWTUtil jwtUtil) {
         super();
         this.authenticationManager = authenticationManager;
@@ -44,11 +46,13 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     protected void successfulAuthentication(HttpServletRequest req,
                                             HttpServletResponse res,
                                             FilterChain chain,
-                                            Authentication auth) {
+                                            Authentication auth) throws IOException {
         String username = ((UserSS) auth.getPrincipal()).getUsername();
         String token = jwtUtil.generateToken(username);
         res.addHeader("Authorization", "Bearer " + token);
         res.addHeader("access-control-expose-headers", "Authorization");
+        //res.getOutputStream().write(mapper.writeValueAsString(jwtUtil.obtemEmpresaAtivaPeloToken(token)).getBytes(StandardCharsets.UTF_8));
+        res.getWriter().write(mapper.writeValueAsString(jwtUtil.obtemEmpresaAtivaPeloToken(token)));
     }
 
     @Override

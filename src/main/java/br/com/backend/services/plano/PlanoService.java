@@ -7,7 +7,7 @@ import br.com.backend.models.dto.plano.response.PlanoResponse;
 import br.com.backend.models.entities.ClienteEntity;
 import br.com.backend.models.entities.PagamentoEntity;
 import br.com.backend.models.entities.PlanoEntity;
-import br.com.backend.models.entities.empresa.EmpresaEntity;
+import br.com.backend.models.entities.EmpresaEntity;
 import br.com.backend.models.enums.FormaPagamentoEnum;
 import br.com.backend.models.enums.StatusPagamentoEnum;
 import br.com.backend.models.enums.StatusPlanoEnum;

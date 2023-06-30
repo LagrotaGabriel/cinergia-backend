@@ -1,6 +1,6 @@
 package br.com.backend.config.security;
 
-import br.com.backend.models.entities.empresa.EmpresaEntity;
+import br.com.backend.models.entities.EmpresaEntity;
 import br.com.backend.repositories.empresa.EmpresaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;

@@ -1,13 +1,19 @@
 package br.com.backend.services.empresa;
 
 import br.com.backend.models.dto.empresa.request.EmpresaRequest;
+import br.com.backend.models.dto.empresa.response.DadosDashBoardResponse;
 import br.com.backend.models.dto.empresa.response.EmpresaResponse;
+import br.com.backend.models.dto.empresa.response.EmpresaSimplificadaResponse;
 import br.com.backend.models.entities.AcessoSistemaEntity;
 import br.com.backend.models.entities.PagamentoEntity;
-import br.com.backend.models.entities.empresa.EmpresaEntity;
+import br.com.backend.models.entities.EmpresaEntity;
 import br.com.backend.models.enums.PerfilEnum;
 import br.com.backend.repositories.empresa.impl.EmpresaRepositoryImpl;
+import br.com.backend.repositories.pagamento.PagamentoRepository;
+import br.com.backend.repositories.plano.PlanoRepository;
 import br.com.backend.services.pagamento.PagamentoService;
+import br.com.backend.util.Constantes;
+import br.com.backend.util.ConversorDeDados;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -22,6 +28,12 @@ import java.util.Set;
 @Slf4j
 @Service
 public class EmpresaService {
+
+    @Autowired
+    PagamentoRepository pagamentoRepository;
+
+    @Autowired
+    PlanoRepository planoRepository;
 
     @Autowired
     PagamentoService pagamentoService;
@@ -90,6 +102,59 @@ public class EmpresaService {
 
         log.debug("Iniciando persistência da empresa com o saldo atualizado...");
         empresaRepositoryImpl.implementaPersistencia(empresaEntity);
+    }
+
+    public EmpresaSimplificadaResponse obtemDadosSimplificadosEmpresa(EmpresaEntity empresa) {
+        return EmpresaSimplificadaResponse.builder()
+                .nomeEmpresa(empresa.getNomeEmpresa())
+                .saldo(ConversorDeDados.converteValorDoubleParaValorMonetario(empresa.getSaldo()))
+                .build();
+    }
+
+    public DadosDashBoardResponse obtemDadosDashBoardEmpresa(EmpresaEntity empresa) {
+
+        log.debug("Método responsável por obter os dados de dashboard da empresa acessado");
+
+        log.debug("Iniciando obtenção de pagamentos atrasados...");
+        Double pagamentosAtrasados = pagamentoRepository.somaDePagamentosAtrasados(empresa.getId());
+        log.debug("Obtenção de pagamentos atrasados realizada com sucesso: {}", pagamentosAtrasados);
+
+        log.debug("Iniciando obtenção de pagamentos previstos...");
+        Double pagamentosPendentes = pagamentoRepository.somaDePagamentosPrevistos(empresa.getId());
+        log.debug("Obtenção de pagamentos previstos realizada com sucesso: {}", pagamentosPendentes);
+
+        log.debug("Iniciando obtenção de pagamentos confirmados...");
+        Double pagamentosConfirmados = pagamentoRepository.somaDePagamentosConfirmados(empresa.getId());
+        log.debug("Obtenção de pagamentos confirmados realizada com sucesso: {}", pagamentosConfirmados);
+
+        log.debug("Iniciando obtenção de quantidade de assinaturas ativas...");
+        Integer qtdPlanosAtivos = planoRepository.somaQtdAssinaturasAtivas(empresa.getId());
+        log.debug("Obtenção de quantidade de planos ativos realizada com sucesso: {}", qtdPlanosAtivos);
+
+        log.debug("Iniciando obtenção de quantidade de assinaturas inativas...");
+        Integer qtdPlanosInativos = planoRepository.somaQtdAssinaturasInativas(empresa.getId());
+        log.debug("Obtenção de quantidade de planos inativos realizada com sucesso: {}", qtdPlanosInativos);
+
+        log.debug("Iniciando construção do objeto DadosDashBoardResponse...");
+        DadosDashBoardResponse dadosDashBoardResponse = DadosDashBoardResponse.builder()
+                .saldo(empresa.getSaldo() != null
+                        ? ConversorDeDados.converteValorDoubleParaValorMonetario(empresa.getSaldo())
+                        : Constantes.ZERO_REAIS)
+                .atrasado(pagamentosAtrasados != null
+                        ? ConversorDeDados.converteValorDoubleParaValorMonetario(pagamentosAtrasados)
+                        : Constantes.ZERO_REAIS)
+                .previsto(pagamentosPendentes != null
+                        ? ConversorDeDados.converteValorDoubleParaValorMonetario(pagamentosPendentes)
+                        : Constantes.ZERO_REAIS)
+                .confirmado(pagamentosConfirmados != null
+                        ? ConversorDeDados.converteValorDoubleParaValorMonetario(pagamentosConfirmados)
+                        : Constantes.ZERO_REAIS)
+                .qtdAssinaturasAtivas(qtdPlanosAtivos)
+                .qtdAssinaturasInativas(qtdPlanosInativos)
+                .totalAssinaturas(qtdPlanosAtivos + qtdPlanosInativos)
+                .build();
+        log.debug("Objeto DadosDashBoardResponse construído com sucesso. Retornando...");
+        return dadosDashBoardResponse;
     }
 
 }

@@ -1,7 +1,7 @@
 package br.com.backend.services.cliente;
 
 import br.com.backend.models.entities.ClienteEntity;
-import br.com.backend.models.entities.empresa.EmpresaEntity;
+import br.com.backend.models.entities.EmpresaEntity;
 import br.com.backend.repositories.cliente.impl.ClienteRepositoryImpl;
 import com.lowagie.text.Font;
 import com.lowagie.text.*;

@@ -12,6 +12,15 @@ import java.util.Optional;
 @Repository
 public interface PagamentoRepository extends JpaRepository<PagamentoEntity, Long> {
 
+    @Query("SELECT SUM(p.valorBruto) FROM PagamentoEntity p WHERE p.idEmpresaResponsavel = ?1 and p.statusPagamento = 'ATRASADO'")
+    Double somaDePagamentosAtrasados(Long idEmpresa);
+
+    @Query("SELECT SUM(p.valorBruto) FROM PagamentoEntity p WHERE p.idEmpresaResponsavel = ?1 and p.statusPagamento = 'PENDENTE'")
+    Double somaDePagamentosPrevistos(Long idEmpresa);
+
+    @Query("SELECT SUM(p.valorBruto) FROM PagamentoEntity p WHERE p.idEmpresaResponsavel = ?1 and p.statusPagamento = 'APROVADO'")
+    Double somaDePagamentosConfirmados(Long idEmpresa);
+
     @Query("SELECT p FROM PagamentoEntity p WHERE " +
             "p.idEmpresaResponsavel = ?1 and p.idPlanoResponsavel = ?2")
     Page<PagamentoEntity> buscaPorPagamentosDoPlano(Pageable pageable, Long idEmpresa, Long idPlano);
@@ -19,6 +28,9 @@ public interface PagamentoRepository extends JpaRepository<PagamentoEntity, Long
     @Query("SELECT p FROM PagamentoEntity p WHERE " +
             "p.idEmpresaResponsavel = ?1 and p.idClienteResponsavel = ?2")
     Page<PagamentoEntity> buscaPorPagamentosDoCliente(Pageable pageable, Long idEmpresa, Long idCliente);
+
+    @Query("SELECT p FROM PagamentoEntity p WHERE p.idEmpresaResponsavel = ?1 and p.statusPagamento = 'APROVADO'")
+    Page<PagamentoEntity> buscaPorPagamentosRealizados(Pageable pageable, Long id);
 
     @Query("SELECT p FROM PagamentoEntity p WHERE p.idEmpresaResponsavel = ?1")
     Page<PagamentoEntity> buscaPorPagamentos(Pageable pageable, Long id);

@@ -3,7 +3,7 @@ package br.com.backend.services.email.services;
 import br.com.backend.models.entities.ClienteEntity;
 import br.com.backend.models.entities.PagamentoEntity;
 import br.com.backend.models.entities.PlanoEntity;
-import br.com.backend.models.entities.empresa.EmpresaEntity;
+import br.com.backend.models.entities.EmpresaEntity;
 import br.com.backend.util.Constantes;
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.AWSCredentialsProvider;

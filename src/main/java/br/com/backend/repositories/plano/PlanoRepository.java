@@ -12,6 +12,11 @@ import java.util.Optional;
 @Repository
 public interface PlanoRepository extends JpaRepository<PlanoEntity, Long> {
 
+    @Query("SELECT SUM(p) FROM PlanoEntity p WHERE p.idEmpresaResponsavel = ?1 and p.statusPlano = 'INATIVO'")
+    Integer somaQtdAssinaturasInativas(Long idEmpresa);
+
+    @Query("SELECT SUM(p) FROM PlanoEntity p WHERE p.idEmpresaResponsavel = ?1 and p.statusPlano = 'ATIVO'")
+    Integer somaQtdAssinaturasAtivas(Long idEmpresa);
     @Query("SELECT p FROM PlanoEntity p WHERE p.idEmpresaResponsavel = ?1")
     Page<PlanoEntity> buscaPorPlanos(Pageable pageable, Long id);
 

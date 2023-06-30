@@ -1,7 +1,7 @@
 package br.com.backend.services.empresa;
 
 import br.com.backend.models.dto.empresa.response.EmpresaResponse;
-import br.com.backend.models.entities.empresa.EmpresaEntity;
+import br.com.backend.models.entities.EmpresaEntity;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 

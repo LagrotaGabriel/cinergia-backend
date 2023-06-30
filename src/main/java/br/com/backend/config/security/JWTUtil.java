@@ -1,6 +1,6 @@
 package br.com.backend.config.security;
 
-import br.com.backend.models.entities.empresa.EmpresaEntity;
+import br.com.backend.models.entities.EmpresaEntity;
 import br.com.backend.repositories.empresa.EmpresaRepository;
 import br.com.backend.services.exceptions.ObjectNotFoundException;
 import io.jsonwebtoken.Claims;
@@ -74,6 +74,13 @@ public class JWTUtil {
 
     public EmpresaEntity obtemEmpresaAtiva(HttpServletRequest req) {
         String token = req.getHeader("Authorization").replace("Bearer ", "");
+        String username = getUsernameFromToken(token);
+        Optional<EmpresaEntity> empresaOptional = empresaRepository.buscaPorCpfCnpj(username);
+        return empresaOptional.orElseThrow(() ->
+                new ObjectNotFoundException("Nenhuma empresa foi encontrada pelo CPF/CNPJ " + username));
+    }
+
+    public EmpresaEntity obtemEmpresaAtivaPeloToken(String token) {
         String username = getUsernameFromToken(token);
         Optional<EmpresaEntity> empresaOptional = empresaRepository.buscaPorCpfCnpj(username);
         return empresaOptional.orElseThrow(() ->

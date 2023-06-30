@@ -4,7 +4,7 @@ import br.com.backend.models.dto.pagamento.response.PagamentoPageResponse;
 import br.com.backend.models.entities.ClienteEntity;
 import br.com.backend.models.entities.PagamentoEntity;
 import br.com.backend.models.entities.PlanoEntity;
-import br.com.backend.models.entities.empresa.EmpresaEntity;
+import br.com.backend.models.entities.EmpresaEntity;
 import br.com.backend.models.enums.FormaPagamentoEnum;
 import br.com.backend.models.enums.NotificacaoEnum;
 import br.com.backend.models.enums.StatusPagamentoEnum;
@@ -28,7 +28,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.beans.Transient;
-import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
@@ -130,6 +129,21 @@ public class PagamentoService {
         return pagamentoPageResponse;
     }
 
+    public PagamentoPageResponse realizaBuscaPaginadaPorPagamentosRealizados(EmpresaEntity empresaLogada,
+                                                                             Pageable pageable) {
+        log.debug("Método de serviço de obtenção paginada de pagamentos realizados acessado.");
+
+        log.debug("Acessando repositório de busca de clientes");
+        Page<PagamentoEntity> pagamentoPage = pagamentoRepository.buscaPorPagamentosRealizados(pageable, empresaLogada.getId());
+
+        log.debug(Constantes.CONVERTE_PAGAMENTO_DE_ENTITY_PARA_RESPONSE);
+        PagamentoPageResponse pagamentoPageResponse = pagamentoTypeConverter.converteListaDePagamentosEntityParaPagamentosResponse(pagamentoPage);
+        log.debug(Constantes.CONVERSAO_TIPAGEM_SUCESSO);
+
+        log.info(Constantes.BUSCA_PAGINADA_PAGAMENTOS_SUCESSO);
+        return pagamentoPageResponse;
+    }
+
     public Double calculaValorLiquidoPagamento(PagamentoEntity pagamento) {
 
         log.debug("Método de cálculo de valor líquido do pagamento acessado");
@@ -165,7 +179,7 @@ public class PagamentoService {
         return (valorBrutoPagamento - taxaTotal);
     }
 
-    public void realizaTratamentoWebhookCobranca(AtualizacaoCobrancaWebHook atualizacaoCobrancaWebHook) throws ParseException {
+    public void realizaTratamentoWebhookCobranca(AtualizacaoCobrancaWebHook atualizacaoCobrancaWebHook) {
 
         log.debug("Método 'motor de distruição' de Webhook de atualização de cobrança acessado");
 
@@ -214,7 +228,7 @@ public class PagamentoService {
     }
 
     public void realizaCriacaoDeNovoPagamento(AtualizacaoCobrancaWebHook atualizacaoCobrancaWebHook,
-                                              PlanoEntity planoEntity) throws ParseException {
+                                              PlanoEntity planoEntity) {
 
         log.debug("Método de criação de novo pagamento acessado");
 
