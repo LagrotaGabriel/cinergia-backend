@@ -2,6 +2,7 @@ package br.com.backend.controllers;
 
 import br.com.backend.config.security.JWTUtil;
 import br.com.backend.models.dto.empresa.response.EmpresaResponse;
+import br.com.backend.models.dto.transferencia.request.TransferenciaRequest;
 import br.com.backend.models.dto.transferencia.response.TransferenciaPageResponse;
 import br.com.backend.services.exceptions.InvalidRequestException;
 import br.com.backend.services.transferencia.TransferenciaService;
@@ -14,10 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
@@ -38,6 +37,26 @@ public class TransferenciaController {
 
     @Autowired
     JWTUtil jwtUtil;
+
+    @PostMapping()
+    @ApiOperation(
+            value = "Criação de nova transferência via PIX",
+            notes = "Esse endpoint tem como objetivo realizar a criação de uma transferência via PIX",
+            produces = MediaType.APPLICATION_JSON,
+            consumes = MediaType.APPLICATION_JSON
+    )
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "A criação da transferência foi realizada com sucesso",
+                    response = TransferenciaPageResponse.class),
+    })
+    @PreAuthorize("hasAnyRole('EMPRESA', 'ADMIN')")
+    public ResponseEntity<?> criaNovaTransferencia(
+            HttpServletRequest req,
+            @RequestBody TransferenciaRequest transferenciaRequest) {
+        log.info("Endpoint de criação de novo plano acessado");
+        transferenciaService.criaTransferencia(jwtUtil.obtemEmpresaAtiva(req), transferenciaRequest);
+        return ResponseEntity.ok().build();
+    }
 
     @GetMapping
     @ApiOperation(
