@@ -1,5 +1,6 @@
 package br.com.backend.models.entities;
 
+import br.com.backend.models.enums.StatusTransferenciaEnum;
 import br.com.backend.models.enums.TipoChavePixEnum;
 import lombok.*;
 
@@ -18,6 +19,9 @@ public class TransferenciaEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(unique = true)
+    private String asaasId;
 
     @Column(nullable = false)
     private Long idEmpresaResponsavel;
@@ -39,4 +43,8 @@ public class TransferenciaEntity {
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private TipoChavePixEnum tipoChavePix;
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private StatusTransferenciaEnum statusTransferencia;
 }

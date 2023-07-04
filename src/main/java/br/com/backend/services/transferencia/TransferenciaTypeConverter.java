@@ -25,6 +25,7 @@ public class TransferenciaTypeConverter {
                 .valor(transferencia.getValor())
                 .chavePix(transferencia.getChavePix())
                 .tipoChavePix(transferencia.getTipoChavePix())
+                .statusTransferencia(transferencia.getStatusTransferencia())
                 .build();
         log.debug("Objeto TransferenciaResponse buildado com sucesso. Retornando...");
         return transferenciaResponse;

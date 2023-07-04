@@ -8,5 +8,5 @@ import lombok.*;
 @AllArgsConstructor
 public class EmpresaSimplificadaResponse {
     private String nomeEmpresa;
-    private String saldo;
+    private Double saldo;
 }

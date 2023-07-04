@@ -32,6 +32,7 @@ class PagamentoEntityTest {
                 1L,
                 1L,
                 1L,
+                1L,
                 "123",
                 LocalDate.of(2023, 2, 3).toString(),
                 LocalTime.of(15, 50).toString(),
@@ -41,6 +42,9 @@ class PagamentoEntityTest {
                 650.0,
                 "Assinatura de plano Pro",
                 LocalDate.of(2023, 2, 5).toString(),
+                "",
+                "",
+                "",
                 null,
                 null
         );

@@ -1,8 +1,7 @@
 package br.com.backend.webhooks;
 
-import br.com.backend.proxy.webhooks.cobranca.AtualizacaoCobrancaWebHook;
-import br.com.backend.services.exceptions.ObjectNotFoundException;
-import br.com.backend.services.pagamento.PagamentoService;
+import br.com.backend.proxy.webhooks.transferencia.AtualizacaoTransferenciaWebHook;
+import br.com.backend.services.transferencia.TransferenciaService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -21,21 +20,22 @@ import java.text.ParseException;
 @Slf4j
 @CrossOrigin
 @RestController
-@Api(value = "Esta API disponibiliza os endpoints de webhook de cobrança")
+@Api(value = "Esta API disponibiliza os endpoints de webhook de transferência")
 @Produces({MediaType.APPLICATION_JSON, "application/json"})
 @Consumes({MediaType.APPLICATION_JSON, "application/json"})
-@RequestMapping("webhook/v1/cobranca")
-public class CobrancaWebHook {
+@RequestMapping("webhook/v1/transferencia")
+public class TransferenciaWebHook {
 
     @Autowired
     WebHookTokenValidation webHookTokenValidation;
 
     @Autowired
-    PagamentoService pagamentoService;
+    TransferenciaService transferenciaService;
+
 
     @ApiOperation(
-            value = "Recebimento de status de pagamento",
-            notes = "Esse endpoint tem como objetivo receber atualizações no status dos pagamentos das assinaturas por " +
+            value = "Recebimento de status de transferência",
+            notes = "Esse endpoint tem como objetivo receber atualizações no status das transferências PIX por " +
                     "parte da integradora ASAAS",
             produces = MediaType.APPLICATION_JSON,
             consumes = MediaType.APPLICATION_JSON
@@ -43,14 +43,13 @@ public class CobrancaWebHook {
     @ApiResponses({
             @ApiResponse(code = 200, message = "Requisição finalizada com sucesso", response = HttpStatus.class)
     })
-    @PostMapping(value = "/pagamento")
-    public ResponseEntity<HttpStatus> recebeStatusPagamentoAsaas(@RequestBody AtualizacaoCobrancaWebHook atualizacaoCobrancaWebHook,
-                                                                 @RequestHeader(value = "asaas-access-token") String token)
+    @PostMapping
+    public ResponseEntity<HttpStatus> recebeStatusTransferenciaAsaas(@RequestBody AtualizacaoTransferenciaWebHook atualizacaoTransferenciaWebHook,
+                                                                     @RequestHeader(value = "asaas-access-token") String token)
             throws ParseException {
-        log.info("Webhook ASAAS de atualização do status de cobrança recebido: {}", atualizacaoCobrancaWebHook);
+        log.info("Webhook ASAAS de atualização do status de transferência recebido: {}", atualizacaoTransferenciaWebHook);
         webHookTokenValidation.realizaValidacaoToken(token);
-        pagamentoService.realizaTratamentoWebhookCobranca(atualizacaoCobrancaWebHook);
+        transferenciaService.realizaTratamentoWebhookTransferencia(atualizacaoTransferenciaWebHook);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
-
 }

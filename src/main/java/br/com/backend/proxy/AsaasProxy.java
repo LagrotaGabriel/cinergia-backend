@@ -5,6 +5,10 @@ import br.com.backend.proxy.cliente.response.CriaClienteAsaasResponse;
 import br.com.backend.proxy.plano.request.CriaPlanoAsaasRequest;
 import br.com.backend.proxy.plano.response.CriaPlanoAsaasResponse;
 import br.com.backend.proxy.plano.response.consulta.ConsultaAssinaturaResponse;
+import br.com.backend.proxy.transferencia.request.CriaChavePixAsaasRequest;
+import br.com.backend.proxy.transferencia.request.TransferePixAsaasRequest;
+import br.com.backend.proxy.transferencia.response.CriaChavePixAsaasResponse;
+import br.com.backend.proxy.transferencia.response.TransferePixAsaasResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,5 +27,13 @@ public interface AsaasProxy {
     @GetMapping(value = "api/v3/subscriptions/{idAssinatura}")
     ResponseEntity<ConsultaAssinaturaResponse> consultaAssinatura(@PathVariable String idAssinatura,
                                                                   @RequestHeader(value = "access_token") String accessToken);
+
+    @PostMapping(value = "api/v3/transfers")
+    ResponseEntity<TransferePixAsaasResponse> transferirPix(@RequestBody TransferePixAsaasRequest transferePixAsaasRequest,
+                                                            @RequestHeader(value = "access_token") String accessToken);
+
+    @PostMapping(value = "api/v3/pix/addressKeys")
+    ResponseEntity<CriaChavePixAsaasResponse> criaChavePix(@RequestBody CriaChavePixAsaasRequest criaChavePixAsaasRequest,
+                                                           @RequestHeader(value = "access_token") String accessToken);
 
 }

@@ -37,6 +37,7 @@ class EmpresaEntityTest {
                 "tabajara@gmail.com",
                 "12345678000150",
                 "1998-07-21",
+                0.0,
                 null,
                 null,
                 null,

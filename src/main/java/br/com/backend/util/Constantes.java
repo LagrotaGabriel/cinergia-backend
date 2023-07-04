@@ -7,7 +7,10 @@ public class Constantes {
     public static final String ZERO_REAIS = "R$ 0,00";
     public static final String ERRO_CRIACAO_ASSINATURA_ASAAS = "Ocorreu um erro no processo de criação da assinatura: ";
     public static final String ERRO_CRIACAO_CLIENTE_ASAAS = "Ocorreu um erro no processo de criação do cliente na integradora: ";
+    public static final String ERRO_CRIACAO_TRANSFERENCIA_ASAAS = "Ocorreu um erro no processo de criação de transferência na integradora: ";
+    public static final String ERRO_CRIACAO_CHAVE_ALEATORIA_ASAAS = "Ocorreu um erro no processo de criação da chave PIX aleatória na integradora: ";
     public static final String CONVERSAO_DE_TIPAGEM_COM_SUCESSO = "Conversão de tipagem realizada com sucesso";
+    public static final String RETORNO_INTEGRADORA_NULO = "O retorno da integradora é nulo";
 
     public static final String INICIANDO_IMPL_PERSISTENCIA_CLIENTE =
             "Iniciando acesso ao método de implementação de persistência do cliente...";

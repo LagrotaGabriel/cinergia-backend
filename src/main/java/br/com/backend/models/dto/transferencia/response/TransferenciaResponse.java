@@ -1,5 +1,6 @@
 package br.com.backend.models.dto.transferencia.response;
 
+import br.com.backend.models.enums.StatusTransferenciaEnum;
 import br.com.backend.models.enums.TipoChavePixEnum;
 import lombok.*;
 
@@ -16,4 +17,5 @@ public class TransferenciaResponse {
     private Double valor;
     private String chavePix;
     private TipoChavePixEnum tipoChavePix;
+    private StatusTransferenciaEnum statusTransferencia;
 }

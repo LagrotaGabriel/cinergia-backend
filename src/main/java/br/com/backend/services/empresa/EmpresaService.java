@@ -107,7 +107,7 @@ public class EmpresaService {
     public EmpresaSimplificadaResponse obtemDadosSimplificadosEmpresa(EmpresaEntity empresa) {
         return EmpresaSimplificadaResponse.builder()
                 .nomeEmpresa(empresa.getNomeEmpresa())
-                .saldo(ConversorDeDados.converteValorDoubleParaValorMonetario(empresa.getSaldo()))
+                .saldo(empresa.getSaldo())
                 .build();
     }
 
