@@ -5,8 +5,8 @@ import br.com.backend.models.dto.empresa.response.DadosDashBoardResponse;
 import br.com.backend.models.dto.empresa.response.EmpresaResponse;
 import br.com.backend.models.dto.empresa.response.EmpresaSimplificadaResponse;
 import br.com.backend.models.entities.AcessoSistemaEntity;
-import br.com.backend.models.entities.PagamentoEntity;
 import br.com.backend.models.entities.EmpresaEntity;
+import br.com.backend.models.entities.PagamentoEntity;
 import br.com.backend.models.enums.PerfilEnum;
 import br.com.backend.repositories.empresa.impl.EmpresaRepositoryImpl;
 import br.com.backend.repositories.pagamento.PagamentoRepository;
@@ -149,8 +149,12 @@ public class EmpresaService {
                 .confirmado(pagamentosConfirmados != null
                         ? ConversorDeDados.converteValorDoubleParaValorMonetario(pagamentosConfirmados)
                         : Constantes.ZERO_REAIS)
-                .qtdAssinaturasAtivas(qtdPlanosAtivos)
-                .qtdAssinaturasInativas(qtdPlanosInativos)
+                .qtdAssinaturasAtivas(qtdPlanosAtivos != null
+                        ? qtdPlanosAtivos
+                        : 0)
+                .qtdAssinaturasInativas(qtdPlanosInativos != null
+                        ? qtdPlanosInativos
+                        : 0)
                 .totalAssinaturas(qtdPlanosAtivos != null && qtdPlanosInativos != null
                         ? qtdPlanosAtivos + qtdPlanosInativos
                         : 0)

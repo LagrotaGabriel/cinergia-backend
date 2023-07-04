@@ -1,7 +1,6 @@
 package br.com.backend.webhooks;
 
 import br.com.backend.proxy.webhooks.cobranca.AtualizacaoCobrancaWebHook;
-import br.com.backend.services.exceptions.ObjectNotFoundException;
 import br.com.backend.services.pagamento.PagamentoService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -16,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import java.text.ParseException;
 
 @Slf4j
 @CrossOrigin
@@ -45,8 +43,7 @@ public class CobrancaWebHook {
     })
     @PostMapping(value = "/pagamento")
     public ResponseEntity<HttpStatus> recebeStatusPagamentoAsaas(@RequestBody AtualizacaoCobrancaWebHook atualizacaoCobrancaWebHook,
-                                                                 @RequestHeader(value = "asaas-access-token") String token)
-            throws ParseException {
+                                                                 @RequestHeader(value = "asaas-access-token") String token) {
         log.info("Webhook ASAAS de atualização do status de cobrança recebido: {}", atualizacaoCobrancaWebHook);
         webHookTokenValidation.realizaValidacaoToken(token);
         pagamentoService.realizaTratamentoWebhookCobranca(atualizacaoCobrancaWebHook);

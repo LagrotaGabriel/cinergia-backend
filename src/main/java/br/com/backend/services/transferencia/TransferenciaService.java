@@ -202,7 +202,7 @@ public class TransferenciaService {
 
     public void realizaTratamentoWebhookTransferencia(AtualizacaoTransferenciaWebHook atualizacaoTransferenciaWebHook) {
         log.debug("Método 'motor de distribuição' de Webhook de atualização de transferência acessado");
-        System.err.println(atualizacaoTransferenciaWebHook);
+        log.warn(String.valueOf(atualizacaoTransferenciaWebHook));
     }
 
 }

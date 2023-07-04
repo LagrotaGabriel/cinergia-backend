@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import java.text.ParseException;
 
 @Slf4j
 @CrossOrigin
@@ -45,8 +44,7 @@ public class TransferenciaWebHook {
     })
     @PostMapping
     public ResponseEntity<HttpStatus> recebeStatusTransferenciaAsaas(@RequestBody AtualizacaoTransferenciaWebHook atualizacaoTransferenciaWebHook,
-                                                                     @RequestHeader(value = "asaas-access-token") String token)
-            throws ParseException {
+                                                                     @RequestHeader(value = "asaas-access-token") String token) {
         log.info("Webhook ASAAS de atualização do status de transferência recebido: {}", atualizacaoTransferenciaWebHook);
         webHookTokenValidation.realizaValidacaoToken(token);
         transferenciaService.realizaTratamentoWebhookTransferencia(atualizacaoTransferenciaWebHook);
