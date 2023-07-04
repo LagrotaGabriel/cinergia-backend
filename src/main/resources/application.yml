@@ -1,9 +1,9 @@
 spring:
   mail:
-    host: email-smtp.us-east-1.amazonaws.com
-    port: 587
-    username: AKIA6JI6XORW2GAQIZFY
-    password: BLpLpiRstB70vn4tScyf17+fv4Q1/LJSIdnq3dgONrbA
+    host: ${AWS_HOST}
+    port: ${AWS_PORT}
+    username: ${AWS_ACCESS}
+    password: ${AWS_SECRET}
     properties:
       mail:
         smtp:
