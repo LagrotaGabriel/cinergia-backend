@@ -151,7 +151,9 @@ public class EmpresaService {
                         : Constantes.ZERO_REAIS)
                 .qtdAssinaturasAtivas(qtdPlanosAtivos)
                 .qtdAssinaturasInativas(qtdPlanosInativos)
-                .totalAssinaturas(qtdPlanosAtivos + qtdPlanosInativos)
+                .totalAssinaturas(qtdPlanosAtivos != null && qtdPlanosInativos != null
+                        ? qtdPlanosAtivos + qtdPlanosInativos
+                        : 0)
                 .build();
         log.debug("Objeto DadosDashBoardResponse construído com sucesso. Retornando...");
         return dadosDashBoardResponse;
