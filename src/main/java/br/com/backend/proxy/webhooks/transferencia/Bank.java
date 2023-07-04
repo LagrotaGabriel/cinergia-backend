@@ -7,7 +7,8 @@ import lombok.*;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class AtualizacaoTransferenciaWebHook {
-    private String event;
-    private TransferWebHook transfer;
+public class Bank {
+    private String code;
+    private String name;
+    private String ispb;
 }
