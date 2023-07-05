@@ -171,6 +171,7 @@ public class EmpresaService {
 
         List<PagamentoEntity> pagamentosDoAno = pagamentoRepository.buscaTodosPagamentosEmpresa(empresa.getId())
                 .stream()
+                .filter(p -> p.getDataPagamento() != null)
                 .filter(p -> {
                     LocalDate dataPagamentoConvertida = LocalDate.parse(p.getDataPagamento());
                     return dataPagamentoConvertida.getYear() == anoAtual
