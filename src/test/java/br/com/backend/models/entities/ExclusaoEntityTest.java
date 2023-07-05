@@ -11,7 +11,7 @@ import java.time.LocalTime;
 
 @SpringBootTest
 @DisplayName("Entity: Exclusao")
-class ExclusaoClienteEntityTest {
+class ExclusaoEntityTest {
 
     @Test
     @DisplayName("Deve testar dataBuilder")

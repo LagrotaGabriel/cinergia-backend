@@ -3,6 +3,7 @@ package br.com.backend.controllers;
 import br.com.backend.config.security.JWTUtil;
 import br.com.backend.models.dto.empresa.request.EmpresaRequest;
 import br.com.backend.models.dto.empresa.response.DadosDashBoardResponse;
+import br.com.backend.models.dto.empresa.response.DadosGraficoResponse;
 import br.com.backend.models.dto.empresa.response.EmpresaResponse;
 import br.com.backend.models.dto.empresa.response.EmpresaSimplificadaResponse;
 import br.com.backend.services.empresa.EmpresaService;
@@ -22,6 +23,7 @@ import javax.validation.Valid;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import java.util.Map;
 
 @Slf4j
 @CrossOrigin
@@ -55,6 +57,25 @@ public class EmpresaController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(empresaService.obtemDadosDashBoardEmpresa(jwtUtil.obtemEmpresaAtiva(req)));
+    }
+
+    @GetMapping("/grafico-faturamento")
+    @ApiOperation(
+            value = "Obtenção de dados do gráfico de faturamento da empresa",
+            notes = "Esse endpoint tem como objetivo realizar a obtenção de dados do gráfico de faturamento da empresa atual",
+            produces = MediaType.APPLICATION_JSON,
+            consumes = MediaType.APPLICATION_JSON
+    )
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "Obtenção dos dados gráficos da empresa realizada com sucesso", response = EmpresaResponse.class),
+            @ApiResponse(code = 400, message = "Ocorreu um erro no processo de obtenção dos dados gráficos da empresa",
+                    response = InvalidRequestException.class),
+    })
+    public ResponseEntity<Map<Integer, DadosGraficoResponse>> obtemDadosGraficoFaturamentoEmpresa(HttpServletRequest req) {
+        log.info("Método controlador de obtenção de dados do gráfico de faturamento da empresa acessado");
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(empresaService.obtemDadosGraficoFaturamentoEmpresa(jwtUtil.obtemEmpresaAtiva(req)));
     }
 
     @GetMapping("/simplificado")

@@ -2,12 +2,14 @@ package br.com.backend.services.empresa;
 
 import br.com.backend.models.dto.empresa.request.EmpresaRequest;
 import br.com.backend.models.dto.empresa.response.DadosDashBoardResponse;
+import br.com.backend.models.dto.empresa.response.DadosGraficoResponse;
 import br.com.backend.models.dto.empresa.response.EmpresaResponse;
 import br.com.backend.models.dto.empresa.response.EmpresaSimplificadaResponse;
 import br.com.backend.models.entities.AcessoSistemaEntity;
 import br.com.backend.models.entities.EmpresaEntity;
 import br.com.backend.models.entities.PagamentoEntity;
 import br.com.backend.models.enums.PerfilEnum;
+import br.com.backend.models.enums.StatusPagamentoEnum;
 import br.com.backend.repositories.empresa.impl.EmpresaRepositoryImpl;
 import br.com.backend.repositories.pagamento.PagamentoRepository;
 import br.com.backend.repositories.plano.PlanoRepository;
@@ -21,9 +23,8 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -98,7 +99,7 @@ public class EmpresaService {
         EmpresaEntity empresaEntity = empresaRepositoryImpl.implementaBuscaPorId(pagamento.getIdEmpresaResponsavel());
 
         log.debug("Setando saldo através do método de cálculo de valor líquido do pagamento...");
-        empresaEntity.setSaldo(empresaEntity.getSaldo() + pagamentoService.calculaValorLiquidoPagamento(pagamento));
+        empresaEntity.setSaldo(empresaEntity.getSaldo() + (pagamento.getValorBruto() - pagamentoService.calculaValorTaxaPagamento(pagamento)));
 
         log.debug("Iniciando persistência da empresa com o saldo atualizado...");
         empresaRepositoryImpl.implementaPersistencia(empresaEntity);
@@ -163,4 +164,53 @@ public class EmpresaService {
         return dadosDashBoardResponse;
     }
 
+    public Map<Integer, DadosGraficoResponse> obtemDadosGraficoFaturamentoEmpresa(EmpresaEntity empresa) {
+
+        LocalDate dataAgora = LocalDate.now();
+        int anoAtual = dataAgora.getYear();
+
+        List<PagamentoEntity> pagamentosDoAno = pagamentoRepository.buscaTodosPagamentosEmpresa(empresa.getId())
+                .stream()
+                .filter(p -> {
+                    LocalDate dataPagamentoConvertida = LocalDate.parse(p.getDataPagamento());
+                    return dataPagamentoConvertida.getYear() == anoAtual
+                            && p.getStatusPagamento().equals(StatusPagamentoEnum.APROVADO);
+                }).collect(Collectors.toList());
+
+        HashMap<Integer, DadosGraficoResponse> faturamentoPorMes = new HashMap<>();
+
+        for (int i = 1; i < 13; i++) {
+            int mesIterado = i;
+
+            List<PagamentoEntity> pagamentosDoMes = pagamentosDoAno
+                    .stream()
+                    .filter(p -> {
+                        LocalDate dataPagamentoConvertida = LocalDate.parse(p.getDataPagamento());
+                        return dataPagamentoConvertida.getMonthValue() == mesIterado
+                                && p.getStatusPagamento().equals(StatusPagamentoEnum.APROVADO);
+                    }).collect(Collectors.toList());
+
+            Double somaValorBrutoPagamentos =
+                    pagamentosDoMes
+                            .stream()
+                            .mapToDouble(PagamentoEntity::getValorBruto).sum();
+
+            Double somaValorTaxaPagamentos =
+                    pagamentosDoMes
+                            .stream()
+                            .mapToDouble(PagamentoEntity::getTaxaTotal).sum();
+
+            Double valorLiquidoPagamentos = (somaValorBrutoPagamentos - somaValorTaxaPagamentos);
+
+            DadosGraficoResponse dadosGraficoResponse = DadosGraficoResponse.builder()
+                    .valorBruto(somaValorBrutoPagamentos)
+                    .valorTaxa(somaValorTaxaPagamentos)
+                    .valorLiquido(valorLiquidoPagamentos)
+                    .build();
+
+            faturamentoPorMes.put(mesIterado, dadosGraficoResponse);
+        }
+
+        return faturamentoPorMes;
+    }
 }

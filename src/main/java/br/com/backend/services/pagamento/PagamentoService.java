@@ -144,7 +144,7 @@ public class PagamentoService {
         return pagamentoPageResponse;
     }
 
-    public Double calculaValorLiquidoPagamento(PagamentoEntity pagamento) {
+    public Double calculaValorTaxaPagamento(PagamentoEntity pagamento) {
 
         log.debug("Método de cálculo de valor líquido do pagamento acessado");
 
@@ -176,7 +176,7 @@ public class PagamentoService {
         log.debug("Taxa total calculada: {}", taxaTotal);
 
         log.debug("Método executado com sucesso. Retornando valor líquido: {}...", valorBrutoPagamento - taxaTotal);
-        return (valorBrutoPagamento - taxaTotal);
+        return taxaTotal;
     }
 
     public void realizaTratamentoWebhookCobranca(AtualizacaoCobrancaWebHook atualizacaoCobrancaWebHook) {
@@ -310,6 +310,7 @@ public class PagamentoService {
         pagamentoEntity.setDataPagamento(LocalDate.now().toString());
         pagamentoEntity.setHoraPagamento(LocalTime.now().toString());
         pagamentoEntity.setValorBruto(atualizacaoCobrancaWebHook.getPayment().getValue());
+        pagamentoEntity.setTaxaTotal(calculaValorTaxaPagamento(pagamentoEntity));
         pagamentoEntity.setValorLiquidoAsaas(atualizacaoCobrancaWebHook.getPayment().getNetValue());
         pagamentoEntity.setLinkBoletoAsaas(atualizacaoCobrancaWebHook.getPayment().getBankSlipUrl());
         pagamentoEntity.setLinkCobranca(atualizacaoCobrancaWebHook.getPayment().getInvoiceUrl());

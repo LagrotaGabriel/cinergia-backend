@@ -46,8 +46,8 @@ public class TransferenciaWebHook {
     public ResponseEntity<HttpStatus> recebeStatusTransferenciaAsaas(@RequestBody AtualizacaoTransferenciaWebHook atualizacaoTransferenciaWebHook,
                                                                      @RequestHeader(value = "asaas-access-token") String token) {
         log.info("Webhook ASAAS de atualização do status de transferência recebido: {}", atualizacaoTransferenciaWebHook);
-//        webHookTokenValidation.realizaValidacaoToken(token);
-//        transferenciaService.realizaTratamentoWebhookTransferencia(atualizacaoTransferenciaWebHook);
+        webHookTokenValidation.realizaValidacaoToken(token);
+        transferenciaService.realizaTratamentoWebhookTransferencia(atualizacaoTransferenciaWebHook);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 }

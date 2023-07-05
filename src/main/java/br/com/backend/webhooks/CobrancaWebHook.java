@@ -45,8 +45,8 @@ public class CobrancaWebHook {
     public ResponseEntity<HttpStatus> recebeStatusPagamentoAsaas(@RequestBody AtualizacaoCobrancaWebHook atualizacaoCobrancaWebHook,
                                                                  @RequestHeader(value = "asaas-access-token") String token) {
         log.info("Webhook ASAAS de atualização do status de cobrança recebido: {}", atualizacaoCobrancaWebHook);
-//        webHookTokenValidation.realizaValidacaoToken(token);
-//        pagamentoService.realizaTratamentoWebhookCobranca(atualizacaoCobrancaWebHook);
+        webHookTokenValidation.realizaValidacaoToken(token);
+        pagamentoService.realizaTratamentoWebhookCobranca(atualizacaoCobrancaWebHook);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 

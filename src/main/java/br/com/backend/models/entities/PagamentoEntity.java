@@ -34,6 +34,7 @@ public class PagamentoEntity {
     private String horaPagamento;
     @Column(nullable = false)
     private Double valorBruto;
+    private Double taxaTotal;
     private Double valorLiquidoAsaas;
     @Column(nullable = false)
     private String descricao;
