@@ -267,7 +267,7 @@ public class PagamentoService {
                 .idEmpresaResponsavel(empresa.getId())
                 .dataCadastro(LocalDate.now().toString())
                 .horaCadastro(LocalTime.now().toString())
-                .descricao(planoEntity.getDescricao() + " - Cobrança criada no valor de "
+                .descricao(planoEntity.getDescricao().toUpperCase() + " - Cobrança criada no valor de "
                         + ConversorDeDados.converteValorDoubleParaValorMonetario(pagamentoEntity.getValorBruto()))
                 .uri(atualizacaoCobrancaWebHook.getPayment().getInvoiceUrl())
                 .tipoNotificacaoEnum(TipoNotificacaoEnum.COBRANCA_CRIADA)
@@ -335,9 +335,6 @@ public class PagamentoService {
         pagamentoEntity.setStatusPagamento(StatusPagamentoEnum.APROVADO);
         log.debug(Constantes.OBJETO_PAGAMENTO_CRIADO, pagamentoEntity);
 
-        log.debug("Setando pagamento à lista de pagamentos do cliente...");
-        planoEntity.getPagamentos().add(pagamentoEntity);
-
         log.debug("Adicionando objeto pagamento criado à lista de pagamentos do plano...");
         planoEntity.getPagamentos().add(pagamentoEntity);
 
@@ -348,7 +345,7 @@ public class PagamentoService {
                 .horaCadastro(LocalTime.now().toString())
                 .descricao("Pagamento de "
                         + ConversorDeDados.converteValorDoubleParaValorMonetario(pagamentoEntity.getValorBruto())
-                        + "da assinatura " + planoEntity.getDescricao() + " recebido com sucesso")
+                        + " da assinatura " + planoEntity.getDescricao().toUpperCase() + " recebido com sucesso")
                 .uri(atualizacaoCobrancaWebHook.getPayment().getTransactionReceiptUrl())
                 .tipoNotificacaoEnum(TipoNotificacaoEnum.COBRANCA_RECEBIDA)
                 .lida(false)
@@ -356,13 +353,12 @@ public class PagamentoService {
 
         log.debug("Adicionando notificação ao objeto empresa...");
         empresa.getNotificacoes().add(notificacaoEntity);
-        empresaRepositoryImpl.implementaPersistencia(empresa);
 
         log.debug(Constantes.INICIANDO_IMPL_PERSISTENCIA_PLANO);
         planoRepositoryImpl.implementaPersistencia(planoEntity);
 
         log.debug("Iniciando acesso ao método de atualização do saldo da empresa...");
-        empresaService.adicionaSaldoContaEmpresa(pagamentoEntity);
+        empresaService.adicionaSaldoContaEmpresa(empresa, pagamentoEntity);
 
         if (planoEntity.getNotificacoes().contains(NotificacaoEnum.EMAIL) && cliente.getEmail() != null) {
             log.debug(Constantes.INICIA_SERVICO_ENVIO_EMAILS);

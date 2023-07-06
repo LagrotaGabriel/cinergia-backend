@@ -6,8 +6,8 @@ import br.com.backend.models.entities.NotificacaoEntity;
 import br.com.backend.repositories.notificacao.NotificacaoRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -21,12 +21,12 @@ public class NotificacaoService {
     @Autowired
     NotificacaoTypeConverter notificacaoTypeConverter;
 
-    public List<NotificacaoResponse> implementaBuscaDeNotificacoesEmpresa(Pageable pageable, EmpresaEntity empresa) {
+    public List<NotificacaoResponse> implementaBuscaDeNotificacoesEmpresa(EmpresaEntity empresa) {
         log.debug("Método de implementação de busca de notificações da empresa acessado");
 
         log.debug("Iniciando query de busca pelas notificações no repositório...");
         List<NotificacaoEntity> notificacaoEntities =
-                notificacaoRepository.buscaNotificacoesDaEmpresa(pageable, empresa.getId());
+                notificacaoRepository.buscaNotificacoesDaEmpresa(empresa.getId());
 
         log.debug("Iniciando acesso ao método de conversão de NotificacaoEntity para NotificacaoResponse...");
         List<NotificacaoResponse> notificacaoResponses =
@@ -34,6 +34,23 @@ public class NotificacaoService {
 
         log.info("Consulta das notificações da empresa realizada com sucesso");
         return notificacaoResponses;
+    }
+
+    @Transactional
+    public void realizaSetagemDasNotificacoesDaEmpresaComoLidas(EmpresaEntity empresa) {
+        log.debug("Método de setagem de notificações da empresa como lidas acessado");
+
+        log.debug("Iniciando query de busca pelas notificações no repositório...");
+        List<NotificacaoEntity> notificacaoEntities =
+                notificacaoRepository.buscaNotificacoesDaEmpresa(empresa.getId());
+
+        log.debug("Setando todas as notificações como lidas...");
+        notificacaoEntities.forEach(notificacao -> notificacao.setLida(true));
+
+        log.debug("Persistindo notificações atualizadas no banco de dados...");
+        notificacaoRepository.saveAll(notificacaoEntities);
+
+        log.info("Atualização das notificações realizada com sucesso");
     }
 
 }

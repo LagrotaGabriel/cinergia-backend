@@ -92,17 +92,14 @@ public class EmpresaService {
         return empresaTypeConverter.converteEmpresaEntityParaEmpresaResponse(empresaPersistida);
     }
 
-    public void adicionaSaldoContaEmpresa(PagamentoEntity pagamento) {
+    public void adicionaSaldoContaEmpresa(EmpresaEntity empresa, PagamentoEntity pagamento) {
         log.debug("Método responsável por adicionar saldo à empresa após pagamento realizado acessado");
 
-        log.debug("Iniciando acesso ao método de implementação de busca por id da empresa...");
-        EmpresaEntity empresaEntity = empresaRepositoryImpl.implementaBuscaPorId(pagamento.getIdEmpresaResponsavel());
-
         log.debug("Setando saldo através do método de cálculo de valor líquido do pagamento...");
-        empresaEntity.setSaldo(empresaEntity.getSaldo() + (pagamento.getValorBruto() - pagamentoService.calculaValorTaxaPagamento(pagamento)));
+        empresa.setSaldo(empresa.getSaldo() + (pagamento.getValorBruto() - pagamentoService.calculaValorTaxaPagamento(pagamento)));
 
         log.debug("Iniciando persistência da empresa com o saldo atualizado...");
-        empresaRepositoryImpl.implementaPersistencia(empresaEntity);
+        empresaRepositoryImpl.implementaPersistencia(empresa);
     }
 
     public EmpresaSimplificadaResponse obtemDadosSimplificadosEmpresa(EmpresaEntity empresa) {

@@ -14,5 +14,5 @@ public class NotificacaoResponse {
     private String descricao;
     private String uri;
     private Boolean lida;
-    private String tipoNotificacaoEnum;
+    private String tipoNotificacao;
 }

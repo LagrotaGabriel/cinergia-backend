@@ -24,7 +24,7 @@ public class NotificacaoTypeConverter {
             NotificacaoResponse notificacaoResponse = NotificacaoResponse.builder()
                     .dataCadastro(notificacaoEntity.getDataCadastro())
                     .horaCadastro(notificacaoEntity.getHoraCadastro())
-                    .tipoNotificacaoEnum(notificacaoEntity.getTipoNotificacaoEnum().getDesc())
+                    .tipoNotificacao(notificacaoEntity.getTipoNotificacaoEnum().getDesc())
                     .uri(notificacaoEntity.getUri())
                     .lida(notificacaoEntity.getLida())
                     .descricao(notificacaoEntity.getDescricao())
