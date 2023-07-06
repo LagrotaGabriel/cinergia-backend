@@ -1,0 +1,41 @@
+package br.com.backend.services.notificacao;
+
+import br.com.backend.models.dto.notificacao.NotificacaoResponse;
+import br.com.backend.models.entities.NotificacaoEntity;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@Slf4j
+@Service
+public class NotificacaoTypeConverter {
+
+    public List<NotificacaoResponse> converteNotificacaoEntityParaNotificacaoResponse(List<NotificacaoEntity> notificacaoEntities) {
+        log.debug("Método responsável por converter lista de NotificacaoEntity para lista de NotificacaoResponse acessado");
+
+        List<NotificacaoResponse> notificacaoResponses = new ArrayList<>();
+
+        log.debug("Iniciando iteração da lista de entidades...");
+        for (NotificacaoEntity notificacaoEntity : notificacaoEntities) {
+            log.debug("Iniciando construção do objeto notificacaoResponse com atributos do notificacaoEntity " +
+                    "iterado: {}", notificacaoEntity);
+            NotificacaoResponse notificacaoResponse = NotificacaoResponse.builder()
+                    .dataCadastro(notificacaoEntity.getDataCadastro())
+                    .horaCadastro(notificacaoEntity.getHoraCadastro())
+                    .tipoNotificacaoEnum(notificacaoEntity.getTipoNotificacaoEnum().getDesc())
+                    .uri(notificacaoEntity.getUri())
+                    .lida(notificacaoEntity.getLida())
+                    .descricao(notificacaoEntity.getDescricao())
+                    .build();
+
+            log.debug("Adicionando objeto criado à lista de notificacoesResponse...");
+            notificacaoResponses.add(notificacaoResponse);
+        }
+
+        log.debug("Conversão de tipos finalizada com sucesso. Retornando...");
+        return notificacaoResponses;
+    }
+
+}

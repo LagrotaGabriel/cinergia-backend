@@ -25,5 +25,7 @@ public class NotificacaoEntity {
     private String descricao;
     private String uri;
     private Boolean lida;
+
+    @Enumerated(EnumType.STRING)
     private TipoNotificacaoEnum tipoNotificacaoEnum;
 }
