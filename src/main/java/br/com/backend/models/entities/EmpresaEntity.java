@@ -86,4 +86,8 @@ public class EmpresaEntity {
     @ToString.Exclude
     private List<TransferenciaEntity> transferencias = new ArrayList<>();
 
+    @JsonIgnore
+    @OneToMany(targetEntity = NotificacaoEntity.class, orphanRemoval = true, cascade = CascadeType.ALL)
+    private List<NotificacaoEntity> notificacoes = new ArrayList<>();
+
 }

@@ -3,9 +3,11 @@ package br.com.backend.services.transferencia;
 import br.com.backend.models.dto.transferencia.request.TransferenciaRequest;
 import br.com.backend.models.dto.transferencia.response.TransferenciaPageResponse;
 import br.com.backend.models.entities.EmpresaEntity;
+import br.com.backend.models.entities.NotificacaoEntity;
 import br.com.backend.models.entities.TransferenciaEntity;
 import br.com.backend.models.enums.StatusTransferenciaEnum;
 import br.com.backend.models.enums.TipoChavePixEnum;
+import br.com.backend.models.enums.TipoNotificacaoEnum;
 import br.com.backend.proxy.AsaasProxy;
 import br.com.backend.proxy.transferencia.request.TransferePixAsaasRequest;
 import br.com.backend.proxy.transferencia.response.TransferePixAsaasResponse;
@@ -16,6 +18,7 @@ import br.com.backend.repositories.transferencia.impl.TransferenciaRepositoryImp
 import br.com.backend.services.exceptions.FeignConnectionException;
 import br.com.backend.services.exceptions.InvalidRequestException;
 import br.com.backend.util.Constantes;
+import br.com.backend.util.ConversorDeDados;
 import feign.FeignException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -175,33 +178,16 @@ public class TransferenciaService {
         log.debug("Iniciando busca da empresa responsável pela transferência pelo ID...");
         EmpresaEntity empresa = empresaRepositoryImpl.implementaBuscaPorId(transferenciaEntity.getId());
 
+        log.debug("Motor de distribuição do status da transferência iniciado");
         switch (atualizacaoTransferenciaWebHook.getEvent()) {
             case "RECEIVED": {
-                log.debug("Removendo transferência da empresa: {}", transferenciaEntity);
-                empresa.getTransferencias().remove(transferenciaEntity);
-
-                log.debug("Setando status da transferência como aprovado...");
-                transferenciaEntity.setStatusTransferencia(StatusTransferenciaEnum.SUCESSO);
-
-                log.debug("Adicionado transferência atualizada à lista de transferências da empresa...");
-                empresa.getTransferencias().add(transferenciaEntity);
-
-                log.debug("Iniciando persistência da empresa atualizada...");
-                empresaRepositoryImpl.implementaPersistencia(empresa);
+                log.debug("Iniciando acesso ao método de tratamento de transferência realizada com sucesso...");
+                tratamentoWebhookTransferenciaComSucesso(empresa, transferenciaEntity);
                 break;
             }
             case "FAILED": {
-                log.debug("Removendo transferência da empresa: {}", transferenciaEntity);
-                empresa.getTransferencias().remove(transferenciaEntity);
-
-                log.debug("Setando status da transferência como recusado...");
-                transferenciaEntity.setStatusTransferencia(StatusTransferenciaEnum.FALHA);
-
-                log.debug("Adicionado transferência atualizada à lista de transferências da empresa...");
-                empresa.getTransferencias().add(transferenciaEntity);
-
-                log.debug("Iniciando persistência da empresa atualizada...");
-                empresaRepositoryImpl.implementaPersistencia(empresa);
+                log.debug("Iniciando acesso ao método de tratamento de transferência realizada com erro...");
+                tratamentoWebhookTransferenciaComErro(empresa, transferenciaEntity);
                 break;
             }
             default: {
@@ -210,4 +196,69 @@ public class TransferenciaService {
         }
     }
 
+    private void tratamentoWebhookTransferenciaComSucesso(EmpresaEntity empresa, TransferenciaEntity transferenciaEntity) {
+
+        log.debug("Método responsável pelo tratamento de webhooks com transferências realizadas com sucesso acessado");
+
+        log.debug("Iniciando construção do objeto notificação para transferência realizada com sucesso");
+        NotificacaoEntity notificacaoEntity = NotificacaoEntity.builder()
+                .idEmpresaResponsavel(empresa.getId())
+                .dataCadastro(LocalDate.now().toString())
+                .horaCadastro(LocalTime.now().toString())
+                .descricao("Transferência PIX no valor de "
+                        + ConversorDeDados.converteValorDoubleParaValorMonetario(transferenciaEntity.getValor())
+                        + " realizada com sucesso")
+                .uri(null)
+                .tipoNotificacaoEnum(TipoNotificacaoEnum.TRANSFERENCIA_SUCESSO)
+                .lida(false)
+                .build();
+
+        log.debug("Adicionando notificação ao objeto empresa...");
+        empresa.getNotificacoes().add(notificacaoEntity);
+
+        log.debug("Removendo transferência da empresa: {}", transferenciaEntity);
+        empresa.getTransferencias().remove(transferenciaEntity);
+
+        log.debug("Setando status da transferência como aprovado...");
+        transferenciaEntity.setStatusTransferencia(StatusTransferenciaEnum.SUCESSO);
+
+        log.debug("Adicionado transferência atualizada à lista de transferências da empresa...");
+        empresa.getTransferencias().add(transferenciaEntity);
+
+        log.debug("Iniciando persistência da empresa atualizada...");
+        empresaRepositoryImpl.implementaPersistencia(empresa);
+    }
+
+    public void tratamentoWebhookTransferenciaComErro(EmpresaEntity empresa, TransferenciaEntity transferenciaEntity) {
+
+        log.debug("Método responsável pelo tratamento de webhooks com transferências realizadas com erro acessado");
+
+        log.debug("Iniciando construção do objeto notificação para transferência realizada com sucesso");
+        NotificacaoEntity notificacaoEntity = NotificacaoEntity.builder()
+                .idEmpresaResponsavel(empresa.getId())
+                .dataCadastro(LocalDate.now().toString())
+                .horaCadastro(LocalTime.now().toString())
+                .descricao("A transferência PIX no valor de "
+                        + ConversorDeDados.converteValorDoubleParaValorMonetario(transferenciaEntity.getValor())
+                        + " não pode ser realizada")
+                .uri(null)
+                .tipoNotificacaoEnum(TipoNotificacaoEnum.TRANSFERENCIA_ERRO)
+                .lida(false)
+                .build();
+
+        log.debug("Adicionando notificação ao objeto empresa...");
+        empresa.getNotificacoes().add(notificacaoEntity);
+
+        log.debug("Removendo transferência da empresa: {}", transferenciaEntity);
+        empresa.getTransferencias().remove(transferenciaEntity);
+
+        log.debug("Setando status da transferência como recusado...");
+        transferenciaEntity.setStatusTransferencia(StatusTransferenciaEnum.FALHA);
+
+        log.debug("Adicionado transferência atualizada à lista de transferências da empresa...");
+        empresa.getTransferencias().add(transferenciaEntity);
+
+        log.debug("Iniciando persistência da empresa atualizada...");
+        empresaRepositoryImpl.implementaPersistencia(empresa);
+    }
 }

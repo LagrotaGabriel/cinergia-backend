@@ -1,14 +1,8 @@
 package br.com.backend.services.pagamento;
 
 import br.com.backend.models.dto.pagamento.response.PagamentoPageResponse;
-import br.com.backend.models.entities.ClienteEntity;
-import br.com.backend.models.entities.PagamentoEntity;
-import br.com.backend.models.entities.PlanoEntity;
-import br.com.backend.models.entities.EmpresaEntity;
-import br.com.backend.models.enums.FormaPagamentoEnum;
-import br.com.backend.models.enums.NotificacaoEnum;
-import br.com.backend.models.enums.StatusPagamentoEnum;
-import br.com.backend.models.enums.StatusPlanoEnum;
+import br.com.backend.models.entities.*;
+import br.com.backend.models.enums.*;
 import br.com.backend.proxy.webhooks.cobranca.AtualizacaoCobrancaWebHook;
 import br.com.backend.repositories.cliente.impl.ClienteRepositoryImpl;
 import br.com.backend.repositories.empresa.impl.EmpresaRepositoryImpl;
@@ -19,6 +13,7 @@ import br.com.backend.services.email.services.EmailService;
 import br.com.backend.services.empresa.EmpresaService;
 import br.com.backend.services.plano.PlanoService;
 import br.com.backend.util.Constantes;
+import br.com.backend.util.ConversorDeDados;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,8 +21,8 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.beans.Transient;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
@@ -179,6 +174,7 @@ public class PagamentoService {
         return taxaTotal;
     }
 
+    @Transactional
     public void realizaTratamentoWebhookCobranca(AtualizacaoCobrancaWebHook atualizacaoCobrancaWebHook) {
 
         log.debug("Método 'motor de distruição' de Webhook de atualização de cobrança acessado");
@@ -186,10 +182,13 @@ public class PagamentoService {
         PlanoEntity plano = planoRepositoryImpl
                 .implementaBuscaPorCodigoPlanoAsaas(atualizacaoCobrancaWebHook.getPayment().getSubscription());
 
+        EmpresaEntity empresa =
+                empresaRepositoryImpl.implementaBuscaPorId(plano.getIdEmpresaResponsavel());
+
         switch (atualizacaoCobrancaWebHook.getEvent()) {
             case PAYMENT_CREATED:
                 log.debug("Condicional para novo pagamento CRIADO acessada");
-                realizaCriacaoDeNovoPagamento(atualizacaoCobrancaWebHook, plano);
+                realizaCriacaoDeNovoPagamento(atualizacaoCobrancaWebHook, plano, empresa);
                 log.info("Cobrança CRIADA com sucesso");
                 break;
             case PAYMENT_RECEIVED:
@@ -228,7 +227,8 @@ public class PagamentoService {
     }
 
     public void realizaCriacaoDeNovoPagamento(AtualizacaoCobrancaWebHook atualizacaoCobrancaWebHook,
-                                              PlanoEntity planoEntity) {
+                                              PlanoEntity planoEntity,
+                                              EmpresaEntity empresa) {
 
         log.debug("Método de criação de novo pagamento acessado");
 
@@ -262,6 +262,22 @@ public class PagamentoService {
         log.debug("Adicionando objeto pagamento criado à lista de pagamentos do plano...");
         planoEntity.getPagamentos().add(pagamentoEntity);
 
+        log.debug("Iniciando construção do objeto notificação para transferência realizada com sucesso");
+        NotificacaoEntity notificacaoEntity = NotificacaoEntity.builder()
+                .idEmpresaResponsavel(empresa.getId())
+                .dataCadastro(LocalDate.now().toString())
+                .horaCadastro(LocalTime.now().toString())
+                .descricao(planoEntity.getDescricao() + " - Cobrança criada no valor de "
+                        + ConversorDeDados.converteValorDoubleParaValorMonetario(pagamentoEntity.getValorBruto()))
+                .uri(atualizacaoCobrancaWebHook.getPayment().getInvoiceUrl())
+                .tipoNotificacaoEnum(TipoNotificacaoEnum.COBRANCA_CRIADA)
+                .lida(false)
+                .build();
+
+        log.debug("Adicionando notificação ao objeto empresa...");
+        empresa.getNotificacoes().add(notificacaoEntity);
+        empresaRepositoryImpl.implementaPersistencia(empresa);
+
         try {
             log.debug("Iniciando acesso ao método de implementação de persistência do plano para o persistir com sua lista " +
                     "de pagamentos atualizada...");
@@ -277,7 +293,6 @@ public class PagamentoService {
         }
     }
 
-    @Transient
     public void realizaAtualizacaoDePagamentoRealizado(AtualizacaoCobrancaWebHook atualizacaoCobrancaWebHook,
                                                        PlanoEntity planoEntity) {
         log.debug(Constantes.INICIANDO_IMPLEMENTACAO_BUSCA_PAGAMENTO_ASAAS);
@@ -322,6 +337,26 @@ public class PagamentoService {
 
         log.debug("Setando pagamento à lista de pagamentos do cliente...");
         planoEntity.getPagamentos().add(pagamentoEntity);
+
+        log.debug("Adicionando objeto pagamento criado à lista de pagamentos do plano...");
+        planoEntity.getPagamentos().add(pagamentoEntity);
+
+        log.debug("Iniciando construção do objeto notificação para transferência realizada com sucesso");
+        NotificacaoEntity notificacaoEntity = NotificacaoEntity.builder()
+                .idEmpresaResponsavel(empresa.getId())
+                .dataCadastro(LocalDate.now().toString())
+                .horaCadastro(LocalTime.now().toString())
+                .descricao("Pagamento de "
+                        + ConversorDeDados.converteValorDoubleParaValorMonetario(pagamentoEntity.getValorBruto())
+                        + "da assinatura " + planoEntity.getDescricao() + " recebido com sucesso")
+                .uri(atualizacaoCobrancaWebHook.getPayment().getTransactionReceiptUrl())
+                .tipoNotificacaoEnum(TipoNotificacaoEnum.COBRANCA_RECEBIDA)
+                .lida(false)
+                .build();
+
+        log.debug("Adicionando notificação ao objeto empresa...");
+        empresa.getNotificacoes().add(notificacaoEntity);
+        empresaRepositoryImpl.implementaPersistencia(empresa);
 
         log.debug(Constantes.INICIANDO_IMPL_PERSISTENCIA_PLANO);
         planoRepositoryImpl.implementaPersistencia(planoEntity);
