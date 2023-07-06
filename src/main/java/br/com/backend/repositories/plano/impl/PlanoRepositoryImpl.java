@@ -1,6 +1,5 @@
 package br.com.backend.repositories.plano.impl;
 
-import br.com.backend.models.entities.ClienteEntity;
 import br.com.backend.models.entities.PagamentoEntity;
 import br.com.backend.models.entities.PlanoEntity;
 import br.com.backend.repositories.plano.PlanoRepository;

@@ -214,7 +214,7 @@ public class PagamentoService {
             case PAYMENT_APPROVED_BY_RISK_ANALYSIS:
             case PAYMENT_REPROVED_BY_RISK_ANALYSIS:
             case PAYMENT_RESTORED:
-            case PAYMENT_REFUNDED: //TODO Implantar lógica para estorno
+            case PAYMENT_REFUNDED:
             case PAYMENT_RECEIVED_IN_CASH_UNDONE:
             case PAYMENT_CHARGEBACK_REQUESTED:
             case PAYMENT_CHARGEBACK_DISPUTE:

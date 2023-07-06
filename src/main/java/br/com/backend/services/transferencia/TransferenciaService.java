@@ -7,15 +7,16 @@ import br.com.backend.models.entities.TransferenciaEntity;
 import br.com.backend.models.enums.StatusTransferenciaEnum;
 import br.com.backend.models.enums.TipoChavePixEnum;
 import br.com.backend.proxy.AsaasProxy;
-import br.com.backend.proxy.transferencia.request.CriaChavePixAsaasRequest;
 import br.com.backend.proxy.transferencia.request.TransferePixAsaasRequest;
-import br.com.backend.proxy.transferencia.response.CriaChavePixAsaasResponse;
 import br.com.backend.proxy.transferencia.response.TransferePixAsaasResponse;
 import br.com.backend.proxy.webhooks.transferencia.AtualizacaoTransferenciaWebHook;
 import br.com.backend.repositories.empresa.impl.EmpresaRepositoryImpl;
 import br.com.backend.repositories.transferencia.TransferenciaRepository;
+import br.com.backend.repositories.transferencia.impl.TransferenciaRepositoryImpl;
+import br.com.backend.services.exceptions.FeignConnectionException;
 import br.com.backend.services.exceptions.InvalidRequestException;
 import br.com.backend.util.Constantes;
+import feign.FeignException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -36,6 +37,9 @@ public class TransferenciaService {
 
     @Autowired
     TransferenciaRepository transferenciaRepository;
+
+    @Autowired
+    TransferenciaRepositoryImpl transferenciaRepositoryImpl;
 
     @Autowired
     AsaasProxy asaasProxy;
@@ -59,7 +63,7 @@ public class TransferenciaService {
                 .replace(",", ""));
 
         if (activeProfile.equals("dev") || activeProfile.equals("test")) {
-            transferenciaRequest.setChavePix(criaChavePixAsaasParaTestes());
+            transferenciaRequest.setChavePix("8512895b-99d1-4e3e-ac20-ba5e811f14b9");
             transferenciaRequest.setTipoChavePix(TipoChavePixEnum.EVP);
         }
 
@@ -108,11 +112,14 @@ public class TransferenciaService {
             log.debug("Realizando envio de requisição de criação de transferência para a integradora ASAAS...");
             responseAsaas =
                     asaasProxy.transferirPix(transferePixAsaasRequest, System.getenv("TOKEN_ASAAS"));
-        } catch (Exception e) {
+        } catch (FeignException e) {
             log.error(Constantes.ERRO_CRIACAO_TRANSFERENCIA_ASAAS
                     + e.getMessage());
-            throw new InvalidRequestException(Constantes.ERRO_CRIACAO_TRANSFERENCIA_ASAAS
-                    + e.getMessage());
+            if (e.status() == 409)
+                throw new FeignConnectionException("Ocorreu um erro interno ao tentar realizar sua transferência. Tente novamente em 5 minutos");
+            else
+                throw new InvalidRequestException(Constantes.ERRO_CRIACAO_TRANSFERENCIA_ASAAS
+                        + e.getMessage());
         }
 
         if (responseAsaas == null) {
@@ -139,49 +146,6 @@ public class TransferenciaService {
         return transferePixAsaasResponse.getId();
     }
 
-    private String criaChavePixAsaasParaTestes() {
-
-        log.debug("Método de serviço responsável pela criação de chave PIX aleatória de testes na integradora ASAAS acessado");
-
-
-        ResponseEntity<CriaChavePixAsaasResponse> responseAsaas;
-
-        try {
-            log.debug("Realizando envio de requisição de criação de transferência para a integradora ASAAS...");
-            responseAsaas = asaasProxy.criaChavePix(
-                    new CriaChavePixAsaasRequest(TipoChavePixEnum.EVP),
-                    System.getenv("TOKEN_ASAAS"));
-        } catch (Exception e) {
-            log.error(Constantes.ERRO_CRIACAO_CHAVE_ALEATORIA_ASAAS
-                    + e.getMessage());
-            throw new InvalidRequestException(Constantes.ERRO_CRIACAO_CHAVE_ALEATORIA_ASAAS
-                    + e.getMessage());
-        }
-
-        if (responseAsaas == null) {
-            log.error("O valor retornado pela integradora na criação da chave PIX é nulo");
-            throw new InvalidRequestException(Constantes.RETORNO_INTEGRADORA_NULO);
-        }
-
-        if (responseAsaas.getStatusCodeValue() != 200) {
-            log.error("Ocorreu um erro no processo de criação da chave PIX na integradora de pagamentos: {}",
-                    responseAsaas.getBody());
-            throw new InvalidRequestException(Constantes.ERRO_CRIACAO_CHAVE_ALEATORIA_ASAAS
-                    + responseAsaas.getBody());
-        }
-        log.debug("Criação de chave PIX ASAAS realizada com sucesso");
-
-        CriaChavePixAsaasResponse criaChavePixAsaasResponse = responseAsaas.getBody();
-
-        if (criaChavePixAsaasResponse == null) {
-            log.error("O valor retornado pela integradora na criação da chave PIX é nulo");
-            throw new InvalidRequestException(Constantes.RETORNO_INTEGRADORA_NULO);
-        }
-
-        log.debug("Retornando chave pix gerada: {}", criaChavePixAsaasResponse.getKey());
-        return criaChavePixAsaasResponse.getKey();
-    }
-
     public TransferenciaPageResponse obtemTransferenciasEmpresa(EmpresaEntity empresa, Pageable pageable) {
 
         log.debug("Método de serviço de obtenção paginada de transferências da empresa acessado");
@@ -201,8 +165,49 @@ public class TransferenciaService {
     }
 
     public void realizaTratamentoWebhookTransferencia(AtualizacaoTransferenciaWebHook atualizacaoTransferenciaWebHook) {
-        log.debug("Método 'motor de distribuição' de Webhook de atualização de transferência acessado");
-        log.warn(String.valueOf(atualizacaoTransferenciaWebHook));
+        log.info("Método 'motor de distribuição' de Webhook de atualização de transferência acessado. " +
+                "Objeto recebido: {}", atualizacaoTransferenciaWebHook);
+
+        log.debug("Iniciando busca de transferência pelo código ASAAS...");
+        TransferenciaEntity transferenciaEntity = transferenciaRepositoryImpl
+                .implementaBuscaPorCodigoTransferenciaAsaas(atualizacaoTransferenciaWebHook.getTransfer().getId());
+
+        log.debug("Iniciando busca da empresa responsável pela transferência pelo ID...");
+        EmpresaEntity empresa = empresaRepositoryImpl.implementaBuscaPorId(transferenciaEntity.getId());
+
+        switch (atualizacaoTransferenciaWebHook.getEvent()) {
+            case "RECEIVED": {
+                log.debug("Removendo transferência da empresa: {}", transferenciaEntity);
+                empresa.getTransferencias().remove(transferenciaEntity);
+
+                log.debug("Setando status da transferência como aprovado...");
+                transferenciaEntity.setStatusTransferencia(StatusTransferenciaEnum.SUCESSO);
+
+                log.debug("Adicionado transferência atualizada à lista de transferências da empresa...");
+                empresa.getTransferencias().add(transferenciaEntity);
+
+                log.debug("Iniciando persistência da empresa atualizada...");
+                empresaRepositoryImpl.implementaPersistencia(empresa);
+                break;
+            }
+            case "FAILED": {
+                log.debug("Removendo transferência da empresa: {}", transferenciaEntity);
+                empresa.getTransferencias().remove(transferenciaEntity);
+
+                log.debug("Setando status da transferência como recusado...");
+                transferenciaEntity.setStatusTransferencia(StatusTransferenciaEnum.FALHA);
+
+                log.debug("Adicionado transferência atualizada à lista de transferências da empresa...");
+                empresa.getTransferencias().add(transferenciaEntity);
+
+                log.debug("Iniciando persistência da empresa atualizada...");
+                empresaRepositoryImpl.implementaPersistencia(empresa);
+                break;
+            }
+            default: {
+                break;
+            }
+        }
     }
 
 }

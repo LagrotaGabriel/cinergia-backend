@@ -53,7 +53,7 @@ public class TransferenciaController {
     public ResponseEntity<?> criaNovaTransferencia(
             HttpServletRequest req,
             @RequestBody TransferenciaRequest transferenciaRequest) {
-        log.info("Endpoint de criação de novo plano acessado");
+        log.info("Endpoint de criação de nova transferência acessado");
         transferenciaService.criaTransferencia(jwtUtil.obtemEmpresaAtiva(req), transferenciaRequest);
         return ResponseEntity.ok().build();
     }
