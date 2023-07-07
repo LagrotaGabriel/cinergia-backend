@@ -141,10 +141,29 @@ public class PlanoController {
     })
     @PreAuthorize("hasAnyRole('EMPRESA', 'ADMIN')")
     public ResponseEntity<DadosPlanoResponse> obtemDadosPlanoPorId(@PathVariable(value = "id") Long id,
-                                                              HttpServletRequest req) {
+                                                                   HttpServletRequest req) {
         log.info("Endpoint de busca de dados de plano por id acessado. ID recebido: {}", id);
         return ResponseEntity.ok().body(planoService
                 .realizaBuscaDeDadosDePlanoPorId(jwtUtil.obtemEmpresaAtiva(req), id));
     }
 
+    @DeleteMapping("/{id}")
+    @ApiOperation(
+            value = "Remoção de plano por id",
+            notes = "Esse endpoint tem como objetivo realizar a remoção de um plano pelo id recebido pelo parâmetro",
+            produces = MediaType.APPLICATION_JSON,
+            consumes = MediaType.APPLICATION_JSON
+    )
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "A remoção de um plano por id foi realizada com sucesso",
+                    response = PlanoResponse.class),
+            @ApiResponse(code = 400, message = "Nenhum plano foi encontrado com o id informado",
+                    response = ObjectNotFoundException.class),
+    })
+    @PreAuthorize("hasAnyRole('EMPRESA', 'ADMIN')")
+    public ResponseEntity<PlanoResponse> realizaCancelamentoDePlanoPorId(@PathVariable(value = "id") Long id,
+                                                                         HttpServletRequest req) {
+        log.info("Endpoint de remoção de plano por id acessado. ID recebido: {}", id);
+        return ResponseEntity.ok().body(planoService.cancelaAssinatura(id, jwtUtil.obtemEmpresaAtiva(req)));
+    }
 }

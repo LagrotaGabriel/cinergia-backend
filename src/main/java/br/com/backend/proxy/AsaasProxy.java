@@ -4,6 +4,7 @@ import br.com.backend.proxy.cliente.request.CriaClienteAsaasRequest;
 import br.com.backend.proxy.cliente.response.CriaClienteAsaasResponse;
 import br.com.backend.proxy.plano.request.CriaPlanoAsaasRequest;
 import br.com.backend.proxy.plano.response.CriaPlanoAsaasResponse;
+import br.com.backend.proxy.plano.response.cancela.CancelamentoAssinaturaResponse;
 import br.com.backend.proxy.plano.response.consulta.ConsultaAssinaturaResponse;
 import br.com.backend.proxy.transferencia.request.TransferePixAsaasRequest;
 import br.com.backend.proxy.transferencia.response.TransferePixAsaasResponse;
@@ -30,4 +31,7 @@ public interface AsaasProxy {
     ResponseEntity<TransferePixAsaasResponse> transferirPix(@RequestBody TransferePixAsaasRequest transferePixAsaasRequest,
                                                             @RequestHeader(value = "access_token") String accessToken);
 
+    @DeleteMapping(value = "/api/v3/subscriptions/{id}")
+    ResponseEntity<CancelamentoAssinaturaResponse> cancelarAssinatura(@PathVariable (value = "id") Long id,
+                                                                      @RequestHeader(value = "access_token") String accessToken);
 }

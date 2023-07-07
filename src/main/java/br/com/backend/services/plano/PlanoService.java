@@ -5,15 +5,16 @@ import br.com.backend.models.dto.plano.response.DadosPlanoResponse;
 import br.com.backend.models.dto.plano.response.PlanoPageResponse;
 import br.com.backend.models.dto.plano.response.PlanoResponse;
 import br.com.backend.models.entities.ClienteEntity;
+import br.com.backend.models.entities.EmpresaEntity;
 import br.com.backend.models.entities.PagamentoEntity;
 import br.com.backend.models.entities.PlanoEntity;
-import br.com.backend.models.entities.EmpresaEntity;
 import br.com.backend.models.enums.FormaPagamentoEnum;
 import br.com.backend.models.enums.StatusPagamentoEnum;
 import br.com.backend.models.enums.StatusPlanoEnum;
 import br.com.backend.proxy.AsaasProxy;
 import br.com.backend.proxy.plano.request.CriaPlanoAsaasRequest;
 import br.com.backend.proxy.plano.response.CriaPlanoAsaasResponse;
+import br.com.backend.proxy.plano.response.cancela.CancelamentoAssinaturaResponse;
 import br.com.backend.proxy.plano.response.consulta.ConsultaAssinaturaResponse;
 import br.com.backend.repositories.cliente.impl.ClienteRepositoryImpl;
 import br.com.backend.repositories.plano.PlanoRepository;
@@ -104,7 +105,6 @@ public class PlanoService {
     private String realizaCriacaoDePlanoDeAssinaturaNaIntegradoraAsaas(PlanoRequest planoRequest,
                                                                        ClienteEntity clienteEntity) {
 
-
         log.debug("Método de serviço responsável pela criação de assinatura na integradora ASAAS acessado");
 
         log.debug("Iniciando construção do objeto CriaPlanoAsaasRequest...");
@@ -139,7 +139,7 @@ public class PlanoService {
 
         if (responseAsaas == null) {
             log.error("O valor retornado pela integradora na criação da assinatura é nulo");
-            throw new InvalidRequestException("O retorno da integradora é nulo");
+            throw new InvalidRequestException(Constantes.RETORNO_INTEGRADORA_NULO);
         }
 
         if (responseAsaas.getStatusCodeValue() != 200) {
@@ -154,11 +154,69 @@ public class PlanoService {
 
         if (planoAsaasResponse == null) {
             log.error("O valor retornado pela integradora na criação da assinatura é nulo");
-            throw new InvalidRequestException("O retorno da integradora é nulo");
+            throw new InvalidRequestException(Constantes.RETORNO_INTEGRADORA_NULO);
         }
 
         log.debug("Retornando id da assinatura gerado: {}", planoAsaasResponse.getId());
         return planoAsaasResponse.getId();
+    }
+
+    @Transactional
+    public PlanoResponse cancelaAssinatura(Long idAssinatura, EmpresaEntity empresa) {
+
+        log.debug("Método responsável por realizar o cancelamento de uma assinatura acessado. ID: {}", idAssinatura);
+        PlanoEntity plano = planoRepositoryImpl.implementaBuscaPorId(idAssinatura, empresa.getId());
+
+        log.debug("Iniciando acesso ao método de cancelamento de assinatura na integradora ASAAS...");
+        realizaCancelamentoDePlanoDeAssinaturaNaIntegradoraAsaas(plano);
+
+        log.debug("Setando status do plano como removido...");
+        plano.setStatusPlano(StatusPlanoEnum.REMOVIDO);
+
+        log.debug("Implementando persistência do plano de assinatura atualizado...");
+        PlanoResponse planoResponse =
+                planoTypeConverter.convertePlanoEntityParaPlanoResponse(planoRepositoryImpl.implementaPersistencia(plano));
+
+        log.info("Cancelamento da assinatura realizado com sucesso");
+        return planoResponse;
+    }
+
+    private void realizaCancelamentoDePlanoDeAssinaturaNaIntegradoraAsaas(PlanoEntity planoEntity) {
+
+        log.debug("Método de serviço responsável pela cancelamento de assinatura na integradora ASAAS acessado");
+        ResponseEntity<CancelamentoAssinaturaResponse> responseAsaas;
+
+        try {
+            log.debug("Realizando envio de requisição de cancelamento de assinatura para a integradora ASAAS...");
+            responseAsaas =
+                    asaasProxy.cancelarAssinatura(planoEntity.getId(), System.getenv("TOKEN_ASAAS"));
+        } catch (Exception e) {
+            log.error(Constantes.ERRO_CANCELAMENTO_ASSINATURA_ASAAS
+                    + e.getMessage());
+            throw new InvalidRequestException(Constantes.ERRO_CANCELAMENTO_ASSINATURA_ASAAS
+                    + e.getMessage());
+        }
+
+        if (responseAsaas == null) {
+            log.error("O valor retornado pela integradora na cancelamento da assinatura é nulo");
+            throw new InvalidRequestException(Constantes.RETORNO_INTEGRADORA_NULO);
+        }
+
+        if (responseAsaas.getStatusCodeValue() != 200) {
+            log.error("Ocorreu um erro no processo de cancelamento da assinatura na integradora de pagamentos: {}",
+                    responseAsaas.getBody());
+            throw new InvalidRequestException(Constantes.ERRO_CANCELAMENTO_ASSINATURA_ASAAS
+                    + responseAsaas.getBody());
+        }
+        log.debug("Cancelamento de assinatura ASAAS realizada com sucesso");
+
+        CancelamentoAssinaturaResponse cancelamentoAssinaturaResponse = responseAsaas.getBody();
+
+        if (cancelamentoAssinaturaResponse == null) {
+            log.error("O valor retornado pela integradora na cancelamento da assinatura é nulo");
+            throw new InvalidRequestException(Constantes.RETORNO_INTEGRADORA_NULO);
+        }
+
     }
 
     public PlanoPageResponse realizaBuscaPaginadaPorPlanosDoCliente(EmpresaEntity empresaLogada,
@@ -244,17 +302,15 @@ public class PlanoService {
 
         double comprometimento = 100.0;
 
-        for(PagamentoEntity pagamento: pagamentos) {
+        for (PagamentoEntity pagamento : pagamentos) {
             quantidadeCobrancas++;
             totalCobrancas += pagamento.getValorBruto();
 
             if (pagamento.getStatusPagamento() == StatusPagamentoEnum.APROVADO) {
                 totalPago += pagamento.getValorBruto();
-            }
-            else if (pagamento.getStatusPagamento() == StatusPagamentoEnum.PENDENTE) {
+            } else if (pagamento.getStatusPagamento() == StatusPagamentoEnum.PENDENTE) {
                 totalPendente += pagamento.getValorBruto();
-            }
-            else {
+            } else {
                 quantidadeEmAtraso++;
                 totalEmAtraso += pagamento.getValorBruto();
             }

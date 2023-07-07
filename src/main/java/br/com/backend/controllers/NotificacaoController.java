@@ -55,7 +55,7 @@ public class NotificacaoController {
                 .body(notificacaoService.implementaBuscaDeNotificacoesEmpresa(jwtUtil.obtemEmpresaAtiva(req)));
     }
 
-    @PostMapping
+    @GetMapping("/marcar-como-lido")
     @ApiOperation(
             value = "Seta notificações da empresa como lidas",
             notes = "Esse endpoint tem como objetivo realizar a setagem das notificações da empresa para lidas",

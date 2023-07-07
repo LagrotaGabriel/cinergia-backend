@@ -7,7 +7,8 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum StatusPlanoEnum {
     ATIVO (0, "Ativo"),
-    INATIVO (1, "Inativo");
+    INATIVO (1, "Inativo"),
+    REMOVIDO (2, "Removido");
 
     private final int code;
     private final String desc;
