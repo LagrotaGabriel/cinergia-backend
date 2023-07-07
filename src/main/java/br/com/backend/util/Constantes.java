@@ -7,10 +7,13 @@ public class Constantes {
     public static final String ZERO_REAIS = "R$ 0,00";
     public static final String ERRO_CRIACAO_ASSINATURA_ASAAS = "Ocorreu um erro no processo de criação da assinatura: ";
     public static final String ERRO_CANCELAMENTO_ASSINATURA_ASAAS = "Ocorreu um erro no processo de cancelamento da assinatura: ";
+    public static final String ERRO_CANCELAMENTO_PAGAMENTO_ASAAS = "Ocorreu um erro no processo de cancelamento do pagamento: ";
     public static final String ERRO_CRIACAO_CLIENTE_ASAAS = "Ocorreu um erro no processo de criação do cliente na integradora: ";
     public static final String ERRO_CRIACAO_TRANSFERENCIA_ASAAS = "Ocorreu um erro no processo de criação de transferência na integradora: ";
     public static final String CONVERSAO_DE_TIPAGEM_COM_SUCESSO = "Conversão de tipagem realizada com sucesso";
     public static final String RETORNO_INTEGRADORA_NULO = "O retorno da integradora é nulo";
+
+    public static final String ATUALIZANDO_VARIAVEIS_PAGAMENTO = "Atualizando variáveis do objeto pagamento...";
 
     public static final String INICIANDO_IMPL_PERSISTENCIA_CLIENTE =
             "Iniciando acesso ao método de implementação de persistência do cliente...";
@@ -30,6 +33,9 @@ public class Constantes {
 
     public static final String PLANO_ENCONTRADO =
             "Plano encontrado: {}";
+
+    public static final String PAGAMENTO_ENCONTRADO =
+            "Pagamento encontrado: {}";
 
     public static final String TRANSFERENCIA_ENCONTRADA =
             "Transferência encontrada: {}";

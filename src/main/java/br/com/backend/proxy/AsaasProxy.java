@@ -2,6 +2,7 @@ package br.com.backend.proxy;
 
 import br.com.backend.proxy.cliente.request.CriaClienteAsaasRequest;
 import br.com.backend.proxy.cliente.response.CriaClienteAsaasResponse;
+import br.com.backend.proxy.pagamento.CancelamentoPagamentoResponse;
 import br.com.backend.proxy.plano.request.CriaPlanoAsaasRequest;
 import br.com.backend.proxy.plano.response.CriaPlanoAsaasResponse;
 import br.com.backend.proxy.plano.response.cancela.CancelamentoAssinaturaResponse;
@@ -32,6 +33,10 @@ public interface AsaasProxy {
                                                             @RequestHeader(value = "access_token") String accessToken);
 
     @DeleteMapping(value = "/api/v3/subscriptions/{id}")
-    ResponseEntity<CancelamentoAssinaturaResponse> cancelarAssinatura(@PathVariable (value = "id") Long id,
+    ResponseEntity<CancelamentoAssinaturaResponse> cancelarAssinatura(@PathVariable(value = "id") String id,
                                                                       @RequestHeader(value = "access_token") String accessToken);
+
+    @DeleteMapping(value = "/api/v3/payments/{id}")
+    ResponseEntity<CancelamentoPagamentoResponse> cancelarCobranca(@PathVariable(value = "id") String id,
+                                                                   @RequestHeader(value = "access_token") String accessToken);
 }

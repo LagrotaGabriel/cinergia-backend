@@ -3,9 +3,11 @@ package br.com.backend.repositories.pagamento.impl;
 import br.com.backend.models.entities.PagamentoEntity;
 import br.com.backend.repositories.pagamento.PagamentoRepository;
 import br.com.backend.services.exceptions.ObjectNotFoundException;
+import br.com.backend.util.Constantes;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -15,6 +17,14 @@ public class PagamentoRepositoryImpl {
 
     @Autowired
     PagamentoRepository pagamentoRepository;
+
+    @Transactional
+    public PagamentoEntity implementaPersistencia(PagamentoEntity pagamento) {
+        log.debug("Método de serviço que implementa persistência do pagamento acessado");
+        PagamentoEntity pagamentoEntity = pagamentoRepository.save(pagamento);
+        log.debug("Persistência do objeto pagamento realizada com sucesso");
+        return pagamentoEntity;
+    }
 
     public PagamentoEntity implementaBuscaPorCodigoPagamentoAsaas(String codigoAsaas) {
         log.debug("Método que implementa busca por pagamento Asaas pelo seu código de pagamento acessado");
@@ -32,6 +42,23 @@ public class PagamentoRepositoryImpl {
         }
 
         log.debug("Retornando pagamento...");
+        return pagamentoEntity;
+    }
+
+    public PagamentoEntity implementaBuscaPorId(Long id, Long idEmpresa) {
+        log.debug("Método que implementa busca de pagamento por id acessado. Id: {}", id);
+
+        Optional<PagamentoEntity> pagamentoOptional = pagamentoRepository.buscaPorId(id, idEmpresa);
+
+        PagamentoEntity pagamentoEntity;
+        if (pagamentoOptional.isPresent()) {
+            pagamentoEntity = pagamentoOptional.get();
+            log.debug(Constantes.PAGAMENTO_ENCONTRADO, pagamentoEntity);
+        } else {
+            log.warn("Nenhum pagamento foi encontrado com o id {}", id);
+            throw new ObjectNotFoundException("Nenhum pagamento foi encontrado com o id informado");
+        }
+        log.debug("Retornando o pagamento encontrado...");
         return pagamentoEntity;
     }
 

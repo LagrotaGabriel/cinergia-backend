@@ -167,6 +167,9 @@ public class PlanoService {
         log.debug("Método responsável por realizar o cancelamento de uma assinatura acessado. ID: {}", idAssinatura);
         PlanoEntity plano = planoRepositoryImpl.implementaBuscaPorId(idAssinatura, empresa.getId());
 
+        if (plano.getStatusPlano().equals(StatusPlanoEnum.REMOVIDO))
+            throw new InvalidRequestException("Não é possível remover um plano que já foi removido");
+
         log.debug("Iniciando acesso ao método de cancelamento de assinatura na integradora ASAAS...");
         realizaCancelamentoDePlanoDeAssinaturaNaIntegradoraAsaas(plano);
 
@@ -189,7 +192,7 @@ public class PlanoService {
         try {
             log.debug("Realizando envio de requisição de cancelamento de assinatura para a integradora ASAAS...");
             responseAsaas =
-                    asaasProxy.cancelarAssinatura(planoEntity.getId(), System.getenv("TOKEN_ASAAS"));
+                    asaasProxy.cancelarAssinatura(planoEntity.getIdAsaas(), System.getenv("TOKEN_ASAAS"));
         } catch (Exception e) {
             log.error(Constantes.ERRO_CANCELAMENTO_ASSINATURA_ASAAS
                     + e.getMessage());

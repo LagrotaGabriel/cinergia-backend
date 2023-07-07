@@ -2,6 +2,7 @@ package br.com.backend.controllers;
 
 import br.com.backend.config.security.JWTUtil;
 import br.com.backend.models.dto.pagamento.response.PagamentoPageResponse;
+import br.com.backend.models.dto.pagamento.response.PagamentoResponse;
 import br.com.backend.services.pagamento.PagamentoService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -120,6 +121,24 @@ public class PagamentoController {
         log.info("Endpoint de busca paginada por pagamentos realizados foi acessada");
         return ResponseEntity.ok().body(pagamentoService.realizaBuscaPaginadaPorPagamentosRealizados(
                 jwtUtil.obtemEmpresaAtiva(req), pageable));
+    }
+
+    @DeleteMapping("/{id}")
+    @ApiOperation(
+            value = "Remoção de pagamento por ID",
+            notes = "Esse endpoint tem como objetivo realizar a remoção de um pagamento por ID",
+            produces = MediaType.APPLICATION_JSON,
+            consumes = MediaType.APPLICATION_JSON
+    )
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "A remoção do pagamento foi realizada com sucesso",
+                    response = PagamentoResponse.class),
+    })
+    @PreAuthorize("hasAnyRole('EMPRESA', 'ADMIN')")
+    public ResponseEntity<PagamentoResponse> realizaRemocaoDoPagamento(@PathVariable(value = "id") Long id,
+                                                                       HttpServletRequest req) {
+        log.info("Endpoint de remoção de pagamento foi acessada");
+        return ResponseEntity.ok().body(pagamentoService.cancelaPagamento(id, jwtUtil.obtemEmpresaAtiva(req)));
     }
 
 

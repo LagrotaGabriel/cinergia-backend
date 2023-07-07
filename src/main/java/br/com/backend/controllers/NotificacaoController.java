@@ -26,7 +26,7 @@ import java.util.List;
 @Api(value = "Esta API disponibiliza os endpoints da entidade Notificacao")
 @Produces({MediaType.APPLICATION_JSON, "application/json"})
 @Consumes({MediaType.APPLICATION_JSON, "application/json"})
-@RequestMapping("api/v1/notificacao")
+@RequestMapping("/api/v1/notificacao")
 public class NotificacaoController {
 
     @Autowired

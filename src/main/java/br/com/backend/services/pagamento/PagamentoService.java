@@ -1,8 +1,11 @@
 package br.com.backend.services.pagamento;
 
 import br.com.backend.models.dto.pagamento.response.PagamentoPageResponse;
+import br.com.backend.models.dto.pagamento.response.PagamentoResponse;
 import br.com.backend.models.entities.*;
 import br.com.backend.models.enums.*;
+import br.com.backend.proxy.AsaasProxy;
+import br.com.backend.proxy.pagamento.CancelamentoPagamentoResponse;
 import br.com.backend.proxy.webhooks.cobranca.AtualizacaoCobrancaWebHook;
 import br.com.backend.repositories.cliente.impl.ClienteRepositoryImpl;
 import br.com.backend.repositories.empresa.impl.EmpresaRepositoryImpl;
@@ -11,6 +14,7 @@ import br.com.backend.repositories.pagamento.impl.PagamentoRepositoryImpl;
 import br.com.backend.repositories.plano.impl.PlanoRepositoryImpl;
 import br.com.backend.services.email.services.EmailService;
 import br.com.backend.services.empresa.EmpresaService;
+import br.com.backend.services.exceptions.InvalidRequestException;
 import br.com.backend.services.plano.PlanoService;
 import br.com.backend.util.Constantes;
 import br.com.backend.util.ConversorDeDados;
@@ -20,6 +24,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +34,9 @@ import java.time.LocalTime;
 @Slf4j
 @Service
 public class PagamentoService {
+
+    @Autowired
+    AsaasProxy asaasProxy;
 
     @Autowired
     PagamentoRepository pagamentoRepository;
@@ -208,6 +216,10 @@ public class PagamentoService {
                 log.info("Atualização de plano para pagamento VENCIDO realizada com sucesso");
                 break;
             case PAYMENT_DELETED:
+                log.debug("Condicional de pagamento DELETADO acessada");
+                realizaAtualizacaoDePlanoParaPagamentoRemovido(atualizacaoCobrancaWebHook);
+                log.info("Atualização de plano para pagamento DELETADO realizada com sucesso");
+                break;
             case PAYMENT_ANTICIPATED:
             case PAYMENT_AWAITING_RISK_ANALYSIS:
             case PAYMENT_APPROVED_BY_RISK_ANALYSIS:
@@ -316,7 +328,7 @@ public class PagamentoService {
         log.debug("Setando plano do cliente como ATIVO...");
         planoEntity.setStatusPlano(StatusPlanoEnum.ATIVO);
 
-        log.debug("Atualizando variáveis do objeto pagamento...");
+        log.debug(Constantes.ATUALIZANDO_VARIAVEIS_PAGAMENTO);
         pagamentoEntity.setIdPlanoResponsavel(planoEntity.getId());
         pagamentoEntity.setIdEmpresaResponsavel(planoEntity.getIdEmpresaResponsavel());
         pagamentoEntity.setIdAsaas(atualizacaoCobrancaWebHook.getPayment().getId());
@@ -400,6 +412,20 @@ public class PagamentoService {
         }
     }
 
+    public void realizaAtualizacaoDePlanoParaPagamentoRemovido(AtualizacaoCobrancaWebHook atualizacaoCobrancaWebHook) {
+        log.debug(Constantes.INICIANDO_IMPLEMENTACAO_BUSCA_PAGAMENTO_ASAAS);
+        PagamentoEntity pagamentoEntity = pagamentoRepositoryImpl
+                .implementaBuscaPorCodigoPagamentoAsaas(atualizacaoCobrancaWebHook.getPayment().getId());
+
+        log.debug(Constantes.ATUALIZANDO_VARIAVEIS_PAGAMENTO);
+        pagamentoEntity.setStatusPagamento(StatusPagamentoEnum.CANCELADO);
+
+        log.debug(Constantes.OBJETO_PAGAMENTO_CRIADO, pagamentoEntity);
+
+        log.debug(Constantes.INICIANDO_IMPL_PERSISTENCIA_PLANO);
+        pagamentoRepositoryImpl.implementaPersistencia(pagamentoEntity);
+    }
+
     public void realizaAtualizacaoDePagamentoAlterado(AtualizacaoCobrancaWebHook atualizacaoCobrancaWebHook,
                                                       PlanoEntity planoEntity) {
         log.debug(Constantes.INICIANDO_IMPLEMENTACAO_BUSCA_PAGAMENTO_ASAAS);
@@ -409,7 +435,7 @@ public class PagamentoService {
         log.debug(Constantes.REMOVENDO_PAGAMENTO_DO_PLANO, pagamentoEntity);
         planoEntity.getPagamentos().remove(pagamentoEntity);
 
-        log.debug("Atualizando variáveis do objeto pagamento...");
+        log.debug(Constantes.ATUALIZANDO_VARIAVEIS_PAGAMENTO);
         pagamentoEntity.setDescricao(atualizacaoCobrancaWebHook.getPayment().getDescription());
         pagamentoEntity.setFormaPagamento(FormaPagamentoEnum.valueOf(atualizacaoCobrancaWebHook
                 .getPayment().getBillingType().getFormaPagamentoResumida()));
@@ -421,6 +447,73 @@ public class PagamentoService {
 
         log.debug(Constantes.INICIANDO_IMPL_PERSISTENCIA_PLANO);
         planoRepositoryImpl.implementaPersistencia(planoEntity);
+    }
+
+    public PagamentoResponse cancelaPagamento(Long idPagamento, EmpresaEntity empresa) {
+
+        log.debug("Método responsável por realizar o cancelamento de um pagamento acessado. ID: {}", idPagamento);
+        PagamentoEntity pagamento = pagamentoRepositoryImpl.implementaBuscaPorId(idPagamento, empresa.getId());
+
+        if (pagamento.getStatusPagamento().equals(StatusPagamentoEnum.CANCELADO))
+            throw new InvalidRequestException("Não é possível remover um pagamento que já foi removido");
+
+        if (pagamento.getStatusPagamento().equals(StatusPagamentoEnum.APROVADO))
+            throw new InvalidRequestException("Não é possível remover um pagamento que já foi realizado");
+
+        if (pagamento.getStatusPagamento().equals(StatusPagamentoEnum.REPROVADO))
+            throw new InvalidRequestException("Não é possível remover um pagamento recusado");
+
+        log.debug("Iniciando acesso ao método de cancelamento de pagamento na integradora ASAAS...");
+        realizaCancelamentoDeCobrancaNaIntegradoraAsaas(pagamento);
+
+        log.debug("Setando status do pagamento como removido...");
+        pagamento.setStatusPagamento(StatusPagamentoEnum.CANCELADO);
+
+        log.debug("Implementando persistência do pagamento de assinatura atualizado...");
+        PagamentoResponse pagamentoResponse =
+                pagamentoTypeConverter.convertePagamentoEntityParaPagamentoResponse(
+                        pagamentoRepositoryImpl.implementaPersistencia(pagamento));
+
+        log.info("Cancelamento do pagamento realizado com sucesso");
+        return pagamentoResponse;
+    }
+
+    private void realizaCancelamentoDeCobrancaNaIntegradoraAsaas(PagamentoEntity pagamentoEntity) {
+
+        log.debug("Método de serviço responsável pela cancelamento de pagamento na integradora ASAAS acessado");
+        ResponseEntity<CancelamentoPagamentoResponse> responseAsaas;
+
+        try {
+            log.debug("Realizando envio de requisição de cancelamento de pagamento para a integradora ASAAS...");
+            responseAsaas =
+                    asaasProxy.cancelarCobranca(pagamentoEntity.getIdAsaas(), System.getenv("TOKEN_ASAAS"));
+        } catch (Exception e) {
+            log.error(Constantes.ERRO_CANCELAMENTO_PAGAMENTO_ASAAS
+                    + e.getMessage());
+            throw new InvalidRequestException(Constantes.ERRO_CANCELAMENTO_PAGAMENTO_ASAAS
+                    + e.getMessage());
+        }
+
+        if (responseAsaas == null) {
+            log.error("O valor retornado pela integradora no cancelamento do pagamento é nulo");
+            throw new InvalidRequestException(Constantes.RETORNO_INTEGRADORA_NULO);
+        }
+
+        if (responseAsaas.getStatusCodeValue() != 200) {
+            log.error("Ocorreu um erro no processo de cancelamento do pagamento na integradora de pagamentos: {}",
+                    responseAsaas.getBody());
+            throw new InvalidRequestException(Constantes.ERRO_CANCELAMENTO_PAGAMENTO_ASAAS
+                    + responseAsaas.getBody());
+        }
+        log.debug("Cancelamento de pagamento ASAAS realizada com sucesso");
+
+        CancelamentoPagamentoResponse cancelamentoAssinaturaResponse = responseAsaas.getBody();
+
+        if (cancelamentoAssinaturaResponse == null) {
+            log.error("O valor retornado pela integradora no cancelamento do pagamento é nulo");
+            throw new InvalidRequestException(Constantes.RETORNO_INTEGRADORA_NULO);
+        }
+
     }
 
 }
