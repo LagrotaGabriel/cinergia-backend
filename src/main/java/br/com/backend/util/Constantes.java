@@ -4,10 +4,12 @@ public class Constantes {
 
     Constantes() {
     }
+
     public static final String ZERO_REAIS = "R$ 0,00";
     public static final String ERRO_CRIACAO_ASSINATURA_ASAAS = "Ocorreu um erro no processo de criação da assinatura: ";
     public static final String ERRO_CANCELAMENTO_ASSINATURA_ASAAS = "Ocorreu um erro no processo de cancelamento da assinatura: ";
     public static final String ERRO_CANCELAMENTO_PAGAMENTO_ASAAS = "Ocorreu um erro no processo de cancelamento do pagamento: ";
+    public static final String ERRO_REMOCAO_CLIENTE_ASAAS = "Ocorreu um erro no processo de remoção do cliente: ";
     public static final String ERRO_CRIACAO_CLIENTE_ASAAS = "Ocorreu um erro no processo de criação do cliente na integradora: ";
     public static final String ERRO_CRIACAO_TRANSFERENCIA_ASAAS = "Ocorreu um erro no processo de criação de transferência na integradora: ";
     public static final String CONVERSAO_DE_TIPAGEM_COM_SUCESSO = "Conversão de tipagem realizada com sucesso";

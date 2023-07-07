@@ -3,10 +3,7 @@ package br.com.backend.services.cliente;
 import br.com.backend.models.dto.cliente.request.ClienteRequest;
 import br.com.backend.models.dto.cliente.response.ClientePageResponse;
 import br.com.backend.models.dto.cliente.response.ClienteResponse;
-import br.com.backend.models.entities.AcessoSistemaEntity;
-import br.com.backend.models.entities.ClienteEntity;
-import br.com.backend.models.entities.EmpresaEntity;
-import br.com.backend.models.entities.ExclusaoEntity;
+import br.com.backend.models.entities.*;
 import br.com.backend.models.entities.global.EnderecoEntity;
 import br.com.backend.models.entities.global.ImagemEntity;
 import br.com.backend.models.entities.global.TelefoneEntity;
@@ -15,9 +12,11 @@ import br.com.backend.models.enums.global.TipoImagemEnum;
 import br.com.backend.proxy.AsaasProxy;
 import br.com.backend.proxy.cliente.request.CriaClienteAsaasRequest;
 import br.com.backend.proxy.cliente.response.CriaClienteAsaasResponse;
+import br.com.backend.proxy.cliente.response.RemoveClienteAsaasResponse;
 import br.com.backend.repositories.cliente.ClienteRepository;
 import br.com.backend.repositories.cliente.impl.ClienteRepositoryImpl;
 import br.com.backend.services.exceptions.InvalidRequestException;
+import br.com.backend.services.plano.PlanoService;
 import br.com.backend.util.Constantes;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +35,9 @@ import java.util.*;
 @Slf4j
 @Service
 public class ClienteService {
+
+    @Autowired
+    PlanoService planoService;
 
     @Autowired
     ClienteValidationService clienteValidationService;
@@ -255,6 +257,13 @@ public class ClienteService {
         log.debug("Persistindo cliente excluído no banco de dados...");
         ClienteEntity clienteExcluido = clienteRepositoryImpl.implementaPersistencia(clienteEncontrado);
 
+        log.debug("Iniciando acesso ao método de remoção de cliente na integradora ASAAS...");
+        realizaRemocaoDoClienteNaIntegradoraAsaas(clienteExcluido);
+
+        log.debug("Iniciando iteração pelos planos do cliente para acionar cancelamento dos planos...");
+        for (PlanoEntity plano : clienteExcluido.getPlanos())
+            planoService.cancelaAssinatura(plano.getId(), empresaLogada);
+
         log.info("Cliente excluído com sucesso");
         return ClienteResponse.builder()
                 .id(clienteExcluido.getId())
@@ -272,6 +281,44 @@ public class ClienteService {
                 .fotoPerfil(clienteExcluido.getFotoPerfil())
                 .telefones(clienteExcluido.getTelefones())
                 .build();
+    }
+
+    private void realizaRemocaoDoClienteNaIntegradoraAsaas(ClienteEntity cliente) {
+
+        log.debug("Método de serviço responsável pela remoção de cliente na integradora ASAAS acessado");
+        ResponseEntity<RemoveClienteAsaasResponse> responseAsaas;
+
+        try {
+            log.debug("Realizando envio de requisição de remoção cliente para a integradora ASAAS...");
+            responseAsaas =
+                    asaasProxy.removerCliente(cliente.getAsaasId(), System.getenv("TOKEN_ASAAS"));
+        } catch (Exception e) {
+            log.error(Constantes.ERRO_REMOCAO_CLIENTE_ASAAS
+                    + e.getMessage());
+            throw new InvalidRequestException(Constantes.ERRO_REMOCAO_CLIENTE_ASAAS
+                    + e.getMessage());
+        }
+
+        if (responseAsaas == null) {
+            log.error("O valor retornado pela integradora na remoção do cliente é nulo");
+            throw new InvalidRequestException(Constantes.RETORNO_INTEGRADORA_NULO);
+        }
+
+        if (responseAsaas.getStatusCodeValue() != 200) {
+            log.error("Ocorreu um erro no processo de remoção do cliente na integradora de pagamentos: {}",
+                    responseAsaas.getBody());
+            throw new InvalidRequestException(Constantes.ERRO_REMOCAO_CLIENTE_ASAAS
+                    + responseAsaas.getBody());
+        }
+        log.debug("Remoção de cliente ASAAS realizada com sucesso");
+
+        RemoveClienteAsaasResponse removeClienteAsaasResponse = responseAsaas.getBody();
+
+        if (removeClienteAsaasResponse == null) {
+            log.error("O valor retornado pela integradora na remoção do cliente é nulo");
+            throw new InvalidRequestException(Constantes.RETORNO_INTEGRADORA_NULO);
+        }
+
     }
 
     public void removeClientesEmMassa(EmpresaEntity empresaLogada, List<Long> ids) {
