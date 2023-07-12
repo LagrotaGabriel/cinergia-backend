@@ -5,12 +5,14 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 
 @SpringBootTest
+@ActiveProfiles("test")
 @DisplayName("Entity: Empresa")
 class EmpresaEntityTest {
 
@@ -18,10 +20,10 @@ class EmpresaEntityTest {
     @DisplayName("Deve testar dataBuilder")
     void deveTestarDataBuilder() {
         Assertions.assertEquals(
-                "EmpresaEntity(id=1, dataCadastro=2023-02-03, horaCadastro=10:48, " +
-                        "nomeEmpresa=Akadia Solutions, email=akadia@gmail.com, cpfCnpj=12345678000112, " +
-                        "dataNascimento=1998-07-21, contaEmpresaAsaas=null, endereco=null, telefone=null, " +
-                        "celular=null, acessoSistema=null, logoEmpresa=null)",
+                "EmpresaEntity(id=1, dataCadastro=2023-02-03, horaCadastro=10:48, nomeEmpresa=Akadia Solutions, " +
+                        "email=akadia@gmail.com, cpfCnpj=12345678000112, dataNascimento=1998-07-21, saldo=null, " +
+                        "endereco=null, telefone=null, celular=null, acessoSistema=null, logoEmpresa=null, " +
+                        "notificacoes=[])",
                 EmpresaEntityBuilder.builder().build().toString()
         );
     }
@@ -50,10 +52,10 @@ class EmpresaEntityTest {
         );
 
         Assertions.assertEquals(
-                "EmpresaEntity(id=1, dataCadastro=2023-02-03, horaCadastro=15:27, " +
-                        "nomeEmpresa=Organizações Tabajara, email=tabajara@gmail.com, cpfCnpj=12345678000150, " +
-                        "dataNascimento=1998-07-21, contaEmpresaAsaas=null, endereco=null, telefone=null, celular=null, " +
-                        "acessoSistema=null, logoEmpresa=null)",
+                "EmpresaEntity(id=1, dataCadastro=2023-02-03, horaCadastro=15:27, nomeEmpresa=Organizações " +
+                        "Tabajara, email=tabajara@gmail.com, cpfCnpj=12345678000150, dataNascimento=1998-07-21, " +
+                        "saldo=0.0, endereco=null, telefone=null, celular=null, acessoSistema=null, logoEmpresa=null, " +
+                        "notificacoes=[])",
                 empresaEntity.toString()
         );
 
@@ -81,8 +83,8 @@ class EmpresaEntityTest {
         Assertions.assertEquals(
                 "EmpresaEntity(id=1, dataCadastro=2023-02-27, horaCadastro=17:40, " +
                         "nomeEmpresa=Organizações Tabajara, email=tabajara@gmail.com, cpfCnpj=12345678000150, " +
-                        "dataNascimento=1998-07-21, contaEmpresaAsaas=null, endereco=null, telefone=null, " +
-                        "celular=null, acessoSistema=null, logoEmpresa=null)",
+                        "dataNascimento=1998-07-21, saldo=0.0, endereco=null, telefone=null, celular=null, " +
+                        "acessoSistema=null, logoEmpresa=null, notificacoes=null)",
                 empresaEntity.toString()
         );
     }
