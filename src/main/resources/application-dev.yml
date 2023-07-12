@@ -12,6 +12,12 @@ spring:
     password: ${DB_PASSWORD}
 server:
   port: ${SERVER_PORT}
+logging:
+  config:
+    src/main/resources/logback.xml
+  level:
+    org.springframework.web: DEBUG
+    guru.springframework.controllers: DEBUG
+    org.hibernate: DEBUG
 
-root_log_level: DEBUG
 log_context: DEVELOPMENT

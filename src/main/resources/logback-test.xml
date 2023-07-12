@@ -1,0 +1,15 @@
+<configuration>
+
+    <contextName>akd-svc-saas-erp</contextName>
+
+    <appender name="coverage-stdout" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} %msg %rEx{short} %n</pattern>
+        </encoder>
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="coverage-stdout"/>
+    </root>
+
+</configuration>

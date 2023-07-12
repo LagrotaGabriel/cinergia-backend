@@ -1,17 +1,40 @@
 spring:
+  mail:
+    host: email-smtp.sa-east-1.amazonaws.com
+    port: 465
+    username: Ambiente_testes_subsy-at-982001349741
+    password: /3J4Mhm+I/RR/Zqf7Wan2V3E66TSGp6hiuG6ilDfRdo=
+  h2:
+    console:
+      path: /h2
+    enabled: true
   jpa:
-    hibernate.ddl-auto: create-drop
-    properties:
-      hibernate:
-        dialect=org:
-          hibernate:
-            dialect: MySQL5InnoDBDialect
+    defer-datasource-inicialization: true
   datasource:
-    url: jdbc:mysql://localhost:3306/cobranca-test?useTimezone=true&serverTimezone=UTC
-    username: root
-    password: 123456
+    url: jdbc:h2:mem:cobranca
+    driverClassName: org.h2.Driver
+    username: admin
+    password: 123
 server:
   port: 9081
+logging:
+  config:
+    src/main/resources/logback-test.xml
+  level:
+    org.springframework.web: DEBUG
+    guru.springframework.controllers: DEBUG
+    org.hibernate: DEBUG
+jwt:
+  secret: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiVGVzdCBlbnYiLCJrZXkiOjEyNTQzNDU2NH0.ATQktNehbZ6cI5lYzvJxyoDZnZgSrFhtRuvt4t_hd_o
+  expiration: 604800000
 
-root_log_level: DEBUG
+# ASAAS
+URL_ASAAS: https://sandbox.asaas.com
+TOKEN_ASAAS: $aact_YTU5YTE0M2M2N2I4MTliNzk0YTI5N2U5MzdjNWZmNDQ6OjAwMDAwMDAwMDAwMDAwNDkyNDA6OiRhYWNoXzBlZGM0MDUwLTBhYWMtNGM1Ni04MThhLTE0YzlmYmQ2MmZjYQ==
+TOKEN_WEBHOOK_ASAAS: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiV2ViaG9vayBBU0FBUyBhbWJpZW50ZSBkZSB0ZXN0ZXMiLCJpYXQiOjEyNDY0Mzk4NzF9.ikyCMBdpWkls-HQ8likkoJP8WchrsfIusRyTVi4PVpQ
+
+AWS_ACCESS_KEY: Ambiente_testes_subsy-at-982001349741
+AWS_SECRET_KEY: /3J4Mhm+I/RR/Zqf7Wan2V3E66TSGp6hiuG6ilDfRdo=
+EMAIL_SUBSY_AWS: gabriellagrota23@gmail.com
+
 log_context: TEST

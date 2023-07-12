@@ -23,7 +23,7 @@ spring:
   main:
     allow-circular-references: true
   profiles:
-    active: ${ACTIVE_PROFILE}
+    active: ${ACTIVE_PROFILE:default}
   aplication:
     name: akadia-saas-erp
   mvc:
