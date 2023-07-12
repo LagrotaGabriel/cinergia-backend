@@ -6,6 +6,7 @@ public class Constantes {
     }
 
     public static final String ZERO_REAIS = "R$ 0,00";
+    public static final String UM_REAL = "R$ 1,00";
     public static final String ERRO_CRIACAO_ASSINATURA_ASAAS = "Ocorreu um erro no processo de criação da assinatura: ";
     public static final String ERRO_CANCELAMENTO_ASSINATURA_ASAAS = "Ocorreu um erro no processo de cancelamento da assinatura: ";
     public static final String ERRO_CANCELAMENTO_PAGAMENTO_ASAAS = "Ocorreu um erro no processo de cancelamento do pagamento: ";
