@@ -4,10 +4,12 @@ import br.com.backend.models.dto.plano.request.PlanoRequest;
 import br.com.backend.models.entities.ClienteEntity;
 import br.com.backend.models.entities.PlanoEntity;
 import br.com.backend.proxy.AsaasProxy;
+import br.com.backend.proxy.plano.request.atualizar.AtualizaAssinaturaAsaasRequest;
 import br.com.backend.proxy.plano.request.criar.CriaPlanoAsaasRequest;
-import br.com.backend.proxy.plano.response.criar.CriaPlanoAsaasResponse;
+import br.com.backend.proxy.plano.response.atualizar.AtualizaAssinaturaAsaasResponse;
 import br.com.backend.proxy.plano.response.cancelar.CancelamentoAssinaturaResponse;
 import br.com.backend.proxy.plano.response.consultar.ConsultaAssinaturaResponse;
+import br.com.backend.proxy.plano.response.criar.CriaPlanoAsaasResponse;
 import br.com.backend.services.exceptions.FeignConnectionException;
 import br.com.backend.services.exceptions.InvalidRequestException;
 import br.com.backend.util.Constantes;
@@ -27,7 +29,7 @@ public class PlanoAsaasService {
     PlanoTypeConverter planoTypeConverter;
 
     protected String realizaCriacaoDePlanoDeAssinaturaNaIntegradoraAsaas(PlanoRequest planoRequest,
-                                                                       ClienteEntity clienteEntity) {
+                                                                         ClienteEntity clienteEntity) {
 
         log.debug("Método de serviço responsável pela criação de assinatura na integradora ASAAS acessado");
 
@@ -53,7 +55,7 @@ public class PlanoAsaasService {
         try {
             log.debug("Realizando envio de requisição de criação de assinatura para a integradora ASAAS...");
             responseAsaas =
-                    asaasProxy.cadastraNovaAssinatura(criaPlanoAsaasRequest, System.getenv("TOKEN_ASAAS"));
+                    asaasProxy.cadastraNovaAssinatura(criaPlanoAsaasRequest, System.getenv(Constantes.TOKEN_ASAAS));
         } catch (Exception e) {
             log.error(Constantes.ERRO_CRIACAO_ASSINATURA_ASAAS
                     + e.getMessage());
@@ -85,6 +87,60 @@ public class PlanoAsaasService {
         return planoAsaasResponse.getId();
     }
 
+    protected void realizaAtualizacaoDePlanoDeAssinaturaNaIntegradoraAsaas(String idPlanoAsaas,
+                                                                             PlanoEntity planoEntity) {
+
+        log.debug("Método de serviço responsável pela atualização de assinatura na integradora ASAAS acessado");
+
+        log.debug("Iniciando construção do objeto AtualizaAssinaturaAsaasRequest...");
+        AtualizaAssinaturaAsaasRequest atualizaAssinaturaAsaasRequest = AtualizaAssinaturaAsaasRequest.builder()
+                .billingType(planoEntity.getFormaPagamento())
+                .value(planoEntity.getValor())
+                .nextDueDate(planoEntity.getDataInicio())
+                .discount(null)
+                .interest(null)
+                .fine(null)
+                .cycle(planoTypeConverter.transformaPeriodicidadeEnumEmCycleEnum(planoEntity.getPeriodicidade()))
+                .description(planoEntity.getDescricao())
+                .updatePendingPayments(true)
+                .externalReference(null)
+                .build();
+
+        ResponseEntity<AtualizaAssinaturaAsaasResponse> responseAsaas;
+
+        try {
+            log.debug("Realizando envio de requisição de atualização de assinatura para a integradora ASAAS...");
+            responseAsaas =
+                    asaasProxy.atualizaAssinatura(idPlanoAsaas, atualizaAssinaturaAsaasRequest, System.getenv(Constantes.TOKEN_ASAAS));
+        } catch (Exception e) {
+            log.error(Constantes.ERRO_ATUALIZACAO_ASSINATURA_ASAAS
+                    + e.getMessage());
+            throw new InvalidRequestException(Constantes.ERRO_ATUALIZACAO_ASSINATURA_ASAAS
+                    + e.getMessage());
+        }
+
+        if (responseAsaas == null) {
+            log.error("O valor retornado pela integradora na atualização da assinatura é nulo");
+            throw new InvalidRequestException(Constantes.RETORNO_INTEGRADORA_NULO);
+        }
+
+        if (responseAsaas.getStatusCodeValue() != 200) {
+            log.error("Ocorreu um erro no processo de atualização da assinatura na integradora de pagamentos: {}",
+                    responseAsaas.getBody());
+            throw new InvalidRequestException(Constantes.ERRO_CRIACAO_ASSINATURA_ASAAS
+                    + responseAsaas.getBody());
+        }
+        log.debug("Atualização de assinatura ASAAS realizada com sucesso");
+
+        AtualizaAssinaturaAsaasResponse planoAsaasResponse = responseAsaas.getBody();
+
+        if (planoAsaasResponse == null) {
+            log.error("O valor retornado pela integradora na atualização da assinatura é nulo");
+            throw new InvalidRequestException(Constantes.RETORNO_INTEGRADORA_NULO);
+        }
+
+    }
+
     protected void realizaCancelamentoDePlanoDeAssinaturaNaIntegradoraAsaas(PlanoEntity planoEntity) {
 
         log.debug("Método de serviço responsável pela cancelamento de assinatura na integradora ASAAS acessado");
@@ -93,7 +149,7 @@ public class PlanoAsaasService {
         try {
             log.debug("Realizando envio de requisição de cancelamento de assinatura para a integradora ASAAS...");
             responseAsaas =
-                    asaasProxy.cancelarAssinatura(planoEntity.getIdAsaas(), System.getenv("TOKEN_ASAAS"));
+                    asaasProxy.cancelarAssinatura(planoEntity.getIdAsaas(), System.getenv(Constantes.TOKEN_ASAAS));
         } catch (Exception e) {
             log.error(Constantes.ERRO_CANCELAMENTO_ASSINATURA_ASAAS
                     + e.getMessage());

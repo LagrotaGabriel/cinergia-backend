@@ -7,6 +7,7 @@ public class Constantes {
 
     public static final String ZERO_REAIS = "R$ 0,00";
     public static final String ERRO_CRIACAO_ASSINATURA_ASAAS = "Ocorreu um erro no processo de criação da assinatura: ";
+    public static final String ERRO_ATUALIZACAO_ASSINATURA_ASAAS = "Ocorreu um erro no processo de atualização da assinatura: ";
     public static final String ERRO_CANCELAMENTO_ASSINATURA_ASAAS = "Ocorreu um erro no processo de cancelamento da assinatura: ";
     public static final String ERRO_CANCELAMENTO_PAGAMENTO_ASAAS = "Ocorreu um erro no processo de cancelamento do pagamento: ";
     public static final String ERRO_REMOCAO_CLIENTE_ASAAS = "Ocorreu um erro no processo de remoção do cliente: ";
@@ -26,6 +27,9 @@ public class Constantes {
 
     public static final String BUSCA_CLIENTE_POR_ID =
             "Iniciando acesso ao método de implementação de busca pelo cliente por id...";
+
+    public static final String BUSCA_PLANO_POR_ID =
+            "Iniciando acesso ao método de implementação de busca de plano por id...";
 
     public static final String OBJETO_PAGAMENTO_CRIADO = "Objeto pagamento criado: {}";
 

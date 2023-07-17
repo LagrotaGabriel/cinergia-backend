@@ -147,6 +147,26 @@ public class PlanoController {
                 .realizaBuscaDeDadosDePlanoPorId(jwtUtil.obtemEmpresaAtiva(req), id));
     }
 
+    @PostMapping("/{id}")
+    @ApiOperation(
+            value = "Atualização de plano de assinatura",
+            notes = "Esse endpoint tem como objetivo realizar a atualização de um novo plano de assinatura",
+            produces = MediaType.APPLICATION_JSON,
+            consumes = MediaType.APPLICATION_JSON
+    )
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "A atualização de um plano foi realizada com sucesso",
+                    response = PlanoResponse.class),
+    })
+    @PreAuthorize("hasAnyRole('EMPRESA', 'ADMIN')")
+    public ResponseEntity<PlanoResponse> atualizaPlano(
+            HttpServletRequest req,
+            @RequestBody PlanoRequest planoRequest) {
+        log.info("Endpoint de atualização de plano acessado");
+        return ResponseEntity.ok().body(planoService.atualizaPlano(
+                jwtUtil.obtemEmpresaAtiva(req), planoRequest));
+    }
+
     @DeleteMapping("/{id}")
     @ApiOperation(
             value = "Remoção de plano por id",

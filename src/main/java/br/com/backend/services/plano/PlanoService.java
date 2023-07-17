@@ -4,10 +4,7 @@ import br.com.backend.models.dto.plano.request.PlanoRequest;
 import br.com.backend.models.dto.plano.response.DadosPlanoResponse;
 import br.com.backend.models.dto.plano.response.PlanoPageResponse;
 import br.com.backend.models.dto.plano.response.PlanoResponse;
-import br.com.backend.models.entities.ClienteEntity;
-import br.com.backend.models.entities.EmpresaEntity;
-import br.com.backend.models.entities.PagamentoEntity;
-import br.com.backend.models.entities.PlanoEntity;
+import br.com.backend.models.entities.*;
 import br.com.backend.models.enums.FormaPagamentoEnum;
 import br.com.backend.models.enums.StatusPagamentoEnum;
 import br.com.backend.models.enums.StatusPlanoEnum;
@@ -135,6 +132,50 @@ public class PlanoService {
         return planoPageResponse;
     }
 
+    public PlanoResponse atualizaPlano(EmpresaEntity empresaLogada, PlanoRequest planoRequest) {
+        log.debug("Método de serviço de atualização de plano acessado");
+
+        log.debug(Constantes.BUSCA_PLANO_POR_ID);
+        PlanoEntity planoEncontrado = planoRepositoryImpl.implementaBuscaPorId(planoRequest.getId(), empresaLogada.getId());
+
+        log.debug("Iniciando acesso ao método de validação de alteração de dados de plano excluído...");
+        validaSePlanoEstaExcluido(planoEncontrado, "Não é possível atualizar um plano excluído");
+
+        log.debug("Iniciando criação do objeto PlanoEntity...");
+        PlanoEntity novoPlanoAtualizado = PlanoEntity.builder()
+                .id(planoEncontrado.getId())
+                .idEmpresaResponsavel(planoEncontrado.getIdEmpresaResponsavel())
+                .idClienteResponsavel(planoEncontrado.getIdClienteResponsavel())
+                .idAsaas(planoEncontrado.getIdAsaas())
+                .dataCadastro(planoEncontrado.getDataCadastro())
+                .horaCadastro(planoEncontrado.getHoraCadastro())
+                .dataVencimento(planoEncontrado.getDataVencimento())
+                .dataInicio(planoRequest.getDataInicio())
+                .descricao(planoRequest.getDescricao())
+                .valor(planoRequest.getValor())
+                .formaPagamento(planoRequest.getFormaPagamento())
+                .statusPlano(planoEncontrado.getStatusPlano())
+                .periodicidade(planoRequest.getPeriodicidade())
+                .notificacoes(planoRequest.getNotificacoes())
+                .cartao(planoEncontrado.getCartao())
+                .pagamentos(planoEncontrado.getPagamentos())
+                .build();
+        log.debug("Objeto plano construído com sucesso");
+
+        log.debug("Iniciando processo de atualização do plano na integradora ASAAS...");
+        planoAsaasService.realizaAtualizacaoDePlanoDeAssinaturaNaIntegradoraAsaas(
+                novoPlanoAtualizado.getIdAsaas(), novoPlanoAtualizado);
+
+        log.debug("Iniciando acesso ao método de implementação da persistência do plano...");
+        PlanoEntity planoPersistido = planoRepositoryImpl.implementaPersistencia(novoPlanoAtualizado);
+
+        log.debug("Plano persistido com sucesso. Convertendo PlanoEntity para PlanoResponse...");
+        PlanoResponse planoResponse = planoTypeConverter.convertePlanoEntityParaPlanoResponse(planoPersistido);
+
+        log.info("Plano atualizado com sucesso");
+        return planoResponse;
+    }
+
     public PlanoPageResponse realizaBuscaPaginadaPorPlanos(EmpresaEntity empresaLogada,
                                                            Pageable pageable,
                                                            String campoBusca) {
@@ -231,5 +272,14 @@ public class PlanoService {
         return dadosPlanoResponse;
     }
 
+    public void validaSePlanoEstaExcluido(PlanoEntity planoEntity, String mensagemCasoEstejaExcluido) {
+        log.debug("Método de validação de planoEntity excluído acessado");
+        if (planoEntity.getStatusPlano().equals(StatusPlanoEnum.REMOVIDO)) {
+            log.debug("Plano de id {}: Validação de planoEntity já excluído falhou. Não é possível realizar operações " +
+                    "em um planoEntity que já foi excluído.", planoEntity.getId());
+            throw new InvalidRequestException(mensagemCasoEstejaExcluido);
+        }
+        log.debug("O planoEntity de id {} não está excluído", planoEntity.getId());
+    }
 
 }
