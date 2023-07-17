@@ -25,6 +25,11 @@ public interface AsaasProxy {
     ResponseEntity<CriaClienteAsaasResponse> cadastraNovoCliente(@RequestBody CriaClienteAsaasRequest criaClienteAsaasRequest,
                                                                  @RequestHeader(value = "access_token") String accessToken);
 
+    @PostMapping(value = "api/v3/customers/{id}")
+    ResponseEntity<CriaClienteAsaasResponse> atualizaCliente(@PathVariable String id,
+                                                             @RequestBody CriaClienteAsaasRequest criaClienteAsaasRequest,
+                                                             @RequestHeader(value = "access_token") String accessToken);
+
     @DeleteMapping(value = "/api/v3/customers/{id}")
     ResponseEntity<RemoveClienteAsaasResponse> removerCliente(@PathVariable(value = "id") String id,
                                                               @RequestHeader(value = "access_token") String accessToken);

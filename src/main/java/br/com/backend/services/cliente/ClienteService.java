@@ -6,13 +6,8 @@ import br.com.backend.models.dto.cliente.response.ClienteResponse;
 import br.com.backend.models.entities.*;
 import br.com.backend.models.entities.global.EnderecoEntity;
 import br.com.backend.models.entities.global.ImagemEntity;
-import br.com.backend.models.entities.global.TelefoneEntity;
 import br.com.backend.models.enums.PerfilEnum;
 import br.com.backend.models.enums.global.TipoImagemEnum;
-import br.com.backend.proxy.AsaasProxy;
-import br.com.backend.proxy.cliente.request.CriaClienteAsaasRequest;
-import br.com.backend.proxy.cliente.response.CriaClienteAsaasResponse;
-import br.com.backend.proxy.cliente.response.RemoveClienteAsaasResponse;
 import br.com.backend.repositories.cliente.ClienteRepository;
 import br.com.backend.repositories.cliente.impl.ClienteRepositoryImpl;
 import br.com.backend.services.exceptions.InvalidRequestException;
@@ -22,7 +17,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -43,6 +37,9 @@ public class ClienteService {
     ClienteValidationService clienteValidationService;
 
     @Autowired
+    ClienteAsaasService clienteAsaasService;
+
+    @Autowired
     ClienteTypeConverter clienteTypeConverter;
 
     @Autowired
@@ -50,9 +47,6 @@ public class ClienteService {
 
     @Autowired
     ClienteRepositoryImpl clienteRepositoryImpl;
-
-    @Autowired
-    AsaasProxy asaasProxy;
 
     public ClienteResponse criaNovoCliente(EmpresaEntity empresaLogada, ClienteRequest clienteRequest) {
 
@@ -67,7 +61,7 @@ public class ClienteService {
         log.debug("Iniciando criação do objeto ClienteEntity...");
         ClienteEntity clienteEntity = ClienteEntity.builder()
                 .idEmpresaResponsavel(empresaLogada.getId())
-                .asaasId(realizaCriacaoClienteAsaas(clienteRequest, empresaLogada.getId()))
+                .asaasId(clienteAsaasService.realizaCriacaoClienteAsaas(clienteRequest, empresaLogada.getId()))
                 .dataCadastro(LocalDate.now().toString())
                 .horaCadastro(LocalTime.now().toString())
                 .nome(clienteRequest.getNome() != null ? clienteRequest.getNome().toUpperCase() : null)
@@ -112,97 +106,6 @@ public class ClienteService {
 
         log.info("Cliente criado com sucesso");
         return clienteResponse;
-    }
-
-    private String realizaCriacaoClienteAsaas(ClienteRequest clienteRequest, Long idEmpresaLogada) {
-
-        log.debug("Método de serviço responsável pela criação de cliente na integradora ASAAS acessado");
-
-        String telefone = obtemTelefoneFixoCliente(clienteRequest.getTelefones());
-        String celular = obtemTelefoneCelularCliente(clienteRequest.getTelefones());
-        EnderecoEntity endereco = clienteRequest.getEndereco();
-
-        log.debug("Iniciando construção do objeto criaClienteAsaasRequest...");
-        CriaClienteAsaasRequest criaClienteAsaasRequest = CriaClienteAsaasRequest.builder()
-                .name(clienteRequest.getNome())
-                .cpfCnpj(clienteRequest.getCpfCnpj())
-                .email(clienteRequest.getEmail())
-                .phone(telefone)
-                .mobilePhone(celular)
-                .address(endereco != null ? endereco.getLogradouro() : null)
-                .addressNumber(endereco != null ? endereco.getNumero().toString() : null)
-                .complement(endereco != null ? endereco.getComplemento() : null)
-                .province(endereco != null ? endereco.getBairro() : null)
-                .postalCode(endereco != null ? endereco.getCodigoPostal() : null)
-                .externalReference(idEmpresaLogada + ';' + clienteRequest.getCpfCnpj())
-                .notificationDisabled(true)
-                .additionalEmails(null)
-                .municipalInscription(null)
-                .stateInscription(null)
-                .groupName(idEmpresaLogada.toString())
-                .build();
-
-        ResponseEntity<CriaClienteAsaasResponse> responseAsaas;
-
-        try {
-            log.debug("Realizando envio de requisição de criação de cliente para a integradora ASAAS...");
-            responseAsaas =
-                    asaasProxy.cadastraNovoCliente(criaClienteAsaasRequest, System.getenv("TOKEN_ASAAS"));
-        } catch (Exception e) {
-            log.error(Constantes.ERRO_CRIACAO_CLIENTE_ASAAS
-                    + e.getMessage());
-            throw new InvalidRequestException(Constantes.ERRO_CRIACAO_CLIENTE_ASAAS
-                    + e.getMessage());
-        }
-
-        if (responseAsaas == null) {
-            log.error("O valor retornado pela integradora na criação do cliente é nulo");
-            throw new InvalidRequestException("O retorno da integradora é nulo");
-        }
-
-        if (responseAsaas.getStatusCodeValue() != 200) {
-            log.error("Ocorreu um erro no processo de criação da cliente na integradora de pagamentos: {}",
-                    responseAsaas.getBody());
-            throw new InvalidRequestException(Constantes.ERRO_CRIACAO_CLIENTE_ASAAS
-                    + responseAsaas.getBody());
-        }
-        log.debug("Criação de cliente ASAAS realizada com sucesso");
-
-        CriaClienteAsaasResponse clienteAsaasResponse = responseAsaas.getBody();
-
-        if (clienteAsaasResponse == null) {
-            log.error("O valor retornado pela integradora na criação do cliente é nulo");
-            throw new InvalidRequestException("O retorno da integradora é nulo");
-        }
-
-        log.debug("Retornando id do cliente gerado: {}", clienteAsaasResponse.getId());
-        return clienteAsaasResponse.getId();
-    }
-
-    private String obtemTelefoneFixoCliente(List<TelefoneEntity> telefones) {
-
-        if (telefones == null) return null;
-        else {
-            if (telefones.isEmpty()) return null;
-        }
-
-        TelefoneEntity telefone = telefones.get(0);
-
-        return (telefone.getPrefixo() + telefone.getNumero());
-    }
-
-    private String obtemTelefoneCelularCliente(List<TelefoneEntity> telefones) {
-        if (telefones == null) return null;
-        else {
-            if (telefones.isEmpty()) return null;
-        }
-
-        for (TelefoneEntity telefone : telefones) {
-            if (telefone.getNumero().length() == 9)
-                return (telefone.getPrefixo() + telefone.getNumero());
-        }
-
-        return null;
     }
 
     public ClientePageResponse realizaBuscaPaginadaPorClientes(EmpresaEntity empresaLogada,
@@ -258,7 +161,7 @@ public class ClienteService {
         ClienteEntity clienteExcluido = clienteRepositoryImpl.implementaPersistencia(clienteEncontrado);
 
         log.debug("Iniciando acesso ao método de remoção de cliente na integradora ASAAS...");
-        realizaRemocaoDoClienteNaIntegradoraAsaas(clienteExcluido);
+        clienteAsaasService.realizaRemocaoDoClienteNaIntegradoraAsaas(clienteExcluido);
 
         log.debug("Iniciando iteração pelos planos do cliente para acionar cancelamento dos planos...");
         for (PlanoEntity plano : clienteExcluido.getPlanos())
@@ -281,44 +184,6 @@ public class ClienteService {
                 .fotoPerfil(clienteExcluido.getFotoPerfil())
                 .telefones(clienteExcluido.getTelefones())
                 .build();
-    }
-
-    private void realizaRemocaoDoClienteNaIntegradoraAsaas(ClienteEntity cliente) {
-
-        log.debug("Método de serviço responsável pela remoção de cliente na integradora ASAAS acessado");
-        ResponseEntity<RemoveClienteAsaasResponse> responseAsaas;
-
-        try {
-            log.debug("Realizando envio de requisição de remoção cliente para a integradora ASAAS...");
-            responseAsaas =
-                    asaasProxy.removerCliente(cliente.getAsaasId(), System.getenv("TOKEN_ASAAS"));
-        } catch (Exception e) {
-            log.error(Constantes.ERRO_REMOCAO_CLIENTE_ASAAS
-                    + e.getMessage());
-            throw new InvalidRequestException(Constantes.ERRO_REMOCAO_CLIENTE_ASAAS
-                    + e.getMessage());
-        }
-
-        if (responseAsaas == null) {
-            log.error("O valor retornado pela integradora na remoção do cliente é nulo");
-            throw new InvalidRequestException(Constantes.RETORNO_INTEGRADORA_NULO);
-        }
-
-        if (responseAsaas.getStatusCodeValue() != 200) {
-            log.error("Ocorreu um erro no processo de remoção do cliente na integradora de pagamentos: {}",
-                    responseAsaas.getBody());
-            throw new InvalidRequestException(Constantes.ERRO_REMOCAO_CLIENTE_ASAAS
-                    + responseAsaas.getBody());
-        }
-        log.debug("Remoção de cliente ASAAS realizada com sucesso");
-
-        RemoveClienteAsaasResponse removeClienteAsaasResponse = responseAsaas.getBody();
-
-        if (removeClienteAsaasResponse == null) {
-            log.error("O valor retornado pela integradora na remoção do cliente é nulo");
-            throw new InvalidRequestException(Constantes.RETORNO_INTEGRADORA_NULO);
-        }
-
     }
 
     public void removeClientesEmMassa(EmpresaEntity empresaLogada, List<Long> ids) {
@@ -422,6 +287,9 @@ public class ClienteService {
                 .planos(clienteEncontrado.getPlanos())
                 .build();
         log.debug("Objeto cliente construído com sucesso");
+
+        log.debug("Iniciando processo de atualização do cliente na integradora ASAAS...");
+        clienteAsaasService.realizaAtualizacaoClienteAsaas(novoClienteAtualizado.getAsaasId(), clienteRequest, empresaLogada.getId());
 
         log.debug("Iniciando acesso ao método de implementação da persistência do cliente...");
         ClienteEntity clientePersistido = clienteRepositoryImpl.implementaPersistencia(novoClienteAtualizado);

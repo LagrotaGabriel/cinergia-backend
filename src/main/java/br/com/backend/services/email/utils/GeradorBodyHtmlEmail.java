@@ -1,4 +1,4 @@
-package br.com.backend.services.email.services;
+package br.com.backend.services.email.utils;
 
 import br.com.backend.models.entities.ClienteEntity;
 import br.com.backend.models.entities.PagamentoEntity;

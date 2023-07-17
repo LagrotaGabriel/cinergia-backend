@@ -15,7 +15,7 @@ import br.com.backend.repositories.plano.impl.PlanoRepositoryImpl;
 import br.com.backend.services.email.services.EmailService;
 import br.com.backend.services.empresa.EmpresaService;
 import br.com.backend.services.exceptions.InvalidRequestException;
-import br.com.backend.services.plano.PlanoService;
+import br.com.backend.services.plano.PlanoAsaasService;
 import br.com.backend.util.Constantes;
 import br.com.backend.util.ConversorDeDados;
 import lombok.extern.slf4j.Slf4j;
@@ -57,7 +57,7 @@ public class PagamentoService {
     PagamentoTypeConverter pagamentoTypeConverter;
 
     @Autowired
-    PlanoService planoService;
+    PlanoAsaasService planoAsaasService;
 
     @Autowired
     EmpresaService empresaService;
@@ -322,7 +322,7 @@ public class PagamentoService {
         planoEntity.getPagamentos().remove(pagamentoEntity);
 
         log.debug("Iniciando setagem da data de vencimento do plano do cliente para o próximo vencimento...");
-        planoEntity.setDataVencimento(planoService
+        planoEntity.setDataVencimento(planoAsaasService
                 .consultaAssinaturaAsaas(atualizacaoCobrancaWebHook.getPayment().getSubscription()).getNextDueDate());
 
         log.debug("Setando plano do cliente como ATIVO...");
