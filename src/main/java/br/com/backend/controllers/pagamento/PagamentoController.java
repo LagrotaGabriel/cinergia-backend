@@ -1,4 +1,4 @@
-package br.com.backend.controllers;
+package br.com.backend.controllers.pagamento;
 
 import br.com.backend.config.security.JWTUtil;
 import br.com.backend.models.dto.pagamento.response.PagamentoPageResponse;
