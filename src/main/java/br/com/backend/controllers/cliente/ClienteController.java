@@ -1,4 +1,4 @@
-package br.com.backend.controllers;
+package br.com.backend.controllers.cliente;
 
 import br.com.backend.config.security.JWTUtil;
 import br.com.backend.models.dto.cliente.request.ClienteRequest;
