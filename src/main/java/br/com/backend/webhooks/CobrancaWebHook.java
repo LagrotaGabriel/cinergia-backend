@@ -1,11 +1,14 @@
 package br.com.backend.webhooks;
 
 import br.com.backend.proxy.webhooks.cobranca.AtualizacaoCobrancaWebHook;
+import br.com.backend.services.exceptions.UnauthorizedAccessException;
 import br.com.backend.services.pagamento.PagamentoService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,10 +22,9 @@ import javax.ws.rs.core.MediaType;
 @Slf4j
 @CrossOrigin
 @RestController
-@Api(value = "Esta API disponibiliza os endpoints de webhook de cobrança")
+@RequestMapping("${default.webhook.path}/cobranca")
 @Produces({MediaType.APPLICATION_JSON, "application/json"})
 @Consumes({MediaType.APPLICATION_JSON, "application/json"})
-@RequestMapping("webhook/v1/cobranca")
 public class CobrancaWebHook {
 
     @Autowired
@@ -31,17 +33,34 @@ public class CobrancaWebHook {
     @Autowired
     PagamentoService pagamentoService;
 
-    @ApiOperation(
-            value = "Recebimento de status de pagamento",
-            notes = "Esse endpoint tem como objetivo receber atualizações no status dos pagamentos das assinaturas por " +
-                    "parte da integradora ASAAS",
-            produces = MediaType.APPLICATION_JSON,
-            consumes = MediaType.APPLICATION_JSON
-    )
-    @ApiResponses({
-            @ApiResponse(code = 200, message = "Requisição finalizada com sucesso", response = HttpStatus.class)
-    })
+    /**
+     * Recebe alteração de status de pagamento
+     * Este método tem como objetivo receber uma atualização do status de pagamento e realizar o acionamento da lógica
+     * cabível para o evento em questão
+     *
+     * @param atualizacaoCobrancaWebHook Objeto contendo todos os atributos enviados pela integradora ASAAS para que
+     *                                   seja realizada a atualização do pagamento com base em sua atualização de status
+     * @param token                      Token de acesso da integradora à API. Necessário para que método possa ser executado até o fim
+     * @return Retorna objeto do tipo HttpStatus, que deverá informar status da requisição
+     */
     @PostMapping(value = "/pagamento")
+    @Tag(name = "Recebimento de status de pagamento")
+    @Operation(summary = "Esse endpoint tem como objetivo receber atualizações no status dos pagamentos das " +
+            "assinaturas por parte da integradora ASAAS", method = "POST")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",
+                    description = "Requisição finalizada com sucesso",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = HttpStatus.class))}),
+            @ApiResponse(responseCode = "403",
+                    description = "Nenhum token de acesso foi recebido",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = UnauthorizedAccessException.class))}),
+            @ApiResponse(responseCode = "403",
+                    description = "O token de acesso recebido está incorreto",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = UnauthorizedAccessException.class))}),
+    })
     public ResponseEntity<HttpStatus> recebeStatusPagamentoAsaas(@RequestBody AtualizacaoCobrancaWebHook atualizacaoCobrancaWebHook,
                                                                  @RequestHeader(value = "asaas-access-token") String token) {
         log.info("Webhook ASAAS de atualização do status de cobrança recebido: {}", atualizacaoCobrancaWebHook);

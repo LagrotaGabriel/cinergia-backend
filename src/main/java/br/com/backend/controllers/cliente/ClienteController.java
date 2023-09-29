@@ -10,10 +10,12 @@ import br.com.backend.services.cliente.ClienteService;
 import br.com.backend.services.exceptions.InvalidRequestException;
 import br.com.backend.services.exceptions.ObjectNotFoundException;
 import com.lowagie.text.DocumentException;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -34,13 +36,18 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * ClienteController
+ * Esta classe fornece os endpoints para acessar as regras lógicas de negócio referentes à entidade ClienteEntity
+ *
+ * @author Gabriel Lagrota
+ */
 @Slf4j
 @CrossOrigin
 @RestController
-@Api(value = "Esta API disponibiliza os endpoints de CRUD da entidade Cliente")
+@RequestMapping("${default.api.path}/cliente")
 @Produces({MediaType.APPLICATION_JSON, "application/json"})
 @Consumes({MediaType.APPLICATION_JSON, "application/json"})
-@RequestMapping("api/v1/cliente")
 public class ClienteController {
 
     @Autowired
@@ -52,18 +59,30 @@ public class ClienteController {
     @Autowired
     JWTUtil jwtUtil;
 
+    /**
+     * Obtenção da imagem de perfil do cliente
+     * Este método permite que a imagem de perfil do cliente seja obtida através do id do cliente informado
+     *
+     * @param req Atributo do tipo HttpServletRequest que possui as informações da requisição
+     * @param id  Chave primária de identificação do cliente
+     * @return Retorna cadeia de bytes da imagem de perfil do cliente
+     * @throws ObjectNotFoundException Lança exception caso nenhum cliente seja encontrado através do ID informado
+     */
     @GetMapping("imagem-perfil/{id}")
-    @ApiOperation(
-            value = "Obtenção de imagem de perfil do cliente",
-            notes = "Esse endpoint tem como objetivo realizar a obtenção da imagem de perfil de um cliente",
-            produces = MediaType.APPLICATION_JSON,
-            consumes = MediaType.APPLICATION_JSON
-    )
-    @ApiResponses({
-            @ApiResponse(code = 200, message = "Imagem de perfil do cliente obtida com sucesso", response = ClienteResponse.class),
-            @ApiResponse(code = 400, message = "Nenhum cliente foi encontrado com o id informado", response = ObjectNotFoundException.class)
-    })
     @PreAuthorize("hasAnyRole('EMPRESA', 'ADMIN')")
+    @Tag(name = "Obtenção de imagem de perfil do cliente")
+    @Operation(summary = "Este endpoint tem como objetivo realizar a obtenção da imagem de perfil de um cliente",
+            method = "GET")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",
+                    description = "Imagem de perfil do cliente obtida com sucesso",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ClienteResponse.class))}),
+            @ApiResponse(responseCode = "404",
+                    description = "Nenhum cliente foi encontrado com o id informado",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ObjectNotFoundException.class))})
+    })
     public ResponseEntity<byte[]> obtemImagemDePerfilDoCliente(HttpServletRequest req,
                                                                @PathVariable("id") Long id) {
         log.info("Método controlador de obtenção de imagem de perfil de cliente acessado");
@@ -72,18 +91,31 @@ public class ClienteController {
                 .body(clienteService.obtemImagemPerfilCliente(jwtUtil.obtemEmpresaAtiva(req), id));
     }
 
+    /**
+     * Atualização de imagem de perfil do cliente
+     * Este método permite que a imagem de perfil do cliente seja atualizada através do id do cliente informado
+     *
+     * @param req          Atributo do tipo HttpServletRequest que possui as informações da requisição
+     * @param imagemPerfil Nova imagem de perfil do cliente a ser atualizada
+     * @param id           Chave primária de identificação do cliente
+     * @return Retorna objeto Cliente que foi atualizado convertido para o tipo Response
+     * @throws ObjectNotFoundException Lança exception caso nenhum cliente seja encontrado através do ID informado
+     */
     @PutMapping("imagem-perfil/{id}")
-    @ApiOperation(
-            value = "Atualização de imagem de perfil do cliente",
-            notes = "Esse endpoint tem como objetivo realizar a atualização da imagem de perfil de um cliente",
-            produces = MediaType.APPLICATION_JSON,
-            consumes = MediaType.APPLICATION_JSON
-    )
-    @ApiResponses({
-            @ApiResponse(code = 200, message = "Cliente atualizado com sucesso", response = ClienteResponse.class),
-            @ApiResponse(code = 400, message = "Nenhum cliente foi encontrado com o id informado", response = ObjectNotFoundException.class)
-    })
     @PreAuthorize("hasAnyRole('EMPRESA', 'ADMIN')")
+    @Tag(name = "Atualização de imagem de perfil do cliente")
+    @Operation(summary = "Esse endpoint tem como objetivo realizar a atualização da imagem de perfil de um cliente",
+            method = "PUT")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",
+                    description = "Cliente atualizado com sucesso",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ClienteResponse.class))}),
+            @ApiResponse(responseCode = "404",
+                    description = "Nenhum cliente foi encontrado com o id informado",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ObjectNotFoundException.class))})
+    })
     public ResponseEntity<ClienteResponse> atualizaImagemPerfilCliente(HttpServletRequest req,
                                                                        @RequestParam(value = "imagemPerfil", required = false) MultipartFile imagemPerfil,
                                                                        @PathVariable("id") Long id) throws IOException {
@@ -96,21 +128,36 @@ public class ClienteController {
                         imagemPerfil));
     }
 
-
+    /**
+     * Cadastro de novo cliente
+     * Este método tem como objetivo disponibilizar o endpoint de acionamento da lógica de criação de novo cliente
+     *
+     * @param req            Atributo do tipo HttpServletRequest que possui as informações da requisição
+     * @param clienteRequest Objeto contendo todos os atributos necessários para a criação de um novo cliente
+     * @return Retorna objeto Cliente criado convertido para o tipo ClienteResponse
+     * @throws InvalidRequestException Exception lançada caso ocorra alguma falha interna na criação do cliente
+     * @throws InvalidRequestException Exception lançada caso ocorra alguma falha interna no processo de criação da
+     *                                 assinatura do cliente
+     */
     @PostMapping
-    @ApiOperation(
-            value = "Cadastro de novo cliente",
-            notes = "Esse endpoint tem como objetivo realizar o cadastro de um novo cliente no banco de dados do projeto " +
-                    "e na integradora de pagamentos ASAAS",
-            produces = MediaType.APPLICATION_JSON,
-            consumes = MediaType.APPLICATION_JSON
-    )
-    @ApiResponses({
-            @ApiResponse(code = 200, message = "Cliente salvo com sucesso", response = ClienteResponse.class),
-            @ApiResponse(code = 400, message = "Ocorreu um erro no processo de criação do cliente", response = InvalidRequestException.class),
-            @ApiResponse(code = 400, message = "Ocorreu um erro no processo de criação da assinatura", response = InvalidRequestException.class),
-    })
     @PreAuthorize("hasAnyRole('EMPRESA', 'ADMIN')")
+    @Tag(name = "Cadastro de novo cliente")
+    @Operation(summary = "Esse endpoint tem como objetivo realizar a atualização da imagem de perfil de um cliente",
+            method = "POST")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",
+                    description = "Cliente salvo com sucesso",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ClienteResponse.class))}),
+            @ApiResponse(responseCode = "400",
+                    description = "Ocorreu um erro no processo de criação do cliente",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = InvalidRequestException.class))}),
+            @ApiResponse(responseCode = "400",
+                    description = "Ocorreu um erro no processo de criação da assinatura",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = InvalidRequestException.class))})
+    })
     public ResponseEntity<ClienteResponse> criaNovoCliente(HttpServletRequest req,
                                                            @Valid @RequestBody ClienteRequest clienteRequest) {
         log.info("Método controlador de criação de novo cliente acessado");
@@ -118,19 +165,27 @@ public class ClienteController {
                 .criaNovoCliente(jwtUtil.obtemEmpresaAtiva(req), clienteRequest));
     }
 
+    /**
+     * Busca paginada de clientes
+     * Este método tem como objetivo disponibilizar o endpoint de acionamento da lógica de busca paginada de clientes
+     *
+     * @param busca    Parâmetro opcional. Recebe uma string para busca de clientes por atributos específicos
+     * @param pageable Contém especificações da paginação, como tamanho da página, página atual, etc
+     * @param req      Atributo do tipo HttpServletRequest que possui as informações da requisição
+     * @return Retorna objeto do tipo ClientePageResponse, que possui informações da paginação e a lista de clientes
+     * encontrados inserida em seu body
+     */
     @GetMapping
-    @ApiOperation(
-            value = "Busca paginada por clientes cadastrados",
-            notes = "Esse endpoint tem como objetivo realizar a busca paginada de clientes cadastrados na empresa " +
-                    "logada que acionou a requisição com os filtros de busca enviados",
-            produces = MediaType.APPLICATION_JSON,
-            consumes = MediaType.APPLICATION_JSON
-    )
-    @ApiResponses({
-            @ApiResponse(code = 200, message = "A busca paginada de clientes foi realizada com sucesso",
-                    response = ClientePageResponse.class),
-    })
     @PreAuthorize("hasAnyRole('EMPRESA', 'ADMIN')")
+    @Tag(name = "Busca paginada por clientes cadastrados")
+    @Operation(summary = "Esse endpoint tem como objetivo realizar a busca paginada de clientes cadastrados na empresa " +
+            "logada que acionou a requisição com os filtros de busca enviados", method = "GET")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",
+                    description = "A busca paginada de clientes foi realizada com sucesso",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ClientePageResponse.class))}),
+    })
     public ResponseEntity<ClientePageResponse> obtemClientesPaginados(
             @RequestParam(value = "busca", required = false) String busca,
             Pageable pageable,
@@ -141,22 +196,28 @@ public class ClienteController {
                 jwtUtil.obtemEmpresaAtiva(req), pageable, busca));
     }
 
+    /**
+     * Validação de duplicidade de CPF/CNPJ
+     * Este método tem como objetivo disponibilizar o endpoint de acionamento da lógica de verificação de duplicidade
+     * no CPF ou CNPJ
+     *
+     * @param req     Atributo do tipo HttpServletRequest que possui as informações da requisição
+     * @param cpfCnpj CPF ou CNPJ a ser verificado
+     * @return Retorna um ResponseEntity sem body, apenas com o status da requisição
+     */
     @PostMapping("/verifica-cpfCnpj")
-    @ApiOperation(
-            value = "Validação de duplicidade na entrada do CPF ou CNPJ",
-            notes = "Esse endpoint tem como objetivo realizar a validação se o CPF ou CNPJ digitado pelo cliente já " +
-                    "existe na base de dados da empresa.",
-            produces = MediaType.APPLICATION_JSON,
-            consumes = MediaType.APPLICATION_JSON
-    )
-    @ApiResponses({
-            @ApiResponse(code = 200, message = "Requisição finalizada com sucesso"),
-            @ApiResponse(code = 400, message = "O CPF/CNPJ informado já existe",
-                    response = InvalidRequestException.class)
-    })
-    @Produces({MediaType.APPLICATION_JSON, "application/json"})
-    @Consumes({MediaType.APPLICATION_JSON, "application/json"})
     @PreAuthorize("hasAnyRole('EMPRESA', 'ADMIN')")
+    @Tag(name = "Validação de duplicidade na entrada do CPF ou CNPJ")
+    @Operation(summary = "Esse endpoint tem como objetivo realizar a validação se o CPF ou CNPJ digitado pelo cliente " +
+            "já existe na base de dados da empresa", method = "POST")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",
+                    description = "Requisição finalizada com sucesso"),
+            @ApiResponse(responseCode = "400",
+                    description = "O CPF/CNPJ informado já existe",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = InvalidRequestException.class))})
+    })
     public ResponseEntity<?> verificaDuplicidadeCpfCnpj(HttpServletRequest req,
                                                         @RequestBody String cpfCnpj) {
         log.info("Endpoint de validação de duplicidade de CPF/CNPJ acessado. CPF/CNPJ: " + cpfCnpj);
@@ -164,21 +225,39 @@ public class ClienteController {
         return ResponseEntity.ok().build();
     }
 
+    /**
+     * Exclusão de cliente em massa
+     * Este método tem como objetivo disponibilizar o endpoint de acionamento da lógica de exclusão de clientes em
+     * massa
+     *
+     * @param req Atributo do tipo HttpServletRequest que possui as informações da requisição
+     * @param ids Lista de ids dos clientes a serem removidos
+     * @return Retorna um ResponseEntity sem body, apenas com o status da requisição
+     */
     @DeleteMapping
-    @ApiOperation(
-            value = "Remoção de cliente em massa",
-            notes = "Esse endpoint tem como objetivo realizar a exclusão de clientes em massa",
-            produces = MediaType.APPLICATION_JSON,
-            consumes = MediaType.APPLICATION_JSON
-    )
-    @ApiResponses({
-            @ApiResponse(code = 200, message = "Clientes excluídos com sucesso"),
-            @ApiResponse(code = 400, message = "Nenhum cliente foi encontrado com o id informado", response = ObjectNotFoundException.class),
-            @ApiResponse(code = 400, message = "O cliente selecionado já foi excluído", response = InvalidRequestException.class),
-            @ApiResponse(code = 400, message = "Nenhum cliente foi encontrado para remoção", response = InvalidRequestException.class),
-            @ApiResponse(code = 400, message = "Não é possível remover um cliente que já foi excluído", response = InvalidRequestException.class)
-    })
     @PreAuthorize("hasAnyRole('EMPRESA', 'ADMIN')")
+    @Tag(name = "Remoção de cliente em massa")
+    @Operation(summary = "Esse endpoint tem como objetivo realizar a exclusão de clientes em massa", method = "DELETE")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",
+                    description = "Clientes excluídos com sucesso"),
+            @ApiResponse(responseCode = "400",
+                    description = "Nenhum cliente foi encontrado com os ids informados",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ObjectNotFoundException.class))}),
+            @ApiResponse(responseCode = "400",
+                    description = "O cliente selecionado já foi excluído",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = InvalidRequestException.class))}),
+            @ApiResponse(responseCode = "400",
+                    description = "Nenhum cliente foi encontrado para remoção",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = InvalidRequestException.class))}),
+            @ApiResponse(responseCode = "400",
+                    description = "Não é possível remover um cliente que já foi excluído",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = InvalidRequestException.class))}),
+    })
     public ResponseEntity<?> removeClientesEmMassa(HttpServletRequest req,
                                                    @RequestBody List<Long> ids) {
         log.info("Método controlador de remoção de clientes em massa acessado");
@@ -186,21 +265,38 @@ public class ClienteController {
         return ResponseEntity.ok().build();
     }
 
+    /**
+     * Exclusão de cliente
+     * Este método tem como objetivo disponibilizar o endpoint de acionamento da lógica de exclusão de cliente por id
+     *
+     * @param req Atributo do tipo HttpServletRequest que possui as informações da requisição
+     * @param id  Id do cliente a ser removido
+     * @return Retorna objeto Cliente removido convertido para o tipo ClienteResponse
+     */
     @DeleteMapping("/{id}")
-    @ApiOperation(
-            value = "Remoção de cliente",
-            notes = "Esse endpoint tem como objetivo realizar a exclusão de um cliente",
-            produces = MediaType.APPLICATION_JSON,
-            consumes = MediaType.APPLICATION_JSON
-    )
-    @ApiResponses({
-            @ApiResponse(code = 200, message = "Clientes excluídos com sucesso", response = ClienteResponse.class),
-            @ApiResponse(code = 400, message = "Nenhum cliente foi encontrado com o id informado", response = ObjectNotFoundException.class),
-            @ApiResponse(code = 400, message = "O cliente selecionado já foi excluído", response = InvalidRequestException.class),
-            @ApiResponse(code = 400, message = "Nenhum cliente foi encontrado para remoção", response = InvalidRequestException.class),
-            @ApiResponse(code = 400, message = "Não é possível remover um cliente que já foi excluído", response = InvalidRequestException.class)
-    })
+    @Tag(name = "Remoção de cliente")
     @PreAuthorize("hasAnyRole('EMPRESA', 'ADMIN')")
+    @Operation(summary = "Esse endpoint tem como objetivo realizar a exclusão de um cliente", method = "DELETE")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",
+                    description = "Cliente excluído com sucesso"),
+            @ApiResponse(responseCode = "404",
+                    description = "Nenhum cliente foi encontrado com o id informado",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ObjectNotFoundException.class))}),
+            @ApiResponse(responseCode = "400",
+                    description = "O cliente selecionado já foi excluído",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = InvalidRequestException.class))}),
+            @ApiResponse(responseCode = "400",
+                    description = "Nenhum cliente foi encontrado para remoção",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = InvalidRequestException.class))}),
+            @ApiResponse(responseCode = "400",
+                    description = "Não é possível remover um cliente que já foi excluído",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = InvalidRequestException.class))}),
+    })
     public ResponseEntity<ClienteResponse> removeCliente(HttpServletRequest req,
                                                          @PathVariable Long id) {
         log.info("Método controlador de remoção de cliente acessado");
@@ -209,19 +305,31 @@ public class ClienteController {
                 .body(clienteService.removeCliente(jwtUtil.obtemEmpresaAtiva(req), id));
     }
 
+    /**
+     * Criação de relatório de clientes em PDF
+     * Este método tem como objetivo disponibilizar o endpoint de acionamento da lógica de criação de relatório de
+     * clientes registrados em PDF
+     *
+     * @param req Atributo do tipo HttpServletRequest que possui as informações da requisição
+     * @param res Atributo do tipo HttpServletResponse que possui as informações da resposta e deve retornar o arquivo
+     *            em PDF com o relatório de clientes cadastrados
+     * @param ids Ids dos clientes que deverão ser exibidos no relatório
+     * @throws DocumentException Exception lançada caso ocorra um erro na criação do relatório em PDF
+     * @throws IOException       Exception lançada caso ocorra um erro na criação do relatório em PDF
+     */
     @PostMapping("/relatorio")
-    @ApiOperation(
-            value = "Gerar relatório em PDF",
-            notes = "Esse endpoint tem como objetivo realizar a criação de um relatório em PDF com a listagem de clientes " +
-                    "solicitada",
-            produces = MediaType.APPLICATION_OCTET_STREAM,
-            consumes = MediaType.APPLICATION_JSON
-    )
-    @ApiResponses({
-            @ApiResponse(code = 200, message = "PDF gerado com sucesso"),
-            @ApiResponse(code = 400, message = "Ocorreu um erro na criação do PDF", response = Exception.class),
-    })
+    @Tag(name = "Gerar relatório em PDF")
     @PreAuthorize("hasAnyRole('EMPRESA', 'ADMIN')")
+    @Operation(summary = "Esse endpoint tem como objetivo realizar a criação de um relatório em PDF com a listagem de " +
+            "clientes solicitada", method = "POST")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",
+                    description = "PDF gerado com sucesso"),
+            @ApiResponse(responseCode = "400",
+                    description = "Ocorreu um erro na criação do PDF",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = Exception.class))}),
+    })
     public void relatorio(HttpServletResponse res,
                           HttpServletRequest req,
                           @RequestBody List<Long> ids) throws DocumentException, IOException {
@@ -240,20 +348,30 @@ public class ClienteController {
         clienteRelatorioService.exportarPdf(res, empresaLogada, ids);
     }
 
+
+    /**
+     * Busca de cliente por id
+     * Este método tem como objetivo disponibilizar o endpoint de acionamento da lógica de busca de cliente por id
+     *
+     * @param req Atributo do tipo HttpServletRequest que possui as informações da requisição
+     * @param id  Id do cliente a ser buscado
+     * @return Retorna objeto Cliente encontrado convertido para o tipo ClienteResponse
+     */
     @GetMapping("/{id}")
-    @ApiOperation(
-            value = "Busca de cliente por id",
-            notes = "Esse endpoint tem como objetivo realizar a busca de um cliente pelo id recebido pelo parâmetro",
-            produces = MediaType.APPLICATION_JSON,
-            consumes = MediaType.APPLICATION_JSON
-    )
-    @ApiResponses({
-            @ApiResponse(code = 200, message = "A busca de cliente por id foi realizada com sucesso",
-                    response = ClienteResponse.class),
-            @ApiResponse(code = 400, message = "Nenhum cliente foi encontrado com o id informado",
-                    response = ObjectNotFoundException.class),
-    })
+    @Tag(name = "Busca de cliente por id")
     @PreAuthorize("hasAnyRole('EMPRESA', 'ADMIN')")
+    @Operation(summary = "Esse endpoint tem como objetivo realizar a busca de um cliente pelo id recebido pelo " +
+            "parâmetro", method = "GET")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",
+                    description = "A busca de cliente por id foi realizada com sucesso",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ClienteResponse.class))}),
+            @ApiResponse(responseCode = "404",
+                    description = "Nenhum cliente foi encontrado com o id informado",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ObjectNotFoundException.class))})
+    })
     public ResponseEntity<ClienteResponse> obtemClientePorId(@PathVariable(value = "id") Long id,
                                                              HttpServletRequest req) {
         log.info("Endpoint de busca de cliente por id acessado. ID recebido: {}", id);
@@ -261,20 +379,35 @@ public class ClienteController {
                 .realizaBuscaDeClientePorId(jwtUtil.obtemEmpresaAtiva(req), id));
     }
 
+
+    /**
+     * Atualiza cliente
+     * Este método tem como objetivo disponibilizar o endpoint de acionamento da lógica de atualização de cliente por id
+     *
+     * @param req Atributo do tipo HttpServletRequest que possui as informações da requisição
+     * @param clienteRequest objeto que deve conter todos os dados necessários para atualização do cliente
+     * @param id  Id do cliente a ser atualizado
+     * @return Retorna objeto Cliente encontrado convertido para o tipo ClienteResponse
+     */
     @PutMapping("/{id}")
-    @ApiOperation(
-            value = "Atualização de cliente",
-            notes = "Esse endpoint tem como objetivo realizar a atualização de um cliente na base de dados da empresa",
-            produces = MediaType.APPLICATION_JSON,
-            consumes = MediaType.APPLICATION_JSON
-    )
-    @ApiResponses({
-            @ApiResponse(code = 200, message = "Cliente atualizado com sucesso", response = ClienteResponse.class),
-            @ApiResponse(code = 400, message = "A inscrição estadual informada já existe", response = InvalidRequestException.class),
-            @ApiResponse(code = 400, message = "O CPF/CNPJ informado já existe", response = InvalidRequestException.class),
-            @ApiResponse(code = 400, message = "Nenhum cliente foi encontrado com o id informado", response = ObjectNotFoundException.class)
-    })
+    @Tag(name = "Atualização de cliente")
     @PreAuthorize("hasAnyRole('EMPRESA', 'ADMIN')")
+    @Operation(summary = "Esse endpoint tem como objetivo realizar a atualização de um cliente na base de dados da " +
+            "empresa", method = "PUT")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Cliente atualizado com sucesso",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ClienteResponse.class))}),
+            @ApiResponse(responseCode = "400", description = "A inscrição estadual informada já existe",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = InvalidRequestException.class))}),
+            @ApiResponse(responseCode = "400", description = "O CPF/CNPJ informado já existe",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = InvalidRequestException.class))}),
+            @ApiResponse(responseCode = "404", description = "Nenhum cliente foi encontrado com o id informado",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ObjectNotFoundException.class))})
+    })
     public ResponseEntity<ClienteResponse> atualizaCliente(HttpServletRequest req,
                                                            @RequestBody ClienteRequest clienteRequest,
                                                            @PathVariable Long id) {
@@ -283,6 +416,4 @@ public class ClienteController {
                 .status(HttpStatus.OK)
                 .body(clienteService.atualizaCliente(jwtUtil.obtemEmpresaAtiva(req), id, clienteRequest));
     }
-
-
 }
