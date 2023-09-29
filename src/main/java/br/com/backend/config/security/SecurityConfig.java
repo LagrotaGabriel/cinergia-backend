@@ -6,6 +6,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -24,7 +25,14 @@ import java.util.Arrays;
         jsr250Enabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    private static final String[] PUBLIC_MATCHERS = {"/api/v1/empresa", "/webhook/v1/**", "/api/v1/email"};
+    //TODO TRATAR ACESSOS LIBERADOS
+    private static final String[] PUBLIC_MATCHERS = {
+            "/api/v1/empresa",
+            "/webhook/v1/**",
+            "/api/v1/email",
+            "/documentacao-api.html",
+            "/swagger-ui/**"
+    };
 
     @Autowired
     private Environment env;
@@ -63,6 +71,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
+
+    @Override
+    public void configure(WebSecurity web) throws Exception {
+        web.ignoring().antMatchers("/swagger-ui/**"); //TODO MELHORAR SEGURANÇA
+         }
+
 
     @Bean
     public BCryptPasswordEncoder bCryptPasswordEncoder() {

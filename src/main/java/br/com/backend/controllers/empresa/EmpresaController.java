@@ -8,14 +8,17 @@ import br.com.backend.models.dto.empresa.response.EmpresaResponse;
 import br.com.backend.models.dto.empresa.response.EmpresaSimplificadaResponse;
 import br.com.backend.services.empresa.EmpresaService;
 import br.com.backend.services.exceptions.InvalidRequestException;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -25,13 +28,18 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.util.Map;
 
+/**
+ * EmpresaController
+ * Esta classe fornece os endpoints para acessar as regras lógicas de negócio referentes à entidade EmpresaEntity
+ *
+ * @author Gabriel Lagrota
+ */
 @Slf4j
 @CrossOrigin
 @RestController
-@Api(value = "Esta API disponibiliza os endpoints de CRUD da entidade Empresa")
+@RequestMapping("${default.api.path}/empresa")
 @Produces({MediaType.APPLICATION_JSON, "application/json"})
 @Consumes({MediaType.APPLICATION_JSON, "application/json"})
-@RequestMapping("api/v1/empresa")
 public class EmpresaController {
 
     @Autowired
@@ -40,17 +48,28 @@ public class EmpresaController {
     @Autowired
     JWTUtil jwtUtil;
 
+    /**
+     * Obtenção dos dados de dashboard da empresa
+     * Este método permite que os dados necessários para a criação de um dashboard da empresa sejam disponibilizados
+     * para o servidor client
+     *
+     * @param req Atributo do tipo HttpServletRequest que possui as informações da requisição
+     * @return Retorna dados do dashboard da empresa, com informações que deverão ser exibidas de forma gráfica
+     */
     @GetMapping("/dashboard")
-    @ApiOperation(
-            value = "Obtenção de dados de dashboard da empresa",
-            notes = "Esse endpoint tem como objetivo realizar a obtenção de dados estatísticos da empresa atual",
-            produces = MediaType.APPLICATION_JSON,
-            consumes = MediaType.APPLICATION_JSON
-    )
-    @ApiResponses({
-            @ApiResponse(code = 200, message = "Obtenção dos dados da empresa realizada com sucesso", response = EmpresaResponse.class),
-            @ApiResponse(code = 400, message = "Ocorreu um erro no processo de obtenção dos dados da empresa",
-                    response = InvalidRequestException.class),
+    @PreAuthorize("hasAnyRole('EMPRESA', 'ADMIN')")
+    @Tag(name = "Obtenção de dados de dashboard da empresa")
+    @Operation(summary = "Esse endpoint tem como objetivo realizar a obtenção de dados estatísticos da empresa atual",
+            method = "GET")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",
+                    description = "Obtenção dos dados da empresa realizada com sucesso",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = EmpresaResponse.class))}),
+            @ApiResponse(responseCode = "400",
+                    description = "Ocorreu um erro no processo de obtenção dos dados da empresa",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = InvalidRequestException.class))})
     })
     public ResponseEntity<DadosDashBoardResponse> obtemDadosEstatisticosEmpresa(HttpServletRequest req) {
         log.info("Método controlador de obtenção de dados estatísticos da empresa acessado");
@@ -59,17 +78,27 @@ public class EmpresaController {
                 .body(empresaService.obtemDadosDashBoardEmpresa(jwtUtil.obtemEmpresaAtiva(req)));
     }
 
+    /**
+     * Obtenção dos dados de faturamento da empresa
+     * Este método tem como objetivo retornar os dados de faturamento da empresa responsável pelo envio da requisição
+     *
+     * @param req Atributo do tipo HttpServletRequest que possui as informações da requisição
+     * @return Retorna dados de faturamento da empresa
+     */
     @GetMapping("/grafico-faturamento")
-    @ApiOperation(
-            value = "Obtenção de dados do gráfico de faturamento da empresa",
-            notes = "Esse endpoint tem como objetivo realizar a obtenção de dados do gráfico de faturamento da empresa atual",
-            produces = MediaType.APPLICATION_JSON,
-            consumes = MediaType.APPLICATION_JSON
-    )
-    @ApiResponses({
-            @ApiResponse(code = 200, message = "Obtenção dos dados gráficos da empresa realizada com sucesso", response = EmpresaResponse.class),
-            @ApiResponse(code = 400, message = "Ocorreu um erro no processo de obtenção dos dados gráficos da empresa",
-                    response = InvalidRequestException.class),
+    @PreAuthorize("hasAnyRole('EMPRESA', 'ADMIN')")
+    @Tag(name = "Obtenção de dados do gráfico de faturamento da empresa")
+    @Operation(summary = "Esse endpoint tem como objetivo realizar a obtenção de dados do gráfico de faturamento da " +
+            "empresa atual", method = "GET")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",
+                    description = "Obtenção dos dados de faturamento da empresa realizada com sucesso",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = EmpresaResponse.class))}),
+            @ApiResponse(responseCode = "400",
+                    description = "Ocorreu um erro no processo de obtenção dos dados de faturamento da empresa",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = InvalidRequestException.class))})
     })
     public ResponseEntity<Map<Integer, DadosGraficoResponse>> obtemDadosGraficoFaturamentoEmpresa(HttpServletRequest req) {
         log.info("Método controlador de obtenção de dados do gráfico de faturamento da empresa acessado");
@@ -78,17 +107,27 @@ public class EmpresaController {
                 .body(empresaService.obtemDadosGraficoFaturamentoEmpresa(jwtUtil.obtemEmpresaAtiva(req)));
     }
 
+    /**
+     * Obtenção simplificada dos dados da empresa
+     * Este método tem como objetivo retornar dados resumidos sobre a empresa
+     *
+     * @param req Atributo do tipo HttpServletRequest que possui as informações da requisição
+     * @return Retorna dados simplificados da empresa
+     */
     @GetMapping("/simplificado")
-    @ApiOperation(
-            value = "Obtenção simplificada de dados da empresa",
-            notes = "Esse endpoint tem como objetivo realizar a obtenção do nome e saldo da empresa logada",
-            produces = MediaType.APPLICATION_JSON,
-            consumes = MediaType.APPLICATION_JSON
-    )
-    @ApiResponses({
-            @ApiResponse(code = 200, message = "Obtenção dos dados da empresa realizada com sucesso", response = EmpresaResponse.class),
-            @ApiResponse(code = 400, message = "Ocorreu um erro no processo de obtenção dos dados da empresa",
-                    response = InvalidRequestException.class),
+    @PreAuthorize("hasAnyRole('EMPRESA', 'ADMIN')")
+    @Tag(name = "Obtenção simplificada de dados da empresa")
+    @Operation(summary = "Esse endpoint tem como objetivo realizar a obtenção do nome e saldo da empresa logada",
+            method = "GET")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",
+                    description = "Obtenção dos dados simplificados da empresa realizada com sucesso",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = EmpresaResponse.class))}),
+            @ApiResponse(responseCode = "400",
+                    description = "Ocorreu um erro no processo de obtenção dos dados simplificados da empresa",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = InvalidRequestException.class))})
     })
     public ResponseEntity<EmpresaSimplificadaResponse> obtemDadosSimplificadosEmpresa(HttpServletRequest req) {
         log.info("Método controlador de obtenção de dados simplificados da empresa acessado");
@@ -97,16 +136,24 @@ public class EmpresaController {
                 .body(empresaService.obtemDadosSimplificadosEmpresa(jwtUtil.obtemEmpresaAtiva(req)));
     }
 
+    /**
+     * Criação de nova empresa
+     * Este método tem como objetivo disponibilizar o acionamento lógico de criação de nova empresa
+     *
+     * @param empresaRequest Objeto contendo todos os atributos necessários para a criação de nova empresa
+     * @return Retorna empresa criada convertida para objeto do tipo Response
+     */
     @PostMapping
-    @ApiOperation(
-            value = "Cadastro de nova empresa",
-            notes = "Esse endpoint tem como objetivo realizar o cadastro de uma nova empresa no banco de dados do projeto",
-            produces = MediaType.APPLICATION_JSON,
-            consumes = MediaType.APPLICATION_JSON
-    )
-    @ApiResponses({
-            @ApiResponse(code = 200, message = "Empresa salva com sucesso", response = EmpresaResponse.class),
-            @ApiResponse(code = 400, message = "Ocorreu um erro no processo de criação da empresa", response = InvalidRequestException.class),
+    @PreAuthorize("hasAnyRole('EMPRESA', 'ADMIN')")
+    @Tag(name = "Cadastro de nova empresa")
+    @Operation(summary = "Esse endpoint tem como objetivo realizar o cadastro de uma nova empresa", method = "POST")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Empresa persistida com sucesso",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = EmpresaResponse.class))}),
+            @ApiResponse(responseCode = "400", description = "Ocorreu um erro no processo de criação da empresa",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = InvalidRequestException.class))})
     })
     public ResponseEntity<EmpresaResponse> criaNovaEmpresa(@Valid @RequestBody EmpresaRequest empresaRequest) {
         log.info("Método controlador de criação de nova empresa acessado");

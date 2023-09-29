@@ -16,8 +16,8 @@ logging:
   config:
     src/main/resources/logback.xml
   level:
-    org.springframework.web: DEBUG
-    guru.springframework.controllers: DEBUG
-    org.hibernate: DEBUG
+    org.springframework.web: INFO
+    guru.springframework.controllers: INFO
+    org.hibernate: INFO
 
 log_context: DEVELOPMENT
