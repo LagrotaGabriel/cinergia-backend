@@ -1,6 +1,6 @@
 package br.com.backend.models.entities.mock;
 
-import br.com.backend.models.entities.EmpresaEntity;
+import br.com.backend.modules.empresa.models.entity.EmpresaEntity;
 
 import java.time.LocalDate;
 import java.time.LocalTime;

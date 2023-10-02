@@ -1,5 +1,6 @@
 package br.com.backend.models.entities.global;
 
+import br.com.backend.globals.models.telefone.entity.TelefoneEntity;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

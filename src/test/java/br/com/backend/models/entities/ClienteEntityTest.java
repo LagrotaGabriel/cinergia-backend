@@ -1,8 +1,9 @@
 package br.com.backend.models.entities;
 
+import br.com.backend.modules.cliente.models.entity.ClienteEntity;
 import br.com.backend.models.entities.mock.ClienteEntityBuilder;
-import br.com.backend.models.enums.StatusClienteEnum;
-import br.com.backend.models.enums.TipoPessoaEnum;
+import br.com.backend.modules.cliente.models.enums.StatusClienteEnum;
+import br.com.backend.modules.cliente.models.enums.TipoPessoaEnum;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

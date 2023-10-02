@@ -1,6 +1,6 @@
 package br.com.backend.config.security;
 
-import br.com.backend.models.enums.PerfilEnum;
+import br.com.backend.globals.models.acesso.enums.PerfilEnum;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

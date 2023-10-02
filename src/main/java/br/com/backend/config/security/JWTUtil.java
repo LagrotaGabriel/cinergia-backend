@@ -1,8 +1,8 @@
 package br.com.backend.config.security;
 
-import br.com.backend.models.entities.EmpresaEntity;
-import br.com.backend.repositories.empresa.EmpresaRepository;
-import br.com.backend.services.exceptions.ObjectNotFoundException;
+import br.com.backend.modules.empresa.models.entity.EmpresaEntity;
+import br.com.backend.modules.empresa.repository.EmpresaRepository;
+import br.com.backend.exceptions.ObjectNotFoundException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;

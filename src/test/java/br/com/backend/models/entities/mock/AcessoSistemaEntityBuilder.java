@@ -1,6 +1,6 @@
 package br.com.backend.models.entities.mock;
 
-import br.com.backend.models.entities.AcessoSistemaEntity;
+import br.com.backend.globals.models.acesso.entity.AcessoSistemaEntity;
 
 import java.util.HashSet;
 

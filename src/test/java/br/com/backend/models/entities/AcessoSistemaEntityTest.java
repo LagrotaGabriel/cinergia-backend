@@ -1,7 +1,8 @@
 package br.com.backend.models.entities;
 
 import br.com.backend.models.entities.mock.AcessoSistemaEntityBuilder;
-import br.com.backend.models.enums.PerfilEnum;
+import br.com.backend.globals.models.acesso.enums.PerfilEnum;
+import br.com.backend.globals.models.acesso.entity.AcessoSistemaEntity;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

@@ -1,7 +1,7 @@
 package br.com.backend.models.entities.global.mock;
 
-import br.com.backend.models.entities.global.ArquivoEntity;
-import br.com.backend.models.enums.global.TipoArquivoEnum;
+import br.com.backend.globals.models.arquivo.entity.ArquivoEntity;
+import br.com.backend.globals.models.arquivo.enums.TipoArquivoEnum;
 
 public class ArquivoEntityBuilder {
     ArquivoEntityBuilder() {
