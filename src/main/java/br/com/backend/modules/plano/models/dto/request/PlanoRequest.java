@@ -1,6 +1,5 @@
 package br.com.backend.modules.plano.models.dto.request;
 
-import br.com.backend.models.cartao.dto.request.CartaoRequest;
 import br.com.backend.globals.enums.FormaPagamentoEnum;
 import br.com.backend.modules.plano.models.enums.NotificacaoEnum;
 import br.com.backend.modules.plano.models.enums.PeriodicidadeEnum;
@@ -29,5 +28,4 @@ public class PlanoRequest {
     @NotNull
     private PeriodicidadeEnum periodicidade;
     private Set<NotificacaoEnum> notificacoes = new HashSet<>();
-    private CartaoRequest cartao;
 }
