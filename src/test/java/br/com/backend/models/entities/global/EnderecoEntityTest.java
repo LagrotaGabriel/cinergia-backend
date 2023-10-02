@@ -1,7 +1,8 @@
 package br.com.backend.models.entities.global;
 
 import br.com.backend.models.entities.global.mock.EnderecoEntityBuilder;
-import br.com.backend.models.enums.global.EstadoEnum;
+import br.com.backend.globals.models.endereco.enums.EstadoEnum;
+import br.com.backend.globals.models.endereco.entity.EnderecoEntity;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

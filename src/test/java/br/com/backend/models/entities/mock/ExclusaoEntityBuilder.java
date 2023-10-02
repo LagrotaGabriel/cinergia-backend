@@ -1,6 +1,6 @@
 package br.com.backend.models.entities.mock;
 
-import br.com.backend.models.entities.ExclusaoEntity;
+import br.com.backend.globals.models.exclusao.entity.ExclusaoEntity;
 
 import java.time.LocalDate;
 import java.time.LocalTime;

@@ -1,8 +1,8 @@
 package br.com.backend.models.entities.mock;
 
-import br.com.backend.models.entities.PagamentoEntity;
-import br.com.backend.models.enums.FormaPagamentoEnum;
-import br.com.backend.models.enums.StatusPagamentoEnum;
+import br.com.backend.modules.pagamento.models.entity.PagamentoEntity;
+import br.com.backend.globals.enums.FormaPagamentoEnum;
+import br.com.backend.modules.pagamento.models.enums.StatusPagamentoEnum;
 
 import java.time.LocalDate;
 import java.time.LocalTime;

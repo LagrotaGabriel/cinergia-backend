@@ -1,6 +1,7 @@
 package br.com.backend.models.entities;
 
 import br.com.backend.models.entities.mock.PagamentoEntityBuilder;
+import br.com.backend.modules.pagamento.models.entity.PagamentoEntity;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

@@ -1,6 +1,6 @@
 package br.com.backend.models.entities.global.mock;
 
-import br.com.backend.models.entities.global.TelefoneEntity;
+import br.com.backend.globals.models.telefone.entity.TelefoneEntity;
 
 public class TelefoneEntityBuilder {
     TelefoneEntityBuilder(){}

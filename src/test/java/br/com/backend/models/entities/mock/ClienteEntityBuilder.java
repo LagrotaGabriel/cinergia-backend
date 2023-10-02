@@ -1,6 +1,6 @@
 package br.com.backend.models.entities.mock;
 
-import br.com.backend.models.entities.ClienteEntity;
+import br.com.backend.modules.cliente.models.entity.ClienteEntity;
 
 import java.time.LocalDate;
 import java.time.LocalTime;

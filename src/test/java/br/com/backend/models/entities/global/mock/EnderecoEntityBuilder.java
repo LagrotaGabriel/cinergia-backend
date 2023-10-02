@@ -1,7 +1,7 @@
 package br.com.backend.models.entities.global.mock;
 
-import br.com.backend.models.entities.global.EnderecoEntity;
-import br.com.backend.models.enums.global.EstadoEnum;
+import br.com.backend.globals.models.endereco.entity.EnderecoEntity;
+import br.com.backend.globals.models.endereco.enums.EstadoEnum;
 
 public class EnderecoEntityBuilder {
     EnderecoEntityBuilder(){}
