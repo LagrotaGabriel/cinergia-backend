@@ -7,7 +7,7 @@ import br.com.backend.modules.empresa.models.dto.response.DadosGraficoResponse;
 import br.com.backend.modules.empresa.models.dto.response.EmpresaResponse;
 import br.com.backend.modules.empresa.models.dto.response.EmpresaSimplificadaResponse;
 import br.com.backend.modules.empresa.services.EmpresaService;
-import br.com.backend.exceptions.InvalidRequestException;
+import br.com.backend.exceptions.custom.InvalidRequestException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;

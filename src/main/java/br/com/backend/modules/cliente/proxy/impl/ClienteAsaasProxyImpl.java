@@ -1,6 +1,6 @@
 package br.com.backend.modules.cliente.proxy.impl;
 
-import br.com.backend.exceptions.InvalidRequestException;
+import br.com.backend.exceptions.custom.InvalidRequestException;
 import br.com.backend.globals.models.endereco.entity.EnderecoEntity;
 import br.com.backend.globals.models.telefone.entity.TelefoneEntity;
 import br.com.backend.modules.cliente.models.dto.request.ClienteRequest;
@@ -9,6 +9,7 @@ import br.com.backend.modules.cliente.proxy.ClienteAsaasProxy;
 import br.com.backend.modules.cliente.proxy.models.request.CriaClienteAsaasRequest;
 import br.com.backend.modules.cliente.proxy.models.response.CriaClienteAsaasResponse;
 import br.com.backend.modules.cliente.proxy.models.response.RemoveClienteAsaasResponse;
+import br.com.backend.modules.cliente.utils.ConstantesClientes;
 import br.com.backend.util.Constantes;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,9 +60,9 @@ public class ClienteAsaasProxyImpl {
             responseAsaas =
                     clienteAsaasProxy.cadastraNovoCliente(criaClienteAsaasRequest, System.getenv(Constantes.TOKEN_ASAAS));
         } catch (Exception e) {
-            log.error(Constantes.ERRO_CRIACAO_CLIENTE_ASAAS
+            log.error(ConstantesClientes.ERRO_CRIACAO_CLIENTE_ASAAS
                     + e.getMessage());
-            throw new InvalidRequestException(Constantes.ERRO_CRIACAO_CLIENTE_ASAAS
+            throw new InvalidRequestException(ConstantesClientes.ERRO_CRIACAO_CLIENTE_ASAAS
                     + e.getMessage());
         }
 
@@ -73,7 +74,7 @@ public class ClienteAsaasProxyImpl {
         if (responseAsaas.getStatusCodeValue() != 200) {
             log.error("Ocorreu um erro no processo de criação da cliente na integradora de pagamentos: {}",
                     responseAsaas.getBody());
-            throw new InvalidRequestException(Constantes.ERRO_CRIACAO_CLIENTE_ASAAS
+            throw new InvalidRequestException(ConstantesClientes.ERRO_CRIACAO_CLIENTE_ASAAS
                     + responseAsaas.getBody());
         }
         log.debug("Criação de cliente ASAAS realizada com sucesso");
@@ -99,9 +100,9 @@ public class ClienteAsaasProxyImpl {
             responseAsaas =
                     clienteAsaasProxy.removerCliente(cliente.getAsaasId(), System.getenv(Constantes.TOKEN_ASAAS));
         } catch (Exception e) {
-            log.error(Constantes.ERRO_REMOCAO_CLIENTE_ASAAS
+            log.error(ConstantesClientes.ERRO_REMOCAO_CLIENTE_ASAAS
                     + e.getMessage());
-            throw new InvalidRequestException(Constantes.ERRO_REMOCAO_CLIENTE_ASAAS
+            throw new InvalidRequestException(ConstantesClientes.ERRO_REMOCAO_CLIENTE_ASAAS
                     + e.getMessage());
         }
 
@@ -113,7 +114,7 @@ public class ClienteAsaasProxyImpl {
         if (responseAsaas.getStatusCodeValue() != 200) {
             log.error("Ocorreu um erro no processo de remoção do cliente na integradora de pagamentos: {}",
                     responseAsaas.getBody());
-            throw new InvalidRequestException(Constantes.ERRO_REMOCAO_CLIENTE_ASAAS
+            throw new InvalidRequestException(ConstantesClientes.ERRO_REMOCAO_CLIENTE_ASAAS
                     + responseAsaas.getBody());
         }
         log.debug("Remoção de cliente ASAAS realizada com sucesso");
@@ -162,9 +163,9 @@ public class ClienteAsaasProxyImpl {
             responseAsaas =
                     clienteAsaasProxy.atualizaCliente(asaasId, criaClienteAsaasRequest, System.getenv(Constantes.TOKEN_ASAAS));
         } catch (Exception e) {
-            log.error(Constantes.ERRO_ATUALIZACAO_CLIENTE_ASAAS
+            log.error(ConstantesClientes.ERRO_ATUALIZACAO_CLIENTE_ASAAS
                     + e.getMessage());
-            throw new InvalidRequestException(Constantes.ERRO_ATUALIZACAO_CLIENTE_ASAAS
+            throw new InvalidRequestException(ConstantesClientes.ERRO_ATUALIZACAO_CLIENTE_ASAAS
                     + e.getMessage());
         }
 
@@ -176,7 +177,7 @@ public class ClienteAsaasProxyImpl {
         if (responseAsaas.getStatusCodeValue() != 200) {
             log.error("Ocorreu um erro no processo de atualização do cliente na integradora de pagamentos: {}",
                     responseAsaas.getBody());
-            throw new InvalidRequestException(Constantes.ERRO_ATUALIZACAO_CLIENTE_ASAAS
+            throw new InvalidRequestException(ConstantesClientes.ERRO_ATUALIZACAO_CLIENTE_ASAAS
                     + responseAsaas.getBody());
         }
         log.debug("Atualização de cliente ASAAS realizada com sucesso");

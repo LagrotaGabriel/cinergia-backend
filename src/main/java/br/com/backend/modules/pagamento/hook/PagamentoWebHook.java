@@ -1,7 +1,7 @@
 package br.com.backend.modules.pagamento.hook;
 
 import br.com.backend.modules.pagamento.hook.models.AtualizacaoPagamentoWebHook;
-import br.com.backend.exceptions.UnauthorizedAccessException;
+import br.com.backend.exceptions.custom.UnauthorizedAccessException;
 import br.com.backend.modules.pagamento.services.PagamentoService;
 import br.com.backend.util.WebHookTokenValidation;
 import io.swagger.v3.oas.annotations.Operation;

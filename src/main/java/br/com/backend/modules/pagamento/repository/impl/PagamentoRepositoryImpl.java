@@ -1,9 +1,9 @@
 package br.com.backend.modules.pagamento.repository.impl;
 
+import br.com.backend.exceptions.custom.ObjectNotFoundException;
 import br.com.backend.modules.pagamento.models.entity.PagamentoEntity;
 import br.com.backend.modules.pagamento.repository.PagamentoRepository;
-import br.com.backend.exceptions.ObjectNotFoundException;
-import br.com.backend.util.Constantes;
+import br.com.backend.modules.pagamento.utils.ConstantesPagamento;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -53,7 +53,7 @@ public class PagamentoRepositoryImpl {
         PagamentoEntity pagamentoEntity;
         if (pagamentoOptional.isPresent()) {
             pagamentoEntity = pagamentoOptional.get();
-            log.debug(Constantes.PAGAMENTO_ENCONTRADO, pagamentoEntity);
+            log.debug(ConstantesPagamento.PAGAMENTO_ENCONTRADO, pagamentoEntity);
         } else {
             log.warn("Nenhum pagamento foi encontrado com o id {}", id);
             throw new ObjectNotFoundException("Nenhum pagamento foi encontrado com o id informado");

@@ -1,22 +1,23 @@
 package br.com.backend.modules.plano.services;
 
+import br.com.backend.exceptions.custom.InvalidRequestException;
+import br.com.backend.globals.enums.FormaPagamentoEnum;
 import br.com.backend.modules.cliente.models.entity.ClienteEntity;
+import br.com.backend.modules.cliente.repository.impl.ClienteRepositoryImpl;
+import br.com.backend.modules.empresa.models.entity.EmpresaEntity;
 import br.com.backend.modules.pagamento.models.entity.PagamentoEntity;
+import br.com.backend.modules.pagamento.models.enums.StatusPagamentoEnum;
 import br.com.backend.modules.plano.models.dto.request.PlanoRequest;
 import br.com.backend.modules.plano.models.dto.response.DadosPlanoResponse;
 import br.com.backend.modules.plano.models.dto.response.PlanoPageResponse;
 import br.com.backend.modules.plano.models.dto.response.PlanoResponse;
-import br.com.backend.modules.empresa.models.entity.EmpresaEntity;
-import br.com.backend.globals.enums.FormaPagamentoEnum;
-import br.com.backend.modules.pagamento.models.enums.StatusPagamentoEnum;
-import br.com.backend.modules.plano.models.enums.StatusPlanoEnum;
 import br.com.backend.modules.plano.models.entity.PlanoEntity;
-import br.com.backend.modules.cliente.repository.impl.ClienteRepositoryImpl;
+import br.com.backend.modules.plano.models.enums.StatusPlanoEnum;
 import br.com.backend.modules.plano.proxy.impl.PlanoAsaasProxyImpl;
 import br.com.backend.modules.plano.repository.PlanoRepository;
 import br.com.backend.modules.plano.repository.impl.PlanoRepositoryImpl;
-import br.com.backend.exceptions.InvalidRequestException;
 import br.com.backend.modules.plano.services.adapter.PlanoTypeConverter;
+import br.com.backend.modules.plano.utils.ConstantesPlano;
 import br.com.backend.util.Constantes;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -139,7 +140,7 @@ public class PlanoService {
     public PlanoResponse atualizaPlano(EmpresaEntity empresaLogada, PlanoRequest planoRequest) {
         log.debug("Método de serviço de atualização de plano acessado");
 
-        log.debug(Constantes.BUSCA_PLANO_POR_ID);
+        log.debug(ConstantesPlano.BUSCA_PLANO_POR_ID);
         PlanoEntity planoEncontrado = planoRepositoryImpl.implementaBuscaPorId(planoRequest.getId(), empresaLogada.getId());
 
         log.debug("Iniciando acesso ao método de validação de alteração de dados de plano excluído...");

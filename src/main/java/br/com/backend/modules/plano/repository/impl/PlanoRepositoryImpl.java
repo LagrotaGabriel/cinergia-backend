@@ -3,8 +3,8 @@ package br.com.backend.modules.plano.repository.impl;
 import br.com.backend.modules.pagamento.models.entity.PagamentoEntity;
 import br.com.backend.modules.plano.models.entity.PlanoEntity;
 import br.com.backend.modules.plano.repository.PlanoRepository;
-import br.com.backend.exceptions.ObjectNotFoundException;
-import br.com.backend.util.Constantes;
+import br.com.backend.exceptions.custom.ObjectNotFoundException;
+import br.com.backend.modules.plano.utils.ConstantesPlano;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -34,7 +34,7 @@ public class PlanoRepositoryImpl {
         PlanoEntity planoEntity;
         if (planoOptional.isPresent()) {
             planoEntity = planoOptional.get();
-            log.debug(Constantes.PLANO_ENCONTRADO, planoEntity);
+            log.debug(ConstantesPlano.PLANO_ENCONTRADO, planoEntity);
         } else {
             log.warn("Nenhum plano foi encontrado com o id {}", id);
             throw new ObjectNotFoundException("Nenhum plano foi encontrado com o id informado");
@@ -51,7 +51,7 @@ public class PlanoRepositoryImpl {
         PlanoEntity planoEntity;
         if (planoOptional.isPresent()) {
             planoEntity = planoOptional.get();
-            log.debug(Constantes.PLANO_ENCONTRADO, planoEntity);
+            log.debug(ConstantesPlano.PLANO_ENCONTRADO, planoEntity);
         } else {
             log.warn("Nenhum plano foi encontrado com o id {}", id);
             throw new ObjectNotFoundException("Nenhum plano foi encontrado com o id informado");
@@ -69,7 +69,7 @@ public class PlanoRepositoryImpl {
         PlanoEntity planoEntity;
         if (planoOptional.isPresent()) {
             planoEntity = planoOptional.get();
-            log.debug(Constantes.PLANO_ENCONTRADO, planoEntity);
+            log.debug(ConstantesPlano.PLANO_ENCONTRADO, planoEntity);
         } else {
             log.warn("Nenhum plano foi encontrado com o código Asaas informado: {}", codigoPlanoAsaas);
             throw new ObjectNotFoundException("Nenhum plano foi encontrado com o codigo Asaas informado");

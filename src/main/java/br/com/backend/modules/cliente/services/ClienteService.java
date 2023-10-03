@@ -1,25 +1,25 @@
 package br.com.backend.modules.cliente.services;
 
+import br.com.backend.exceptions.custom.InvalidRequestException;
+import br.com.backend.globals.models.acesso.entity.AcessoSistemaEntity;
+import br.com.backend.globals.models.acesso.enums.PerfilEnum;
+import br.com.backend.globals.models.endereco.entity.EnderecoEntity;
+import br.com.backend.globals.models.exclusao.entity.ExclusaoEntity;
+import br.com.backend.globals.models.imagem.entity.ImagemEntity;
+import br.com.backend.globals.models.imagem.enums.TipoImagemEnum;
 import br.com.backend.modules.cliente.models.dto.request.ClienteRequest;
 import br.com.backend.modules.cliente.models.dto.response.ClientePageResponse;
 import br.com.backend.modules.cliente.models.dto.response.ClienteResponse;
 import br.com.backend.modules.cliente.models.entity.ClienteEntity;
 import br.com.backend.modules.cliente.proxy.impl.ClienteAsaasProxyImpl;
-import br.com.backend.modules.cliente.services.adapter.ClienteTypeConverter;
-import br.com.backend.modules.cliente.services.validator.ClienteValidationService;
-import br.com.backend.modules.empresa.models.entity.EmpresaEntity;
-import br.com.backend.globals.models.acesso.entity.AcessoSistemaEntity;
-import br.com.backend.globals.models.endereco.entity.EnderecoEntity;
-import br.com.backend.globals.models.exclusao.entity.ExclusaoEntity;
-import br.com.backend.globals.models.imagem.entity.ImagemEntity;
-import br.com.backend.globals.models.acesso.enums.PerfilEnum;
-import br.com.backend.globals.models.imagem.enums.TipoImagemEnum;
-import br.com.backend.modules.plano.models.entity.PlanoEntity;
 import br.com.backend.modules.cliente.repository.ClienteRepository;
 import br.com.backend.modules.cliente.repository.impl.ClienteRepositoryImpl;
-import br.com.backend.exceptions.InvalidRequestException;
+import br.com.backend.modules.cliente.services.adapter.ClienteTypeConverter;
+import br.com.backend.modules.cliente.services.validator.ClienteValidationService;
+import br.com.backend.modules.cliente.utils.ConstantesClientes;
+import br.com.backend.modules.empresa.models.entity.EmpresaEntity;
+import br.com.backend.modules.plano.models.entity.PlanoEntity;
 import br.com.backend.modules.plano.services.PlanoService;
-import br.com.backend.util.Constantes;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -148,7 +148,7 @@ public class ClienteService {
     public ClienteResponse removeCliente(EmpresaEntity empresaLogada, Long id) {
         log.debug("Método de serviço de remoção de cliente acessado");
 
-        log.debug(Constantes.BUSCA_CLIENTE_POR_ID);
+        log.debug(ConstantesClientes.BUSCA_CLIENTE_POR_ID);
         ClienteEntity clienteEncontrado = clienteRepositoryImpl.implementaBuscaPorId(id, empresaLogada.getId());
 
         log.debug("Iniciando acesso ao método de validação de exclusão de cliente que já foi excluído...");
@@ -199,7 +199,7 @@ public class ClienteService {
         List<ClienteEntity> clientesEncontrados = new ArrayList<>();
 
         for (Long id : ids) {
-            log.debug(Constantes.BUSCA_CLIENTE_POR_ID);
+            log.debug(ConstantesClientes.BUSCA_CLIENTE_POR_ID);
             ClienteEntity clienteEncontrado = clienteRepositoryImpl.implementaBuscaPorId(id, empresaLogada.getId());
             clientesEncontrados.add(clienteEncontrado);
         }
@@ -255,7 +255,7 @@ public class ClienteService {
     public ClienteResponse atualizaCliente(EmpresaEntity empresaLogada, Long id, ClienteRequest clienteRequest) {
         log.debug("Método de serviço de atualização de cliente acessado");
 
-        log.debug(Constantes.BUSCA_CLIENTE_POR_ID);
+        log.debug(ConstantesClientes.BUSCA_CLIENTE_POR_ID);
         ClienteEntity clienteEncontrado = clienteRepositoryImpl.implementaBuscaPorId(id, empresaLogada.getId());
 
         log.debug("Iniciando acesso ao método de validação de alteração de dados de cliente excluído...");
@@ -343,7 +343,7 @@ public class ClienteService {
         log.debug("Acoplando foto de perfil ao objeto do cliente...");
         cliente.setFotoPerfil(fotoPerfilEntity);
 
-        log.debug(Constantes.INICIANDO_IMPL_PERSISTENCIA_CLIENTE);
+        log.debug(ConstantesClientes.INICIANDO_IMPL_PERSISTENCIA_CLIENTE);
         ClienteEntity clientePersistido = clienteRepositoryImpl.implementaPersistencia(cliente);
 
         return clienteTypeConverter.converteClienteEntityParaClienteResponse(clientePersistido);

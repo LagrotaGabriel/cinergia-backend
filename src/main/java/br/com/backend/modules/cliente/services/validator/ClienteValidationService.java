@@ -4,7 +4,7 @@ import br.com.backend.modules.cliente.models.dto.request.ClienteRequest;
 import br.com.backend.modules.cliente.models.entity.ClienteEntity;
 import br.com.backend.modules.empresa.models.entity.EmpresaEntity;
 import br.com.backend.modules.cliente.repository.impl.ClienteRepositoryImpl;
-import br.com.backend.exceptions.InvalidRequestException;
+import br.com.backend.exceptions.custom.InvalidRequestException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

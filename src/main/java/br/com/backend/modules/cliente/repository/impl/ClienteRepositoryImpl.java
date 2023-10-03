@@ -3,7 +3,7 @@ package br.com.backend.modules.cliente.repository.impl;
 import br.com.backend.modules.cliente.models.entity.ClienteEntity;
 import br.com.backend.globals.models.imagem.entity.ImagemEntity;
 import br.com.backend.modules.cliente.repository.ClienteRepository;
-import br.com.backend.exceptions.ObjectNotFoundException;
+import br.com.backend.exceptions.custom.ObjectNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -89,6 +89,9 @@ public class ClienteRepositoryImpl {
         log.debug("Retornando a imagem de perfil encontrada...");
         return imagemEntity;
     }
+
+    //TODO ENTENDER O PQ DE NÃO ESTAR SENDO USADO E REALIZAR TRATAMENTO
+    //TODO OBS: O MÉTODO É UMA IMPL DE PROXY
 
     public ClienteEntity implementaBuscaPorCodigoClienteAsaas(String codigoClienteAsaas) {
         log.debug("Método que implementa busca por cliente Asaas pelo seu código de cliente acessado");

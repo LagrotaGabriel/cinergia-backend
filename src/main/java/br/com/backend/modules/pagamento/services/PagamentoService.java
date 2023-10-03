@@ -1,13 +1,16 @@
 package br.com.backend.modules.pagamento.services;
 
-import br.com.backend.exceptions.InvalidRequestException;
+import br.com.backend.exceptions.custom.InvalidRequestException;
 import br.com.backend.globals.enums.FormaPagamentoEnum;
+import br.com.backend.modules.cliente.utils.ConstantesClientes;
+import br.com.backend.modules.email.utils.ConstantesEmail;
 import br.com.backend.modules.notificacao.models.entity.NotificacaoEntity;
 import br.com.backend.modules.notificacao.models.enums.TipoNotificacaoPlanoEnum;
 import br.com.backend.modules.pagamento.models.dto.response.PagamentoPageResponse;
 import br.com.backend.modules.pagamento.models.dto.response.PagamentoResponse;
 import br.com.backend.modules.pagamento.models.entity.PagamentoEntity;
 import br.com.backend.modules.pagamento.models.enums.StatusPagamentoEnum;
+import br.com.backend.modules.pagamento.utils.ConstantesPagamento;
 import br.com.backend.modules.plano.models.entity.PlanoEntity;
 import br.com.backend.modules.plano.models.enums.NotificacaoEnum;
 import br.com.backend.modules.plano.models.enums.StatusPlanoEnum;
@@ -24,6 +27,7 @@ import br.com.backend.modules.pagamento.repository.impl.PagamentoRepositoryImpl;
 import br.com.backend.modules.plano.repository.impl.PlanoRepositoryImpl;
 import br.com.backend.modules.email.services.EmailService;
 import br.com.backend.modules.plano.proxy.impl.PlanoAsaasProxyImpl;
+import br.com.backend.modules.plano.utils.ConstantesPlano;
 import br.com.backend.util.Constantes;
 import br.com.backend.util.ConversorDeDados;
 import lombok.extern.slf4j.Slf4j;
@@ -97,11 +101,11 @@ public class PagamentoService {
         log.debug("Acessando repositório de busca de pagamentos do cliente");
         Page<PagamentoEntity> pagamentoPage = pagamentoRepository.buscaPorPagamentosDoCliente(pageable, empresaLogada.getId(), idCliente);
 
-        log.debug(Constantes.CONVERTE_PAGAMENTO_DE_ENTITY_PARA_RESPONSE);
+        log.debug(ConstantesPagamento.CONVERTE_PAGAMENTO_DE_ENTITY_PARA_RESPONSE);
         PagamentoPageResponse pagamentoPageResponse = pagamentoTypeConverter.converteListaDePagamentosEntityParaPagamentosResponse(pagamentoPage);
         log.debug(Constantes.CONVERSAO_TIPAGEM_SUCESSO);
 
-        log.info(Constantes.BUSCA_PAGINADA_PAGAMENTOS_SUCESSO);
+        log.info(ConstantesPagamento.BUSCA_PAGINADA_PAGAMENTOS_SUCESSO);
         return pagamentoPageResponse;
     }
 
@@ -113,11 +117,11 @@ public class PagamentoService {
         log.debug("Acessando repositório de busca de pagamentos");
         Page<PagamentoEntity> pagamentoPage = pagamentoRepository.buscaPorPagamentosDoPlano(pageable, empresaLogada.getId(), idPlano);
 
-        log.debug(Constantes.CONVERTE_PAGAMENTO_DE_ENTITY_PARA_RESPONSE);
+        log.debug(ConstantesPagamento.CONVERTE_PAGAMENTO_DE_ENTITY_PARA_RESPONSE);
         PagamentoPageResponse pagamentoPageResponse = pagamentoTypeConverter.converteListaDePagamentosEntityParaPagamentosResponse(pagamentoPage);
         log.debug(Constantes.CONVERSAO_TIPAGEM_SUCESSO);
 
-        log.info(Constantes.BUSCA_PAGINADA_PAGAMENTOS_SUCESSO);
+        log.info(ConstantesPagamento.BUSCA_PAGINADA_PAGAMENTOS_SUCESSO);
         return pagamentoPageResponse;
     }
 
@@ -131,11 +135,11 @@ public class PagamentoService {
                 ? pagamentoRepository.buscaPorPagamentosTypeAhead(pageable, (campoBusca).toUpperCase(), empresaLogada.getId())
                 : pagamentoRepository.buscaPorPagamentos(pageable, empresaLogada.getId());
 
-        log.debug(Constantes.CONVERTE_PAGAMENTO_DE_ENTITY_PARA_RESPONSE);
+        log.debug(ConstantesPagamento.CONVERTE_PAGAMENTO_DE_ENTITY_PARA_RESPONSE);
         PagamentoPageResponse pagamentoPageResponse = pagamentoTypeConverter.converteListaDePagamentosEntityParaPagamentosResponse(pagamentoPage);
         log.debug(Constantes.CONVERSAO_TIPAGEM_SUCESSO);
 
-        log.info(Constantes.BUSCA_PAGINADA_PAGAMENTOS_SUCESSO);
+        log.info(ConstantesPagamento.BUSCA_PAGINADA_PAGAMENTOS_SUCESSO);
         return pagamentoPageResponse;
     }
 
@@ -146,11 +150,11 @@ public class PagamentoService {
         log.debug("Acessando repositório de busca de clientes");
         Page<PagamentoEntity> pagamentoPage = pagamentoRepository.buscaPorPagamentosRealizados(pageable, empresaLogada.getId());
 
-        log.debug(Constantes.CONVERTE_PAGAMENTO_DE_ENTITY_PARA_RESPONSE);
+        log.debug(ConstantesPagamento.CONVERTE_PAGAMENTO_DE_ENTITY_PARA_RESPONSE);
         PagamentoPageResponse pagamentoPageResponse = pagamentoTypeConverter.converteListaDePagamentosEntityParaPagamentosResponse(pagamentoPage);
         log.debug(Constantes.CONVERSAO_TIPAGEM_SUCESSO);
 
-        log.info(Constantes.BUSCA_PAGINADA_PAGAMENTOS_SUCESSO);
+        log.info(ConstantesPagamento.BUSCA_PAGINADA_PAGAMENTOS_SUCESSO);
         return pagamentoPageResponse;
     }
 
@@ -251,7 +255,7 @@ public class PagamentoService {
 
         log.debug("Método de criação de novo pagamento acessado");
 
-        log.debug(Constantes.BUSCA_CLIENTE_POR_ID);
+        log.debug(ConstantesClientes.BUSCA_CLIENTE_POR_ID);
         ClienteEntity cliente = clienteRepositoryImpl.implementaBuscaPorId(planoEntity.getIdClienteResponsavel(),
                 planoEntity.getIdEmpresaResponsavel());
 
@@ -276,7 +280,7 @@ public class PagamentoService {
                         .getPayment().getBillingType().getFormaPagamentoResumida()))
                 .statusPagamento(StatusPagamentoEnum.PENDENTE)
                 .build();
-        log.debug(Constantes.OBJETO_PAGAMENTO_CRIADO, pagamentoEntity);
+        log.debug(ConstantesPagamento.OBJETO_PAGAMENTO_CRIADO, pagamentoEntity);
 
         log.debug("Adicionando objeto pagamento criado à lista de pagamentos do plano...");
         planoEntity.getPagamentos().add(pagamentoEntity);
@@ -303,7 +307,7 @@ public class PagamentoService {
             planoRepositoryImpl.implementaPersistencia(planoEntity);
 
             if (planoEntity.getNotificacoes().contains(NotificacaoEnum.EMAIL) && cliente.getEmail() != null) {
-                log.debug(Constantes.INICIA_SERVICO_ENVIO_EMAILS);
+                log.debug(ConstantesEmail.INICIA_SERVICO_ENVIO_EMAILS);
                 emailService.enviarEmailCobranca(pagamentoEntity, planoEntity, cliente);
             }
         } catch (DataIntegrityViolationException dataIntegrityViolationException) {
@@ -314,18 +318,18 @@ public class PagamentoService {
 
     public void realizaAtualizacaoDePagamentoRealizado(AtualizacaoPagamentoWebHook atualizacaoPagamentoWebHook,
                                                        PlanoEntity planoEntity) {
-        log.debug(Constantes.INICIANDO_IMPLEMENTACAO_BUSCA_PAGAMENTO_ASAAS);
+        log.debug(ConstantesPagamento.INICIANDO_IMPLEMENTACAO_BUSCA_PAGAMENTO_ASAAS);
         PagamentoEntity pagamentoEntity = pagamentoRepositoryImpl
                 .implementaBuscaPorCodigoPagamentoAsaas(atualizacaoPagamentoWebHook.getPayment().getId());
 
-        log.debug(Constantes.BUSCA_CLIENTE_POR_ID);
+        log.debug(ConstantesClientes.BUSCA_CLIENTE_POR_ID);
         ClienteEntity cliente = clienteRepositoryImpl.implementaBuscaPorId(planoEntity.getIdClienteResponsavel(),
                 planoEntity.getIdEmpresaResponsavel());
 
-        log.debug(Constantes.BUSCA_CLIENTE_POR_ID);
+        log.debug("Iniciando busca pela empresa por id");
         EmpresaEntity empresa = empresaRepositoryImpl.implementaBuscaPorId(planoEntity.getIdEmpresaResponsavel());
 
-        log.debug(Constantes.REMOVENDO_PAGAMENTO_DO_PLANO, pagamentoEntity);
+        log.debug(ConstantesPagamento.REMOVENDO_PAGAMENTO_DO_PLANO, pagamentoEntity);
         planoEntity.getPagamentos().remove(pagamentoEntity);
 
         log.debug("Iniciando setagem da data de vencimento do plano do cliente para o próximo vencimento...");
@@ -335,7 +339,7 @@ public class PagamentoService {
         log.debug("Setando plano do cliente como ATIVO...");
         planoEntity.setStatusPlano(StatusPlanoEnum.ATIVO);
 
-        log.debug(Constantes.ATUALIZANDO_VARIAVEIS_PAGAMENTO);
+        log.debug(ConstantesPagamento.ATUALIZANDO_VARIAVEIS_PAGAMENTO);
         pagamentoEntity.setIdPlanoResponsavel(planoEntity.getId());
         pagamentoEntity.setIdEmpresaResponsavel(planoEntity.getIdEmpresaResponsavel());
         pagamentoEntity.setIdAsaas(atualizacaoPagamentoWebHook.getPayment().getId());
@@ -352,7 +356,7 @@ public class PagamentoService {
         pagamentoEntity.setFormaPagamento(FormaPagamentoEnum.valueOf(atualizacaoPagamentoWebHook
                 .getPayment().getBillingType().getFormaPagamentoResumida()));
         pagamentoEntity.setStatusPagamento(StatusPagamentoEnum.APROVADO);
-        log.debug(Constantes.OBJETO_PAGAMENTO_CRIADO, pagamentoEntity);
+        log.debug(ConstantesPagamento.OBJETO_PAGAMENTO_CRIADO, pagamentoEntity);
 
         log.debug("Adicionando objeto pagamento criado à lista de pagamentos do plano...");
         planoEntity.getPagamentos().add(pagamentoEntity);
@@ -373,14 +377,14 @@ public class PagamentoService {
         log.debug("Adicionando notificação ao objeto empresa...");
         empresa.getNotificacoes().add(notificacaoEntity);
 
-        log.debug(Constantes.INICIANDO_IMPL_PERSISTENCIA_PLANO);
+        log.debug(ConstantesPlano.INICIANDO_IMPL_PERSISTENCIA_PLANO);
         planoRepositoryImpl.implementaPersistencia(planoEntity);
 
         log.debug("Iniciando acesso ao método de atualização do saldo da empresa...");
         empresaService.adicionaSaldoContaEmpresa(empresa, pagamentoEntity);
 
         if (planoEntity.getNotificacoes().contains(NotificacaoEnum.EMAIL) && cliente.getEmail() != null) {
-            log.debug(Constantes.INICIA_SERVICO_ENVIO_EMAILS);
+            log.debug(ConstantesEmail.INICIA_SERVICO_ENVIO_EMAILS);
             emailService.enviarEmailSucessoPagamento(pagamentoEntity, planoEntity, cliente, empresa);
         }
     }
@@ -390,15 +394,15 @@ public class PagamentoService {
 
         log.debug("Método de atualização de pagamento e plano como vencidos acessado");
 
-        log.debug(Constantes.BUSCA_CLIENTE_POR_ID);
+        log.debug(ConstantesClientes.BUSCA_CLIENTE_POR_ID);
         ClienteEntity cliente = clienteRepositoryImpl.implementaBuscaPorId(planoEntity.getIdClienteResponsavel(),
                 planoEntity.getIdEmpresaResponsavel());
 
-        log.debug(Constantes.INICIANDO_IMPLEMENTACAO_BUSCA_PAGAMENTO_ASAAS);
+        log.debug(ConstantesPagamento.INICIANDO_IMPLEMENTACAO_BUSCA_PAGAMENTO_ASAAS);
         PagamentoEntity pagamentoEntity = pagamentoRepositoryImpl
                 .implementaBuscaPorCodigoPagamentoAsaas(atualizacaoPagamentoWebHook.getPayment().getId());
 
-        log.debug(Constantes.REMOVENDO_PAGAMENTO_DO_PLANO, pagamentoEntity);
+        log.debug(ConstantesPagamento.REMOVENDO_PAGAMENTO_DO_PLANO, pagamentoEntity);
         planoEntity.getPagamentos().remove(pagamentoEntity);
 
         log.debug("Setando status do pagamento como atrasado...");
@@ -410,49 +414,49 @@ public class PagamentoService {
         log.debug("Setando plano do cliente como INATIVO...");
         planoEntity.setStatusPlano(StatusPlanoEnum.INATIVO);
 
-        log.debug(Constantes.INICIANDO_IMPL_PERSISTENCIA_PLANO);
+        log.debug(ConstantesPlano.INICIANDO_IMPL_PERSISTENCIA_PLANO);
         planoRepositoryImpl.implementaPersistencia(planoEntity);
 
         if (planoEntity.getNotificacoes().contains(NotificacaoEnum.EMAIL) && cliente.getEmail() != null) {
-            log.debug(Constantes.INICIA_SERVICO_ENVIO_EMAILS);
+            log.debug(ConstantesEmail.INICIA_SERVICO_ENVIO_EMAILS);
             emailService.enviarEmailAtrasoPagamento(pagamentoEntity, planoEntity, cliente);
         }
     }
 
     public void realizaAtualizacaoDePlanoParaPagamentoRemovido(AtualizacaoPagamentoWebHook atualizacaoPagamentoWebHook) {
-        log.debug(Constantes.INICIANDO_IMPLEMENTACAO_BUSCA_PAGAMENTO_ASAAS);
+        log.debug(ConstantesPagamento.INICIANDO_IMPLEMENTACAO_BUSCA_PAGAMENTO_ASAAS);
         PagamentoEntity pagamentoEntity = pagamentoRepositoryImpl
                 .implementaBuscaPorCodigoPagamentoAsaas(atualizacaoPagamentoWebHook.getPayment().getId());
 
-        log.debug(Constantes.ATUALIZANDO_VARIAVEIS_PAGAMENTO);
+        log.debug(ConstantesPagamento.ATUALIZANDO_VARIAVEIS_PAGAMENTO);
         pagamentoEntity.setStatusPagamento(StatusPagamentoEnum.CANCELADO);
 
-        log.debug(Constantes.OBJETO_PAGAMENTO_CRIADO, pagamentoEntity);
+        log.debug(ConstantesPagamento.OBJETO_PAGAMENTO_CRIADO, pagamentoEntity);
 
-        log.debug(Constantes.INICIANDO_IMPL_PERSISTENCIA_PLANO);
+        log.debug(ConstantesPlano.INICIANDO_IMPL_PERSISTENCIA_PLANO);
         pagamentoRepositoryImpl.implementaPersistencia(pagamentoEntity);
     }
 
     public void realizaAtualizacaoDePagamentoAlterado(AtualizacaoPagamentoWebHook atualizacaoPagamentoWebHook,
                                                       PlanoEntity planoEntity) {
-        log.debug(Constantes.INICIANDO_IMPLEMENTACAO_BUSCA_PAGAMENTO_ASAAS);
+        log.debug(ConstantesPagamento.INICIANDO_IMPLEMENTACAO_BUSCA_PAGAMENTO_ASAAS);
         PagamentoEntity pagamentoEntity = pagamentoRepositoryImpl
                 .implementaBuscaPorCodigoPagamentoAsaas(atualizacaoPagamentoWebHook.getPayment().getId());
 
-        log.debug(Constantes.REMOVENDO_PAGAMENTO_DO_PLANO, pagamentoEntity);
+        log.debug(ConstantesPagamento.REMOVENDO_PAGAMENTO_DO_PLANO, pagamentoEntity);
         planoEntity.getPagamentos().remove(pagamentoEntity);
 
-        log.debug(Constantes.ATUALIZANDO_VARIAVEIS_PAGAMENTO);
+        log.debug(ConstantesPagamento.ATUALIZANDO_VARIAVEIS_PAGAMENTO);
         pagamentoEntity.setDescricao(atualizacaoPagamentoWebHook.getPayment().getDescription());
         pagamentoEntity.setFormaPagamento(FormaPagamentoEnum.valueOf(atualizacaoPagamentoWebHook
                 .getPayment().getBillingType().getFormaPagamentoResumida()));
 
-        log.debug(Constantes.OBJETO_PAGAMENTO_CRIADO, pagamentoEntity);
+        log.debug(ConstantesPagamento.OBJETO_PAGAMENTO_CRIADO, pagamentoEntity);
 
         log.debug("Setando pagamento à lista de pagamentos do plano...");
         planoEntity.getPagamentos().add(pagamentoEntity);
 
-        log.debug(Constantes.INICIANDO_IMPL_PERSISTENCIA_PLANO);
+        log.debug(ConstantesPlano.INICIANDO_IMPL_PERSISTENCIA_PLANO);
         planoRepositoryImpl.implementaPersistencia(planoEntity);
     }
 

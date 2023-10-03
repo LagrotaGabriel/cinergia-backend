@@ -1,7 +1,7 @@
 package br.com.backend.modules.transferencia.hook;
 
 import br.com.backend.modules.transferencia.hook.models.AtualizacaoTransferenciaWebHook;
-import br.com.backend.exceptions.UnauthorizedAccessException;
+import br.com.backend.exceptions.custom.UnauthorizedAccessException;
 import br.com.backend.modules.transferencia.services.TransferenciaService;
 import br.com.backend.util.WebHookTokenValidation;
 import io.swagger.v3.oas.annotations.Operation;

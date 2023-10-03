@@ -11,8 +11,9 @@ import br.com.backend.modules.plano.proxy.models.response.atualizar.AtualizaAssi
 import br.com.backend.modules.plano.proxy.models.response.cancelar.CancelamentoAssinaturaResponse;
 import br.com.backend.modules.plano.proxy.models.response.consultar.ConsultaAssinaturaResponse;
 import br.com.backend.modules.plano.proxy.models.response.criar.CriaPlanoAsaasResponse;
-import br.com.backend.exceptions.FeignConnectionException;
-import br.com.backend.exceptions.InvalidRequestException;
+import br.com.backend.exceptions.custom.FeignConnectionException;
+import br.com.backend.exceptions.custom.InvalidRequestException;
+import br.com.backend.modules.plano.utils.ConstantesPlano;
 import br.com.backend.util.Constantes;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,9 +59,9 @@ public class PlanoAsaasProxyImpl {
             responseAsaas =
                     planoAsaasProxy.cadastraNovaAssinatura(criaPlanoAsaasRequest, System.getenv(Constantes.TOKEN_ASAAS));
         } catch (Exception e) {
-            log.error(Constantes.ERRO_CRIACAO_ASSINATURA_ASAAS
+            log.error(ConstantesPlano.ERRO_CRIACAO_ASSINATURA_ASAAS
                     + e.getMessage());
-            throw new InvalidRequestException(Constantes.ERRO_CRIACAO_ASSINATURA_ASAAS
+            throw new InvalidRequestException(ConstantesPlano.ERRO_CRIACAO_ASSINATURA_ASAAS
                     + e.getMessage());
         }
 
@@ -72,7 +73,7 @@ public class PlanoAsaasProxyImpl {
         if (responseAsaas.getStatusCodeValue() != 200) {
             log.error("Ocorreu um erro no processo de criação da assinatura na integradora de pagamentos: {}",
                     responseAsaas.getBody());
-            throw new InvalidRequestException(Constantes.ERRO_CRIACAO_ASSINATURA_ASAAS
+            throw new InvalidRequestException(ConstantesPlano.ERRO_CRIACAO_ASSINATURA_ASAAS
                     + responseAsaas.getBody());
         }
         log.debug("Criação de assinatura ASAAS realizada com sucesso");
@@ -114,9 +115,9 @@ public class PlanoAsaasProxyImpl {
             responseAsaas =
                     planoAsaasProxy.atualizaAssinatura(idPlanoAsaas, atualizaAssinaturaAsaasRequest, System.getenv(Constantes.TOKEN_ASAAS));
         } catch (Exception e) {
-            log.error(Constantes.ERRO_ATUALIZACAO_ASSINATURA_ASAAS
+            log.error(ConstantesPlano.ERRO_ATUALIZACAO_ASSINATURA_ASAAS
                     + e.getMessage());
-            throw new InvalidRequestException(Constantes.ERRO_ATUALIZACAO_ASSINATURA_ASAAS
+            throw new InvalidRequestException(ConstantesPlano.ERRO_ATUALIZACAO_ASSINATURA_ASAAS
                     + e.getMessage());
         }
 
@@ -128,7 +129,7 @@ public class PlanoAsaasProxyImpl {
         if (responseAsaas.getStatusCodeValue() != 200) {
             log.error("Ocorreu um erro no processo de atualização da assinatura na integradora de pagamentos: {}",
                     responseAsaas.getBody());
-            throw new InvalidRequestException(Constantes.ERRO_CRIACAO_ASSINATURA_ASAAS
+            throw new InvalidRequestException(ConstantesPlano.ERRO_CRIACAO_ASSINATURA_ASAAS
                     + responseAsaas.getBody());
         }
         log.debug("Atualização de assinatura ASAAS realizada com sucesso");
@@ -152,9 +153,9 @@ public class PlanoAsaasProxyImpl {
             responseAsaas =
                     planoAsaasProxy.cancelarAssinatura(planoEntity.getIdAsaas(), System.getenv(Constantes.TOKEN_ASAAS));
         } catch (Exception e) {
-            log.error(Constantes.ERRO_CANCELAMENTO_ASSINATURA_ASAAS
+            log.error(ConstantesPlano.ERRO_CANCELAMENTO_ASSINATURA_ASAAS
                     + e.getMessage());
-            throw new InvalidRequestException(Constantes.ERRO_CANCELAMENTO_ASSINATURA_ASAAS
+            throw new InvalidRequestException(ConstantesPlano.ERRO_CANCELAMENTO_ASSINATURA_ASAAS
                     + e.getMessage());
         }
 
@@ -166,7 +167,7 @@ public class PlanoAsaasProxyImpl {
         if (responseAsaas.getStatusCodeValue() != 200) {
             log.error("Ocorreu um erro no processo de cancelamento da assinatura na integradora de pagamentos: {}",
                     responseAsaas.getBody());
-            throw new InvalidRequestException(Constantes.ERRO_CANCELAMENTO_ASSINATURA_ASAAS
+            throw new InvalidRequestException(ConstantesPlano.ERRO_CANCELAMENTO_ASSINATURA_ASAAS
                     + responseAsaas.getBody());
         }
         log.debug("Cancelamento de assinatura ASAAS realizada com sucesso");

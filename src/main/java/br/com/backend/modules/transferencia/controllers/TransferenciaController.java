@@ -3,7 +3,7 @@ package br.com.backend.modules.transferencia.controllers;
 import br.com.backend.config.security.JWTUtil;
 import br.com.backend.modules.transferencia.models.dto.request.TransferenciaRequest;
 import br.com.backend.modules.transferencia.models.dto.response.TransferenciaPageResponse;
-import br.com.backend.exceptions.InvalidRequestException;
+import br.com.backend.exceptions.custom.InvalidRequestException;
 import br.com.backend.modules.transferencia.services.TransferenciaService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;

@@ -1,6 +1,6 @@
 package br.com.backend.util;
 
-import br.com.backend.exceptions.UnauthorizedAccessException;
+import br.com.backend.exceptions.custom.UnauthorizedAccessException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
