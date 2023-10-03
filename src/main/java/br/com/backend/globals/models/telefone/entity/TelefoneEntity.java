@@ -1,8 +1,10 @@
 package br.com.backend.globals.models.telefone.entity;
 
 import lombok.*;
+import org.hibernate.annotations.Comment;
 
 import javax.persistence.*;
+import java.util.UUID;
 
 @Entity
 @Builder
@@ -11,16 +13,20 @@ import javax.persistence.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "tb_telefone")
+@Table(name = "TB_SBS_TELEFONE")
 public class TelefoneEntity {
 
     @Id
+    @Comment("Chave primária do telefone - UUID")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(table = "TB_SBS_TELEFONE", name = "COD_TELEFONE_TEL", nullable = false, updatable = false, length = 36)
+    private UUID uuid;
 
-    @Column(nullable = false)
+    @Comment("Prefixo do telefone")
+    @Column(table = "TB_SBS_TELEFONE", name = "STR_PREFIXO_TEL", nullable = false, length = 2)
     private String prefixo;
 
-    @Column(nullable = false)
+    @Comment("Número do telefone")
+    @Column(table = "TB_SBS_TELEFONE", name = "STR_NUMERO_TEL", nullable = false, length = 9)
     private String numero;
 }
