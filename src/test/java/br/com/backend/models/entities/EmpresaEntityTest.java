@@ -47,7 +47,6 @@ class EmpresaEntityTest {
                 null,
                 null,
                 null,
-                null,
                 new ArrayList<>(),
                 new ArrayList<>()
         );
@@ -78,7 +77,6 @@ class EmpresaEntityTest {
                 .acessoSistema(null)
                 .logoEmpresa(null)
                 .saldo(0.0)
-                .modelosPlano(new ArrayList<>())
                 .clientes(new ArrayList<>())
                 .build();
         Assertions.assertEquals(

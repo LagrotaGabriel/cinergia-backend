@@ -1,4 +1,4 @@
-package br.com.backend.exceptions;
+package br.com.backend.exceptions.custom;
 
 public class ObjectNotFoundException extends RuntimeException{
     public ObjectNotFoundException(String message) {

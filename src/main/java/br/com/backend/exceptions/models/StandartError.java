@@ -1,4 +1,4 @@
-package br.com.backend.exceptions;
+package br.com.backend.exceptions.models;
 
 import lombok.*;
 

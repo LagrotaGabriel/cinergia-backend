@@ -1,7 +1,7 @@
 package br.com.backend.config.security;
 
 import br.com.backend.config.security.empresa.CredenciaisRequest;
-import br.com.backend.exceptions.UnauthorizedAccessException;
+import br.com.backend.exceptions.custom.UnauthorizedAccessException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

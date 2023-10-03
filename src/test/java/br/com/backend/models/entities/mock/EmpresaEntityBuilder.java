@@ -27,7 +27,6 @@ public class EmpresaEntityBuilder {
         builder.empresaEntity.setTelefone(null);
         builder.empresaEntity.setAcessoSistema(null);
         builder.empresaEntity.setLogoEmpresa(null);
-        builder.empresaEntity.setModelosPlano(new ArrayList<>());
         builder.empresaEntity.setClientes(new ArrayList<>());
         return builder;
     }

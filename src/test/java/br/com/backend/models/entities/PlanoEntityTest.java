@@ -50,7 +50,6 @@ class PlanoEntityTest {
                 StatusPlanoEnum.INATIVO,
                 PeriodicidadeEnum.MENSAL,
                 null,
-                null,
                 new ArrayList<>()
         );
         Assertions.assertEquals(

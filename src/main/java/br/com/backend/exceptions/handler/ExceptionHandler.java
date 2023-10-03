@@ -1,6 +1,9 @@
-package br.com.backend.exceptions;
+package br.com.backend.exceptions.handler;
 
 import javax.servlet.http.HttpServletRequest;
+
+import br.com.backend.exceptions.models.StandartError;
+import br.com.backend.exceptions.custom.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
