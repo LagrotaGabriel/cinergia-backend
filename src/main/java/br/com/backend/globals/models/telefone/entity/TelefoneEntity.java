@@ -19,14 +19,14 @@ public class TelefoneEntity {
     @Id
     @Comment("Chave primária do telefone - UUID")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(table = "TB_SBS_TELEFONE", name = "COD_TELEFONE_TEL", nullable = false, updatable = false, length = 36)
+    @Column(name = "COD_TELEFONE_TEL", nullable = false, updatable = false, length = 36)
     private UUID uuid;
 
     @Comment("Prefixo do telefone")
-    @Column(table = "TB_SBS_TELEFONE", name = "STR_PREFIXO_TEL", nullable = false, length = 2)
+    @Column(name = "STR_PREFIXO_TEL", nullable = false, length = 2)
     private String prefixo;
 
     @Comment("Número do telefone")
-    @Column(table = "TB_SBS_TELEFONE", name = "STR_NUMERO_TEL", nullable = false, length = 9)
+    @Column(name = "STR_NUMERO_TEL", nullable = false, length = 9)
     private String numero;
 }

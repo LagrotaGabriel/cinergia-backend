@@ -21,15 +21,17 @@ public class AcessoSistemaEntity {
     @Id
     @Comment("Chave primária do acesso - UUID")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(table = "TB_SBS_ACESSO", name = "COD_ACESSO_ACS", nullable = false, updatable = false, length = 36)
+    @Column(name = "COD_ACESSO_ACS", nullable = false, updatable = false, length = 36)
     private UUID uuid;
 
     @Comment("Senha do acesso")
-    @Column(table = "TB_SBS_ACESSO", name = "STR_SENHA_ACS", nullable = false, length = 200)
+    @Column(name = "STR_SENHA_ACS", nullable = false, length = 200)
     private String senha;
 
+    @ToString.Exclude
+    @Builder.Default
     @Comment("Perfis de acesso")
-    @Column(table = "TB_SBS_ACESSO", name = "LST_PERFIS_ACS", nullable = false)
+    @Column(name = "LST_PERFIS_ACS", nullable = false)
     @CollectionTable(name = "PERFIS")
     @ElementCollection(fetch = FetchType.EAGER)
     protected Set<PerfilEnum> perfis = new HashSet<>();

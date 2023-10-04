@@ -20,26 +20,26 @@ public class ImagemEntity {
     @Id
     @Comment("Chave primária da imagem - UUID")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(table = "TB_SBS_IMAGEM", name = "COD_IMAGEM_IMG", nullable = false, updatable = false, length = 36)
+    @Column(name = "COD_IMAGEM_IMG", nullable = false, updatable = false, length = 36)
     private UUID uuid;
 
     @Comment("Nome do arquivo")
-    @Column(table = "TB_SBS_IMAGEM", name = "STR_NOME_IMG", nullable = false, length = 70)
+    @Column(name = "STR_NOME_IMG", nullable = false, length = 70)
     private String nome;
 
     @Comment("Tamanho da imagem")
-    @Column(table = "TB_SBS_IMAGEM", name = "LNG_TAMANHO_IMG", nullable = false)
+    @Column(name = "LNG_TAMANHO_IMG", nullable = false)
     private Long tamanho;
 
     @Enumerated(EnumType.STRING)
     @Comment("Tipo do arquivo da imagem: 0 - Jpeg, 1 - Png")
-    @Column(table = "TB_SBS_IMAGEM", name = "ENM_TIPO_IMG", nullable = false)
+    @Column(name = "ENM_TIPO_IMG", nullable = false)
     private TipoImagemEnum tipo;
 
     @Lob
     @Comment("Arquivo de imagem")
     @Type(type = "org.hibernate.type.ImageType")
-    @Column(table = "TB_SBS_IMAGEM", name = "ARQ_ARQUIVO_IMG", nullable = false)
+    @Column(name = "ARQ_ARQUIVO_IMG", nullable = false)
     private byte[] arquivo;
 
 }
