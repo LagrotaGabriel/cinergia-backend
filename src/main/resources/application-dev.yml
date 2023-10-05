@@ -1,11 +1,14 @@
 spring:
   jpa:
-    hibernate.ddl-auto: update
+    show-sql: true
+    hibernate.ddl-auto: create-drop
     properties:
       hibernate:
+        generate_statistics: true
+        format_sql: true
         dialect=org:
           hibernate:
-            dialect: MySQL5InnoDBDialect
+            dialect: MySQL57Dialect
   datasource:
     url: ${DB_URL}
     username: ${DB_USERNAME}
@@ -18,6 +21,7 @@ logging:
   level:
     org.springframework.web: INFO
     guru.springframework.controllers: INFO
-    org.hibernate: INFO
+    org:
+      hibernate: INFO
 
 log_context: DEVELOPMENT
