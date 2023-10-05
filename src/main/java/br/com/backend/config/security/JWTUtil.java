@@ -1,8 +1,8 @@
 package br.com.backend.config.security;
 
+import br.com.backend.exceptions.custom.ObjectNotFoundException;
 import br.com.backend.modules.empresa.models.entity.EmpresaEntity;
 import br.com.backend.modules.empresa.repository.EmpresaRepository;
-import br.com.backend.exceptions.custom.ObjectNotFoundException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -73,6 +73,7 @@ public class JWTUtil {
     }
 
     public EmpresaEntity obtemEmpresaAtiva(HttpServletRequest req) {
+
         String token = req.getHeader("Authorization").replace("Bearer ", "");
         String username = getUsernameFromToken(token);
         Optional<EmpresaEntity> empresaOptional = empresaRepository.buscaPorCpfCnpj(username);

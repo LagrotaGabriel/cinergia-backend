@@ -52,7 +52,8 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         res.addHeader("Authorization", "Bearer " + token);
         res.addHeader("access-control-expose-headers", "Authorization");
         //res.getOutputStream().write(mapper.writeValueAsString(jwtUtil.obtemEmpresaAtivaPeloToken(token)).getBytes(StandardCharsets.UTF_8));
-        res.getWriter().write(mapper.writeValueAsString(jwtUtil.obtemEmpresaAtivaPeloToken(token)));
+        //res.getWriter().write(mapper.writeValueAsString(jwtUtil.obtemEmpresaAtivaPeloToken(token)));
+        //TODO REMOVER COMMENTS
     }
 
     @Override
