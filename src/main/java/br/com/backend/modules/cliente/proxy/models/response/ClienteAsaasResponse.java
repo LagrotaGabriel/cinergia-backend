@@ -9,7 +9,7 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CriaClienteAsaasResponse {
+public class ClienteAsaasResponse {
 
     private String object;
     private String id;
