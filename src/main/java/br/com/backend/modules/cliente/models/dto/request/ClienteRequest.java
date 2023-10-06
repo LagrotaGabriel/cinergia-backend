@@ -7,6 +7,7 @@ import br.com.backend.modules.cliente.models.enums.StatusClienteEnum;
 import br.com.backend.modules.cliente.models.enums.TipoPessoaEnum;
 import lombok.*;
 
+import javax.validation.Valid;
 import javax.validation.constraints.*;
 import java.util.List;
 
@@ -45,8 +46,13 @@ public class ClienteRequest {
     @NotNull(message = "O campo tipo pessoa não pode ser nulo")
     private TipoPessoaEnum tipoPessoa;
 
+    @Valid
     private AcessoSistemaRequest acessoSistema;
+
+    @Valid
     private EnderecoRequest endereco;
+
+    @Valid
     private List<TelefoneRequest> telefones;
 
 }
