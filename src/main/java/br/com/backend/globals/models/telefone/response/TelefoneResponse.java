@@ -14,8 +14,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TelefoneResponse {
-    private String prefixo;
-    private String numero;
+    private Integer prefixo;
+    private Integer numero;
 
     public TelefoneResponse constroiTelefoneResponse(TelefoneEntity telefoneEntity) {
         log.info("Método de conversão de objeto do tipo TelefoneEntity para objeto do tipo TelefoneResponse acessado");

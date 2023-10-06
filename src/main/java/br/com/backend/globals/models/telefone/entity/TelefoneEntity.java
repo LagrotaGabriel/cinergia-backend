@@ -31,11 +31,11 @@ public class TelefoneEntity {
 
     @Comment("Prefixo do telefone")
     @Column(name = "str_prefixo_tel", nullable = false, length = 2)
-    private String prefixo;
+    private Integer prefixo;
 
     @Comment("Número do telefone")
     @Column(name = "str_numero_tel", nullable = false, length = 9)
-    private String numero;
+    private Integer numero;
 
     public TelefoneEntity constroiTelefoneEntity(TelefoneRequest telefoneRequest) {
         return TelefoneEntity.builder()

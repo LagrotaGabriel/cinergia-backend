@@ -27,7 +27,7 @@ public class ClienteAsaasProxyUtils {
         }
 
         for (TelefoneRequest telefone : telefones) {
-            if (telefone.getNumero().length() == 9)
+            if (telefone.getNumero().toString().length() == 9)
                 return telefone.obtemPrefixoComNumeroJuntos();
         }
 
