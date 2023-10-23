@@ -1,35 +1,40 @@
 package br.com.backend.modules.plano.repository;
 
 import br.com.backend.modules.plano.models.entity.PlanoEntity;
+import br.com.backend.modules.plano.models.entity.id.PlanoId;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
-public interface PlanoRepository extends JpaRepository<PlanoEntity, Long> {
+public interface PlanoRepository extends JpaRepository<PlanoEntity, PlanoId> {
 
-    @Query("SELECT SUM(p) FROM PlanoEntity p WHERE p.idEmpresaResponsavel = ?1 and p.statusPlano = 'INATIVO'")
-    Integer somaQtdAssinaturasInativas(Long idEmpresa);
+    Optional<PlanoEntity> findByAsaasId(String asaasId);
 
-    @Query("SELECT SUM(p) FROM PlanoEntity p WHERE p.idEmpresaResponsavel = ?1 and p.statusPlano = 'ATIVO'")
-    Integer somaQtdAssinaturasAtivas(Long idEmpresa);
-    @Query("SELECT p FROM PlanoEntity p WHERE p.idEmpresaResponsavel = ?1")
-    Page<PlanoEntity> buscaPorPlanos(Pageable pageable, Long id);
+    @Query("SELECT p FROM PlanoEntity p " +
+            "WHERE p.empresa.uuid = ?1 " +
+            "AND (?2 IS NULL OR p.descricao LIKE ?2%)")
+    Page<PlanoEntity> buscaPaginadaPorPlanos(Pageable pageable,
+                                             UUID uuidEmpresa,
+                                             String busca);
 
-    @Query("SELECT p FROM PlanoEntity p WHERE " +
-            "upper(p.descricao) LIKE ?1% and p.idEmpresaResponsavel = ?2")
-    Page<PlanoEntity> buscaPorPlanosTypeAhead(Pageable pageable, String busca, Long id);
+    @Query("SELECT p FROM PlanoEntity p " +
+            "WHERE p.cliente.uuid = ?2 " +
+            "AND p.empresa.uuid = ?1")
+    Page<PlanoEntity> buscaPaginadaPorPlanosDoCliente(Pageable pageable, UUID uuidEmpresa, UUID uuidCliente);
 
-    @Query("SELECT p FROM PlanoEntity p WHERE " +
-            "p.idClienteResponsavel = ?2 and p.idEmpresaResponsavel = ?1")
-    Page<PlanoEntity> buscaPorPlanosDoCliente(Pageable pageable, Long id, Long idCliente);
+    @Query("SELECT p FROM PlanoEntity p " +
+            "WHERE p.cliente.uuid = ?1")
+    List<PlanoEntity> buscaPorPlanosDoCliente(UUID uuidCliente);
 
-    @Query("SELECT p FROM PlanoEntity p WHERE p.id=?1 and p.idEmpresaResponsavel = ?2")
-    Optional<PlanoEntity> buscaPorId(Long idPlano, Long idEmpresa);
-
-    Optional<PlanoEntity> findByIdAsaas(String asaasId);
+    @Query("SELECT p FROM PlanoEntity p " +
+            "WHERE p.dataAgendamentoRemocao <= ?1 " +
+            "AND p.statusPlano != 'REMOVIDO'")
+    List<PlanoEntity> buscaPlanosComAgendamentosDeRemocaoPendentes(String dataAgendamentoRemocao);
 }
