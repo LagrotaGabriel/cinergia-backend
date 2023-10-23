@@ -1,4 +1,4 @@
-package br.com.backend.config.security;
+package br.com.backend.config.security.jwt.util;
 
 import br.com.backend.exceptions.custom.ObjectNotFoundException;
 import br.com.backend.modules.empresa.models.entity.EmpresaEntity;
