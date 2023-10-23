@@ -1,7 +1,6 @@
 package br.com.backend.modules.cliente.models.dto.response;
 
 import br.com.backend.globals.models.endereco.dto.response.EnderecoResponse;
-import br.com.backend.globals.models.imagem.response.ImagemResponse;
 import br.com.backend.globals.models.telefone.response.TelefoneResponse;
 import br.com.backend.modules.cliente.models.entity.ClienteEntity;
 import lombok.*;
@@ -29,7 +28,6 @@ public class ClienteResponse {
     private String dataNascimento;
     private String tipoPessoa;
     private EnderecoResponse endereco;
-    private ImagemResponse fotoPerfil;
     private List<TelefoneResponse> telefones;
 
     public ClienteResponse constroiClienteResponse(ClienteEntity clienteEntity) {
@@ -38,8 +36,8 @@ public class ClienteResponse {
         log.info("Iniciando construção do objeto ClienteResponse...");
         ClienteResponse clienteResponse = ClienteResponse.builder()
                 .uuid(clienteEntity.getUuid())
-                .dataCadastro(clienteEntity.getDataCadastro())
-                .horaCadastro(clienteEntity.getHoraCadastro())
+                .dataCadastro(clienteEntity.getDataCriacao())
+                .horaCadastro(clienteEntity.getHoraCriacao())
                 .nome(clienteEntity.getNome())
                 .email(clienteEntity.getEmail())
                 .cpfCnpj(clienteEntity.getCpfCnpj())
@@ -50,9 +48,6 @@ public class ClienteResponse {
                 .endereco(clienteEntity.getEndereco() == null
                         ? null
                         : new EnderecoResponse().constroiEnderecoResponse(clienteEntity.getEndereco()))
-                .fotoPerfil(clienteEntity.getFotoPerfil() == null
-                        ? null
-                        : new ImagemResponse().constroiImagemResponse(clienteEntity.getFotoPerfil()))
                 .telefones(clienteEntity.getTelefones() == null
                         ? new ArrayList<>()
                         : new TelefoneResponse().constroiListaTelefoneResponse(clienteEntity.getTelefones()))
