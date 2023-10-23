@@ -1,4 +1,4 @@
-package br.com.backend.config.security.empresa;
+package br.com.backend.config.security.user;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

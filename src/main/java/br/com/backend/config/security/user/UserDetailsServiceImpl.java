@@ -1,4 +1,4 @@
-package br.com.backend.config.security;
+package br.com.backend.config.security.user;
 
 import br.com.backend.modules.empresa.repository.EmpresaRepository;
 import br.com.backend.modules.empresa.repository.views.EmpresaSessaoView;

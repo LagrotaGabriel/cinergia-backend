@@ -1,6 +1,8 @@
-package br.com.backend.config.security;
+package br.com.backend.config.security.jwt.filter;
 
-import br.com.backend.config.security.empresa.CredenciaisRequest;
+import br.com.backend.config.security.jwt.util.JWTUtil;
+import br.com.backend.config.security.user.UserSS;
+import br.com.backend.config.security.user.CredenciaisRequest;
 import br.com.backend.exceptions.custom.UnauthorizedAccessException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -20,8 +22,6 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
     private final AuthenticationManager authenticationManager;
     private final JWTUtil jwtUtil;
-
-    ObjectMapper mapper = new ObjectMapper();
 
     public JWTAuthenticationFilter(AuthenticationManager authenticationManager, JWTUtil jwtUtil) {
         super();
@@ -51,9 +51,6 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         String token = jwtUtil.generateToken(username);
         res.addHeader("Authorization", "Bearer " + token);
         res.addHeader("access-control-expose-headers", "Authorization");
-        //res.getOutputStream().write(mapper.writeValueAsString(jwtUtil.obtemEmpresaAtivaPeloToken(token)).getBytes(StandardCharsets.UTF_8));
-        //res.getWriter().write(mapper.writeValueAsString(jwtUtil.obtemEmpresaAtivaPeloToken(token)));
-        //TODO REMOVER COMMENTS
     }
 
     @Override
