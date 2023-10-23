@@ -25,14 +25,14 @@ public class ClienteRepositoryImpl {
     }
 
     public ClienteEntity implementaBuscaPorUUID(ClienteId clienteId) {
-        log.info("Método que implementa busca de cliente por uuid acessado. Id: {}", clienteId);
+        log.info("Método que implementa busca de cliente por uuid acessado");
 
         Optional<ClienteEntity> clienteOptional = repository.buscaPorId(clienteId.getEmpresa(), clienteId.getUuid());
 
         ClienteEntity clienteEntity;
         if (clienteOptional.isPresent()) {
             clienteEntity = clienteOptional.get();
-            log.info("Cliente encontrado: {}", clienteEntity);
+            log.info("Cliente encontrado");
         } else {
             log.warn("Nenhum cliente foi encontrado com o id: {}", clienteId);
             throw new ObjectNotFoundException("Nenhum cliente foi encontrado com o id informado");
@@ -42,7 +42,6 @@ public class ClienteRepositoryImpl {
     }
 
     public List<ClienteEntity> implementaBuscaPorTodos(UUID uuidEmpresaSessao) {
-        //TODO FIND ALL PARA GERAR RELATÓRIO TALVEZ NÃO SEJA UMA BOA PRÁTICA. PESQUISAR ALGUMA TÉCNICA PARA MELHORAR O DESEMPENHO
         log.info("Método que implementa busca por todos os clientes acessado");
         return repository.buscaTodos(uuidEmpresaSessao);
     }
@@ -81,7 +80,7 @@ public class ClienteRepositoryImpl {
             log.info("Imagem de perfil encontrada: {}", imagemEntity.getNome());
         } else {
             log.warn("Nenhuma imagem de perfil foi encontrada com o uuidCliente {}", clienteId);
-            throw new ObjectNotFoundException("Nenhuma imagem de perfil foi encontrada com o uuidCliente informado");
+            throw new ObjectNotFoundException("Nenhuma imagem de perfil foi encontrada no registro do cliente");
         }
         log.info("Retornando a imagem de perfil encontrada...");
         return imagemEntity;
