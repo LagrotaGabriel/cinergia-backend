@@ -3797,6 +3797,24 @@
 											"height": 13,
 											"text": "ATRASADO",
 											"horizontalAlignment": 0
+										},
+										{
+											"_type": "UMLEnumerationLiteralView",
+											"_id": "AAAAAAGLN/MXQWA/T04=",
+											"_parent": {
+												"$ref": "AAAAAAGIUxZLgPNcbZI="
+											},
+											"model": {
+												"$ref": "AAAAAAGLN/MXFmA8OGk="
+											},
+											"fillColor": "#d8d8ff",
+											"font": "Arial;13;0",
+											"left": 1973,
+											"top": 319,
+											"width": 145.91357421875,
+											"height": 13,
+											"text": "CANCELADO",
+											"horizontalAlignment": 0
 										}
 									],
 									"fillColor": "#d8d8ff",
@@ -3804,7 +3822,7 @@
 									"left": 1968,
 									"top": 254,
 									"width": 155.91357421875,
-									"height": 68
+									"height": 83
 								}
 							],
 							"fillColor": "#d8d8ff",
@@ -3813,7 +3831,7 @@
 							"left": 1968,
 							"top": 216,
 							"width": 155.91357421875,
-							"height": 106,
+							"height": 121,
 							"nameCompartment": {
 								"$ref": "AAAAAAGIUxZLf/NTS3c="
 							},
@@ -4064,7 +4082,25 @@
 											"top": 632,
 											"width": 315.3896484375,
 											"height": 13,
-											"text": "-dataVencimento: String {ordered}",
+											"text": "-dataVencimento: String",
+											"horizontalAlignment": 0
+										},
+										{
+											"_type": "UMLAttributeView",
+											"_id": "AAAAAAGLOA+r/IRQe2A=",
+											"_parent": {
+												"$ref": "AAAAAAGIUxibSvPAys8="
+											},
+											"model": {
+												"$ref": "AAAAAAGLOA+r4oRNrLQ="
+											},
+											"fillColor": "#ffe2d8",
+											"font": "Arial;13;0",
+											"left": 1645,
+											"top": 647,
+											"width": 315.3896484375,
+											"height": 13,
+											"text": "-dataAgendamentoRemocao: String",
 											"horizontalAlignment": 0
 										},
 										{
@@ -4079,10 +4115,10 @@
 											"fillColor": "#ffe2d8",
 											"font": "Arial;13;0",
 											"left": 1645,
-											"top": 647,
+											"top": 662,
 											"width": 315.3896484375,
 											"height": 13,
-											"text": "-dataInicio: String {ordered}",
+											"text": "-dataInicio: String {readOnly, ordered}",
 											"horizontalAlignment": 0
 										},
 										{
@@ -4097,7 +4133,7 @@
 											"fillColor": "#ffe2d8",
 											"font": "Arial;13;0",
 											"left": 1645,
-											"top": 662,
+											"top": 677,
 											"width": 315.3896484375,
 											"height": 13,
 											"text": "-descricao: String {ordered}",
@@ -4115,7 +4151,7 @@
 											"fillColor": "#ffe2d8",
 											"font": "Arial;13;0",
 											"left": 1645,
-											"top": 677,
+											"top": 692,
 											"width": 315.3896484375,
 											"height": 13,
 											"text": "-valor: Double {ordered}",
@@ -4133,7 +4169,7 @@
 											"fillColor": "#ffe2d8",
 											"font": "Arial;13;0",
 											"left": 1645,
-											"top": 692,
+											"top": 707,
 											"width": 315.3896484375,
 											"height": 13,
 											"text": "-formaPagamento: FormaPagamentoEnum {ordered}",
@@ -4151,7 +4187,7 @@
 											"fillColor": "#ffe2d8",
 											"font": "Arial;13;0",
 											"left": 1645,
-											"top": 707,
+											"top": 722,
 											"width": 315.3896484375,
 											"height": 13,
 											"text": "-periodicidade: PeriodicidadeEnum {ordered}",
@@ -4169,7 +4205,7 @@
 											"fillColor": "#ffe2d8",
 											"font": "Arial;13;0",
 											"left": 1645,
-											"top": 722,
+											"top": 737,
 											"width": 315.3896484375,
 											"height": 13,
 											"text": "-statusPlano: StatusPlanoEnum {ordered}",
@@ -4187,7 +4223,7 @@
 											"fillColor": "#ffe2d8",
 											"font": "Arial;13;0",
 											"left": 1645,
-											"top": 737,
+											"top": 752,
 											"width": 315.3896484375,
 											"height": 13,
 											"text": "-notificacoes: Set<NotificacaoEnum> = new ArrayList()",
@@ -4205,7 +4241,7 @@
 											"fillColor": "#ffe2d8",
 											"font": "Arial;13;0",
 											"left": 1645,
-											"top": 752,
+											"top": 767,
 											"width": 315.3896484375,
 											"height": 13,
 											"text": "-pagamentos: List<Pagamento> = new ArrayList()",
@@ -4217,7 +4253,7 @@
 									"left": 1640,
 									"top": 537,
 									"width": 325.3896484375,
-									"height": 233
+									"height": 248
 								},
 								{
 									"_type": "UMLOperationCompartmentView",
@@ -4231,7 +4267,7 @@
 									"fillColor": "#ffe2d8",
 									"font": "Arial;13;0",
 									"left": 1640,
-									"top": 770,
+									"top": 785,
 									"width": 325.3896484375,
 									"height": 10
 								},
@@ -4276,7 +4312,7 @@
 							"left": 1640,
 							"top": 512,
 							"width": 325.3896484375,
-							"height": 268,
+							"height": 283,
 							"nameCompartment": {
 								"$ref": "AAAAAAGIUxibSvO79us="
 							},
@@ -4521,24 +4557,6 @@
 											"height": 13,
 											"text": "REMOVIDO",
 											"horizontalAlignment": 0
-										},
-										{
-											"_type": "UMLEnumerationLiteralView",
-											"_id": "AAAAAAGJMZO9vHaqrzY=",
-											"_parent": {
-												"$ref": "AAAAAAGIUyLmoPSpRV8="
-											},
-											"model": {
-												"$ref": "AAAAAAGJMZO9pnankA0="
-											},
-											"fillColor": "#d8d8ff",
-											"font": "Arial;13;0",
-											"left": 2069,
-											"top": 648,
-											"width": 183,
-											"height": 13,
-											"text": "CANCELADO",
-											"horizontalAlignment": 0
 										}
 									],
 									"fillColor": "#d8d8ff",
@@ -4546,7 +4564,7 @@
 									"left": 2064,
 									"top": 598,
 									"width": 193,
-									"height": 68
+									"height": 53
 								}
 							],
 							"fillColor": "#d8d8ff",
@@ -4555,7 +4573,7 @@
 							"left": 2064,
 							"top": 560,
 							"width": 193,
-							"height": 106,
+							"height": 91,
 							"nameCompartment": {
 								"$ref": "AAAAAAGIUyLmn/SgXT8="
 							},
@@ -14742,7 +14760,7 @@
 									"font": "Arial;13;0",
 									"left": 1368,
 									"top": 1355,
-									"width": 12.65087890625,
+									"width": 13.83154296875,
 									"height": 13,
 									"alpha": -0.5235987755982988,
 									"distance": 30,
@@ -18486,6 +18504,14 @@
 								"$ref": "AAAAAAGIUxZLf/NQz9E="
 							},
 							"name": "ATRASADO"
+						},
+						{
+							"_type": "UMLEnumerationLiteral",
+							"_id": "AAAAAAGLN/MXFmA8OGk=",
+							"_parent": {
+								"$ref": "AAAAAAGIUxZLf/NQz9E="
+							},
+							"name": "CANCELADO"
 						}
 					]
 				},
@@ -18785,8 +18811,17 @@
 							},
 							"name": "dataVencimento",
 							"visibility": "private",
-							"type": "String",
-							"isOrdered": true
+							"type": "String"
+						},
+						{
+							"_type": "UMLAttribute",
+							"_id": "AAAAAAGLOA+r4oRNrLQ=",
+							"_parent": {
+								"$ref": "AAAAAAGIUxibSvO4Kpk="
+							},
+							"name": "dataAgendamentoRemocao",
+							"visibility": "private",
+							"type": "String"
 						},
 						{
 							"_type": "UMLAttribute",
@@ -18797,6 +18832,7 @@
 							"name": "dataInicio",
 							"visibility": "private",
 							"type": "String",
+							"isReadOnly": true,
 							"isOrdered": true
 						},
 						{
@@ -18997,14 +19033,6 @@
 								"$ref": "AAAAAAGIUyLmn/Sd4uM="
 							},
 							"name": "REMOVIDO"
-						},
-						{
-							"_type": "UMLEnumerationLiteral",
-							"_id": "AAAAAAGJMZO9pnankA0=",
-							"_parent": {
-								"$ref": "AAAAAAGIUyLmn/Sd4uM="
-							},
-							"name": "CANCELADO"
 						}
 					]
 				},
