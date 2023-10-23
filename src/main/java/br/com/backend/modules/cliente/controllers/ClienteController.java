@@ -1,15 +1,15 @@
 package br.com.backend.modules.cliente.controllers;
 
-import br.com.backend.config.security.UserSS;
+import br.com.backend.config.security.user.UserSS;
 import br.com.backend.exceptions.custom.InvalidRequestException;
 import br.com.backend.exceptions.custom.ObjectNotFoundException;
 import br.com.backend.modules.cliente.models.dto.request.ClienteRequest;
 import br.com.backend.modules.cliente.models.dto.response.ClienteResponse;
 import br.com.backend.modules.cliente.models.dto.response.page.ClientePageResponse;
-import br.com.backend.modules.cliente.models.entity.id.ClienteId;
 import br.com.backend.modules.cliente.services.ClienteService;
 import br.com.backend.modules.cliente.services.report.ClienteRelatorioService;
 import br.com.backend.modules.cliente.services.validator.ClienteValidationService;
+import br.com.backend.util.RelatorioUtil;
 import com.lowagie.text.DocumentException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -34,8 +34,6 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -53,8 +51,6 @@ import java.util.UUID;
 @Consumes({MediaType.APPLICATION_JSON, "application/json"})
 public class ClienteController {
 
-    //TODO ATUALIZAR DOCUMENTAÇÃO COM ACTIVE USERS
-
     @Autowired
     ClienteService clienteService;
 
@@ -64,10 +60,14 @@ public class ClienteController {
     @Autowired
     ClienteRelatorioService clienteRelatorioService;
 
+    @Autowired
+    RelatorioUtil relatorioUtil;
+
     /**
      * Cadastro de novo cliente
      * Este método tem como objetivo disponibilizar o endpoint de acionamento da lógica de criação de novo cliente
      *
+     * @param userDetails    Dados do usuário logado na sessão atual
      * @param clienteRequest Objeto contendo todos os atributos necessários para a criação de um novo cliente
      * @return Retorna objeto Cliente criado convertido para o tipo ClienteResponse
      * @throws InvalidRequestException Exception lançada caso ocorra alguma falha interna na criação do cliente
@@ -106,8 +106,9 @@ public class ClienteController {
      * Busca paginada de clientes
      * Este método tem como objetivo disponibilizar o endpoint de acionamento da lógica de busca paginada de clientes
      *
-     * @param busca    Parâmetro opcional. Recebe uma string para busca de clientes por atributos específicos
-     * @param pageable Contém especificações da paginação, como tamanho da página, página atual, etc
+     * @param userDetails Dados do usuário logado na sessão atual
+     * @param busca       Parâmetro opcional. Recebe uma string para busca de clientes por atributos específicos
+     * @param pageable    Contém especificações da paginação, como tamanho da página, página atual, etc
      * @return Retorna objeto do tipo ClientePageResponse, que possui informações da paginação e a lista de clientes
      * encontrados inserida em seu body
      */
@@ -137,6 +138,7 @@ public class ClienteController {
      * Busca de cliente por uuidCliente
      * Este método tem como objetivo disponibilizar o endpoint de acionamento da lógica de busca de cliente por uuidCliente
      *
+     * @param userDetails Dados do usuário logado na sessão atual
      * @param uuidCliente Id do cliente a ser buscado
      * @return Retorna objeto Cliente encontrado convertido para o tipo ClienteResponse
      */
@@ -160,13 +162,15 @@ public class ClienteController {
         log.info("Endpoint de busca de cliente por uuidCliente acessado. ID recebido: {}", uuidCliente);
         return ResponseEntity.ok().body(
                 clienteService.realizaBuscaDeClientePorId(
-                        new ClienteId(((UserSS) userDetails).getId(), uuidCliente)));
+                        ((UserSS) userDetails).getId(),
+                        uuidCliente));
     }
 
     /**
      * Obtenção da imagem de perfil do cliente
      * Este método permite que a imagem de perfil do cliente seja obtida através do uuidCliente do cliente informado
      *
+     * @param userDetails Dados do usuário logado na sessão atual
      * @param uuidCliente Chave primária de identificação do cliente
      * @return Retorna cadeia de bytes da imagem de perfil do cliente
      * @throws ObjectNotFoundException Lança exception caso nenhum cliente seja encontrado através do ID informado
@@ -191,13 +195,15 @@ public class ClienteController {
         log.info("Método controlador de obtenção de imagem de perfil de cliente acessado");
         return ResponseEntity.status(HttpStatus.OK).body(
                 clienteService.obtemImagemPerfilCliente(
-                        new ClienteId(((UserSS) userDetails).getId(), uuidCliente)));
+                        ((UserSS) userDetails).getId(),
+                        uuidCliente));
     }
 
     /**
      * Atualiza cliente
      * Este método tem como objetivo disponibilizar o endpoint de acionamento da lógica de atualização de cliente por uuidCliente
      *
+     * @param userDetails    Dados do usuário logado na sessão atual
      * @param clienteRequest objeto que deve conter todos os dados necessários para atualização do cliente
      * @param uuidCliente    Id do cliente a ser atualizado
      * @return Retorna objeto Cliente encontrado convertido para o tipo ClienteResponse
@@ -223,11 +229,12 @@ public class ClienteController {
     })
     public ResponseEntity<ClienteResponse> atualizaCliente(@AuthenticationPrincipal UserDetails userDetails,
                                                            @PathVariable UUID uuidCliente,
-                                                           @RequestBody ClienteRequest clienteRequest) {
+                                                           @Valid @RequestBody ClienteRequest clienteRequest) {
         log.info("Método controlador de atualização de cliente acessado");
         return ResponseEntity.status(HttpStatus.OK).body(
                 clienteService.atualizaCliente(
-                        new ClienteId(((UserSS) userDetails).getId(), uuidCliente),
+                        ((UserSS) userDetails).getId(),
+                        uuidCliente,
                         clienteRequest));
     }
 
@@ -235,6 +242,7 @@ public class ClienteController {
      * Atualização de imagem de perfil do cliente
      * Este método permite que a imagem de perfil do cliente seja atualizada através do uuidCliente do cliente informado
      *
+     * @param userDetails  Dados do usuário logado na sessão atual
      * @param imagemPerfil Nova imagem de perfil do cliente a ser atualizada
      * @param uuidCliente  Chave primária de identificação do cliente
      * @return Retorna objeto Cliente que foi atualizado convertido para o tipo Response
@@ -257,11 +265,12 @@ public class ClienteController {
     })
     public ResponseEntity<ClienteResponse> atualizaImagemPerfilCliente(@AuthenticationPrincipal UserDetails userDetails,
                                                                        @RequestParam(value = "imagemPerfil", required = false) MultipartFile imagemPerfil,
-                                                                       @PathVariable("uuid") UUID uuidCliente) throws IOException {
+                                                                       @PathVariable("uuidCliente") UUID uuidCliente) throws IOException {
         log.info("Método controlador de atualização de imagem de perfil de cliente acessado");
         return ResponseEntity.status(HttpStatus.OK).body(
                 clienteService.atualizaImagemPerfilCliente(
-                        new ClienteId(((UserSS) userDetails).getId(), uuidCliente),
+                        ((UserSS) userDetails).getId(),
+                        uuidCliente,
                         imagemPerfil));
     }
 
@@ -269,6 +278,7 @@ public class ClienteController {
      * Exclusão de cliente
      * Este método tem como objetivo disponibilizar o endpoint de acionamento da lógica de exclusão de cliente por uuid
      *
+     * @param userDetails Dados do usuário logado na sessão atual
      * @param uuidCliente Id do cliente a ser removido
      * @return Retorna objeto Cliente removido convertido para o tipo ClienteResponse
      */
@@ -300,7 +310,9 @@ public class ClienteController {
                                                          @PathVariable UUID uuidCliente) {
         log.info("Método controlador de remoção de cliente acessado");
         return ResponseEntity.status(HttpStatus.OK).body(
-                clienteService.removeCliente(new ClienteId(((UserSS) userDetails).getId(), uuidCliente)));
+                clienteService.removeCliente(
+                        ((UserSS) userDetails).getId(),
+                        uuidCliente));
     }
 
     /**
@@ -308,7 +320,8 @@ public class ClienteController {
      * Este método tem como objetivo disponibilizar o endpoint de acionamento da lógica de verificação de duplicidade
      * no CPF ou CNPJ
      *
-     * @param cpfCnpj CPF ou CNPJ a ser verificado
+     * @param userDetails Dados do usuário logado na sessão atual
+     * @param cpfCnpj     CPF ou CNPJ a ser verificado
      * @return Retorna um ResponseEntity sem body, apenas com o status da requisição
      */
     @PostMapping("/verifica-cpfCnpj")
@@ -339,9 +352,10 @@ public class ClienteController {
      * Este método tem como objetivo disponibilizar o endpoint de acionamento da lógica de criação de relatório de
      * clientes registrados em PDF
      *
-     * @param res Atributo do tipo HttpServletResponse que possui as informações da resposta e deve retornar o arquivo
-     *            em PDF com o relatório de clientes cadastrados
-     * @param ids Ids dos clientes que deverão ser exibidos no relatório
+     * @param userDetails Dados do usuário logado na sessão atual
+     * @param res         Atributo do tipo HttpServletResponse que possui as informações da resposta e deve retornar o arquivo
+     *                    em PDF com o relatório de clientes cadastrados
+     * @param ids         Ids dos clientes que deverão ser exibidos no relatório
      * @throws DocumentException Exception lançada caso ocorra um erro na criação do relatório em PDF
      * @throws IOException       Exception lançada caso ocorra um erro na criação do relatório em PDF
      */
@@ -360,19 +374,9 @@ public class ClienteController {
     })
     public void relatorio(@AuthenticationPrincipal UserDetails userDetails,
                           HttpServletResponse res,
-                          @RequestBody List<UUID> ids) throws DocumentException, IOException {
+                          @RequestBody(required = false) List<UUID> ids) throws DocumentException, IOException {
         log.info("Método controlador de obtenção de relatório de clientes em PDF acessado. IDs: {}", ids);
-
-        // TODO CRIAR UTIL PARA ABSTRAIR INFORMAÇÕES ABAIXO
-
-        res.setContentType("application/pdf");
-        String headerKey = "Content-Disposition";
-        String headerValue = "attachement; relatorio"
-                + "_clientes_"
-                + new SimpleDateFormat("dd.MM.yyyy_HHmmss").format(new Date())
-                + ".pdf";
-        res.setHeader(headerKey, headerValue);
-
+        relatorioUtil.setaAtributosHttpServletResponseRelatorio(res, "clientes");
         clienteRelatorioService.exportarPdf(
                 ((UserSS) userDetails).getId(), res, ids);
     }
