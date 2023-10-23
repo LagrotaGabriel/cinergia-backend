@@ -21,8 +21,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-import static br.com.backend.util.ConversorDeDados.converteDataUsParaDataBr;
-
 @Slf4j
 @Service
 public class ClienteRelatorioService {
@@ -45,7 +43,7 @@ public class ClienteRelatorioService {
                 "retornar PDF construído acessado");
 
         log.info("Verificando se listagem de ids de clientes recebidas por parâmetro é vazia...");
-        List<ClienteEntity> clientes = uuidsClientes.isEmpty()
+        List<ClienteEntity> clientes = uuidsClientes == null || uuidsClientes.isEmpty()
                 ? clienteRepositoryImpl.implementaBuscaPorTodos(uuidEmpresaSessao)
                 : clienteRepositoryImpl.implementaBuscaPorIdEmMassa(uuidEmpresaSessao, uuidsClientes);
 
@@ -124,7 +122,7 @@ public class ClienteRelatorioService {
 
             log.info("Setando campos da tabela...");
 
-            cell.setPhrase(new Phrase(converteDataUsParaDataBr(cliente.getDataCadastro()), font));
+            cell.setPhrase(new Phrase(cliente.getDataCriacao() + " " + cliente.getHoraCriacao(), font));
             table.addCell(cell);
 
             cell.setPhrase(new Phrase(cliente.getNome(), font));
