@@ -1,16 +1,16 @@
 package br.com.backend.modules.cliente.repository.impl;
 
-import br.com.backend.modules.cliente.models.entity.ClienteEntity;
-import br.com.backend.globals.models.imagem.entity.ImagemEntity;
-import br.com.backend.modules.cliente.repository.ClienteRepository;
 import br.com.backend.exceptions.custom.ObjectNotFoundException;
+import br.com.backend.globals.models.imagem.entity.ImagemEntity;
+import br.com.backend.modules.cliente.models.entity.ClienteEntity;
+import br.com.backend.modules.cliente.models.entity.id.ClienteId;
+import br.com.backend.modules.cliente.repository.ClienteRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -19,97 +19,71 @@ public class ClienteRepositoryImpl {
     @Autowired
     ClienteRepository repository;
 
-    @Transactional
     public ClienteEntity implementaPersistencia(ClienteEntity cliente) {
-        log.debug("Método de serviço que implementa persistência do cliente acessado");
+        log.info("Método de serviço que implementa persistência do cliente acessado");
         return repository.save(cliente);
     }
 
-    public Optional<ClienteEntity> implementaBuscaPorCpfCnpjIdentico(String cpfCnpj, Long id) {
-        log.debug("Método que implementa busca de cliente por CPF/CNPJ acessado. CPF/CNPJ: {}", cpfCnpj);
-        return repository.buscaPorCpfCnpjIdenticoNaEmpresaDaSessaoAtual(cpfCnpj, id);
-    }
+    public ClienteEntity implementaBuscaPorUUID(ClienteId clienteId) {
+        log.info("Método que implementa busca de cliente por uuid acessado");
 
-    public ClienteEntity implementaBuscaPorId(Long id, Long idEmpresa) {
-        log.debug("Método que implementa busca de cliente por id acessado. Id: {}", id);
-
-        Optional<ClienteEntity> clienteOptional = repository.buscaPorId(id, idEmpresa);
+        Optional<ClienteEntity> clienteOptional = repository.buscaPorId(clienteId.getEmpresa(), clienteId.getUuid());
 
         ClienteEntity clienteEntity;
         if (clienteOptional.isPresent()) {
             clienteEntity = clienteOptional.get();
-            log.debug("Cliente encontrado: {}", clienteEntity);
+            log.info("Cliente encontrado");
         } else {
-            log.warn("Nenhum cliente foi encontrado com o id {}", id);
+            log.warn("Nenhum cliente foi encontrado com o id: {}", clienteId);
             throw new ObjectNotFoundException("Nenhum cliente foi encontrado com o id informado");
         }
-        log.debug("Retornando o cliente encontrado...");
+        log.info("Retornando o cliente encontrado...");
         return clienteEntity;
     }
 
-    @Transactional
-    public void implementaPersistenciaEmMassa(List<ClienteEntity> clientes) {
-        log.debug("Método de serviço que implementa persistência em massa do cliente acessado");
-        repository.saveAll((clientes));
+    public List<ClienteEntity> implementaBuscaPorTodos(UUID uuidEmpresaSessao) {
+        log.info("Método que implementa busca por todos os clientes acessado");
+        return repository.buscaTodos(uuidEmpresaSessao);
     }
 
-    public List<ClienteEntity> implementaBuscaPorTodos(Long idEmpresa) {
-        log.debug("Método que implementa busca por todos os clientes acessado");
-        return repository.buscaTodos(idEmpresa);
-    }
+    public List<ClienteEntity> implementaBuscaPorIdEmMassa(UUID uuidEmpresaSessao, List<UUID> uuidClientes) {
+        log.info("Método que implementa busca de cliente por id em massa acessado. Ids: {}", uuidClientes.toString());
 
-    public List<ClienteEntity> implementaBuscaPorIdEmMassa(List<Long> ids) {
-        log.debug("Método que implementa busca de cliente por id em massa acessado. Ids: {}", ids.toString());
+        log.info("Criando lista de objetos do tipo ClienteId...");
+        List<ClienteId> clienteIds = new ArrayList<>();
+        uuidClientes.forEach(uuidCliente -> clienteIds.add(new ClienteId(uuidEmpresaSessao, uuidCliente)));
+        log.info("Lista criada com sucesso. Iniciando busca por clientes por lista de ids...");
 
-        List<ClienteEntity> clientes = repository.findAllById(ids);
+        List<ClienteEntity> clientes =
+                (repository.findAllById(clienteIds)).stream().filter(Objects::nonNull).collect(Collectors.toList());
+        log.info("Busca realizada com sucesso");
 
         if (!clientes.isEmpty()) {
-            log.debug("{} Clientes encontrados", clientes.size());
+            log.info("{} Clientes encontrados", clientes.size());
         } else {
             log.warn("Nenhum cliente foi encontrado");
-            throw new ObjectNotFoundException("Nenhum cliente foi encontrado com os ids informados");
+            throw new ObjectNotFoundException("Nenhum cliente foi encontrado com os uuid informados");
         }
-        log.debug("Retornando os clientes encontrados...");
+        log.info("Retornando os clientes encontrados...");
         return clientes;
     }
 
-    public ImagemEntity implementaBuscaDeImagemDePerfilPorId(Long id, Long idEmpresa) {
-        log.debug("Método que implementa busca de imagem de perfil de cliente por id acessado. Id: {}", id);
+    public ImagemEntity implementaBuscaDeImagemDePerfilPorId(ClienteId clienteId) {
+        log.info("Método que implementa busca de imagem de perfil de cliente por uuid acessado. Id: {}", clienteId);
 
-        Optional<ImagemEntity> imagemEntityOptional = repository.buscaImagemPerfilPorId(id, idEmpresa);
+        Optional<ImagemEntity> imagemEntityOptional =
+                repository.buscaImagemPerfilPorId(clienteId.getEmpresa(), clienteId.getUuid());
 
         ImagemEntity imagemEntity;
         if (imagemEntityOptional.isPresent()) {
             imagemEntity = imagemEntityOptional.get();
-            log.debug("Imagem de perfil encontrada: {}", imagemEntity.getNome());
+            log.info("Imagem de perfil encontrada: {}", imagemEntity.getNome());
         } else {
-            log.warn("Nenhuma imagem de perfil foi encontrada com o id {}", id);
-            throw new ObjectNotFoundException("Nenhuma imagem de perfil foi encontrada com o id informado");
+            log.warn("Nenhuma imagem de perfil foi encontrada com o uuidCliente {}", clienteId);
+            throw new ObjectNotFoundException("Nenhuma imagem de perfil foi encontrada no registro do cliente");
         }
-        log.debug("Retornando a imagem de perfil encontrada...");
+        log.info("Retornando a imagem de perfil encontrada...");
         return imagemEntity;
-    }
-
-    //TODO ENTENDER O PQ DE NÃO ESTAR SENDO USADO E REALIZAR TRATAMENTO
-    //TODO OBS: O MÉTODO É UMA IMPL DE PROXY
-
-    public ClienteEntity implementaBuscaPorCodigoClienteAsaas(String codigoClienteAsaas) {
-        log.debug("Método que implementa busca por cliente Asaas pelo seu código de cliente acessado");
-
-        Optional<ClienteEntity> clienteOptional =
-                repository.findByAsaasId(codigoClienteAsaas);
-
-        ClienteEntity clienteSistema;
-        if (clienteOptional.isPresent()) {
-            clienteSistema = clienteOptional.get();
-            log.debug("Cliente encontrado: {}", clienteSistema);
-        } else {
-            log.warn("Nenhum cliente foi encontrado com o código Asaas informado: {}", codigoClienteAsaas);
-            throw new ObjectNotFoundException("Nenhum cliente foi encontrado com o codigo Asaas informado");
-        }
-
-        log.debug("Retornando cliente...");
-        return clienteSistema;
     }
 
 }

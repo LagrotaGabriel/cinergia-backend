@@ -8,10 +8,10 @@ import lombok.Getter;
 public enum BillingTypeEnum {
     BOLETO("Boleto Bancário", "BOLETO"),
     CREDIT_CARD("Cartão de crédito", "CREDIT_CARD"),
-    DEBIT_CARD("Cartão de débito", "DEBIT_CARD"),
-    UNDEFINED("Perguntar ao cliente", null),
-    TRANSFER("Transferência bancária", null),
-    DEPOSIT("Depósito bancário", null),
+    DEBIT_CARD("Cartão de débito", "DEBIT_CARD"), //TODO VALIDAR PARA NÃO LANÇAR NULL POINTER
+    UNDEFINED("Perguntar ao cliente", null), //TODO VALIDAR PARA NÃO LANÇAR NULL POINTER
+    TRANSFER("Transferência bancária", null), //TODO VALIDAR PARA NÃO LANÇAR NULL POINTER
+    DEPOSIT("Depósito bancário", null), //TODO VALIDAR PARA NÃO LANÇAR NULL POINTER
     PIX("Recebimento via Pix", "PIX");
     private final String desc;
     private final String formaPagamentoResumida;

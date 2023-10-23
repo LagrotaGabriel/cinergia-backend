@@ -1,8 +1,11 @@
 spring:
   jpa:
-    hibernate.ddl-auto: update
+    show-sql: true
+    hibernate.ddl-auto: create-drop
     properties:
       hibernate:
+        generate_statistics: false
+        format_sql: false
         dialect=org:
           hibernate:
             dialect: MySQL5InnoDBDialect
@@ -13,11 +16,12 @@ spring:
 server:
   port: ${SERVER_PORT}
 logging:
-  config:
-    src/main/resources/logback.xml
   level:
     org.springframework.web: INFO
     guru.springframework.controllers: INFO
-    org.hibernate: INFO
+    org:
+      hibernate: INFO
 
 log_context: DEVELOPMENT
+
+tuneller.path: ${LOCAL_TUNELLER_PATH}

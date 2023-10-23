@@ -1,5 +1,7 @@
 spring:
-
+  jackson:
+    serialization:
+      fail-on-empty-beans: false
   mail:
     host: ${AWS_HOST}
     port: ${AWS_PORT}
@@ -38,7 +40,10 @@ spring:
 
   jpa:
     show-sql: false
-    generate-ddl: true
+    generate-ddl: false
+    properties:
+      hibernate:
+        enable_lazy_load_no_trans: true
 
 jwt:
   secret: ${JWT_SECRET}
@@ -51,6 +56,10 @@ springdoc:
     operationsSorter: method
     tagSorter: alpha
 
+java:
+  runtime:
+    version: 17
+
 #AWS
 AWS_ACCESS_KEY: ${AWS_ACCESS}
 AWS_SECRET_KEY: ${AWS_SECRET}
@@ -60,6 +69,7 @@ EMAIL_SUBSY_AWS: ${EMAIL_AWS}
 URL_ASAAS: {$URL_ASAAS}
 TOKEN_ASAAS: {$TOKEN_ASAAS}
 TOKEN_WEBHOOK_ASAAS: ${TOKEN_WEBHOOK_ASAAS}
+asaas.webhook.token: ${TOKEN_WEBHOOK_ASAAS}
 
 # TAXAS
 TAXA_SISTEMA_PERCENTUAL: 0.0
