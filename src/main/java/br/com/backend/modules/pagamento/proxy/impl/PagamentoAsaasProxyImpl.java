@@ -26,7 +26,7 @@ public class PagamentoAsaasProxyImpl {
         try {
             log.debug("Realizando envio de requisição de cancelamento de pagamento para a integradora ASAAS...");
             responseAsaas =
-                    pagamentoAsaasProxy.cancelarCobranca(pagamentoEntity.getIdAsaas(), System.getenv("TOKEN_ASAAS"));
+                    pagamentoAsaasProxy.cancelarCobranca(pagamentoEntity.getAsaasId(), System.getenv("TOKEN_ASAAS"));
         } catch (Exception e) {
             log.error(ConstantesPagamento.ERRO_CANCELAMENTO_PAGAMENTO_ASAAS
                     + e.getMessage());

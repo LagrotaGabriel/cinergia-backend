@@ -22,7 +22,7 @@ public class RemocaoClienteAsaasProxyImpl {
     @Autowired
     RemocaoClienteAsaasProxyUtils remocaoClienteAsaasProxyUtils;
 
-    public void realizaRemocaoDoClienteNaIntegradoraAsaas(ClienteEntity cliente) {
+    public void realizaRemocaoDoClienteNaIntegradoraAsaas(String asaasId) {
 
         log.info("Método de serviço responsável pela remoção de cliente na integradora ASAAS acessado");
         ResponseEntity<RemoveClienteAsaasResponse> responseAsaas;
@@ -30,7 +30,7 @@ public class RemocaoClienteAsaasProxyImpl {
         try {
             log.info("Realizando envio de requisição de remoção cliente para a integradora ASAAS...");
             responseAsaas =
-                    clienteAsaasProxy.removerCliente(cliente.getAsaasId(), System.getenv(Constantes.TOKEN_ASAAS));
+                    clienteAsaasProxy.removerCliente(asaasId, System.getenv(Constantes.TOKEN_ASAAS));
         } catch (Exception e) {
             log.error(ConstantesClientes.ERRO_REMOCAO_CLIENTE_ASAAS
                     + e.getMessage());
