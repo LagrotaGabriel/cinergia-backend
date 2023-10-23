@@ -1,13 +1,13 @@
 package br.com.backend.modules.empresa.controllers;
 
-import br.com.backend.config.security.JWTUtil;
+import br.com.backend.config.security.user.UserSS;
+import br.com.backend.exceptions.custom.InvalidRequestException;
 import br.com.backend.modules.empresa.models.dto.request.EmpresaRequest;
 import br.com.backend.modules.empresa.models.dto.response.DadosDashBoardResponse;
 import br.com.backend.modules.empresa.models.dto.response.DadosGraficoResponse;
 import br.com.backend.modules.empresa.models.dto.response.EmpresaResponse;
 import br.com.backend.modules.empresa.models.dto.response.EmpresaSimplificadaResponse;
 import br.com.backend.modules.empresa.services.EmpresaService;
-import br.com.backend.exceptions.custom.InvalidRequestException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -19,10 +19,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
@@ -42,18 +42,18 @@ import java.util.Map;
 @Consumes({MediaType.APPLICATION_JSON, "application/json"})
 public class EmpresaController {
 
-    @Autowired
-    EmpresaService empresaService;
+    //TODO CONSTRUIR DASHBOARDS
+    //TODO CONSTRUIR COLLECTION POSTMAN
 
     @Autowired
-    JWTUtil jwtUtil;
+    EmpresaService empresaService;
 
     /**
      * Obtenção dos dados de dashboard da empresa
      * Este método permite que os dados necessários para a criação de um dashboard da empresa sejam disponibilizados
      * para o servidor client
      *
-     * @param req Atributo do tipo HttpServletRequest que possui as informações da requisição
+     * @param userDetails Dados do usuário logado na sessão atual
      * @return Retorna dados do dashboard da empresa, com informações que deverão ser exibidas de forma gráfica
      */
     @GetMapping("/dashboard")
@@ -71,18 +71,21 @@ public class EmpresaController {
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = InvalidRequestException.class))})
     })
-    public ResponseEntity<DadosDashBoardResponse> obtemDadosEstatisticosEmpresa(HttpServletRequest req) {
+    public ResponseEntity<DadosDashBoardResponse> obtemDadosEstatisticosEmpresa(
+            @AuthenticationPrincipal UserDetails userDetails) {
+
         log.info("Método controlador de obtenção de dados estatísticos da empresa acessado");
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(empresaService.obtemDadosDashBoardEmpresa(jwtUtil.obtemEmpresaAtiva(req)));
+                .body(empresaService.obtemDadosDashBoardEmpresa(
+                        ((UserSS) userDetails).getId()));
     }
 
     /**
      * Obtenção dos dados de faturamento da empresa
      * Este método tem como objetivo retornar os dados de faturamento da empresa responsável pelo envio da requisição
      *
-     * @param req Atributo do tipo HttpServletRequest que possui as informações da requisição
+     * @param userDetails Dados do usuário logado na sessão atual
      * @return Retorna dados de faturamento da empresa
      */
     @GetMapping("/grafico-faturamento")
@@ -100,18 +103,21 @@ public class EmpresaController {
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = InvalidRequestException.class))})
     })
-    public ResponseEntity<Map<Integer, DadosGraficoResponse>> obtemDadosGraficoFaturamentoEmpresa(HttpServletRequest req) {
+    public ResponseEntity<Map<Integer, DadosGraficoResponse>> obtemDadosGraficoFaturamentoEmpresa(
+            @AuthenticationPrincipal UserDetails userDetails) {
+
         log.info("Método controlador de obtenção de dados do gráfico de faturamento da empresa acessado");
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(empresaService.obtemDadosGraficoFaturamentoEmpresa(jwtUtil.obtemEmpresaAtiva(req)));
+                .body(empresaService.obtemDadosGraficoFaturamentoEmpresa(
+                        ((UserSS) userDetails).getId()));
     }
 
     /**
      * Obtenção simplificada dos dados da empresa
      * Este método tem como objetivo retornar dados resumidos sobre a empresa
      *
-     * @param req Atributo do tipo HttpServletRequest que possui as informações da requisição
+     * @param userDetails Dados do usuário logado na sessão atual
      * @return Retorna dados simplificados da empresa
      */
     @GetMapping("/simplificado")
@@ -129,11 +135,14 @@ public class EmpresaController {
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = InvalidRequestException.class))})
     })
-    public ResponseEntity<EmpresaSimplificadaResponse> obtemDadosSimplificadosEmpresa(HttpServletRequest req) {
+    public ResponseEntity<EmpresaSimplificadaResponse> obtemDadosSimplificadosEmpresa(
+            @AuthenticationPrincipal UserDetails userDetails) {
+
         log.info("Método controlador de obtenção de dados simplificados da empresa acessado");
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(empresaService.obtemDadosSimplificadosEmpresa(jwtUtil.obtemEmpresaAtiva(req)));
+                .body(empresaService.obtemDadosSimplificadosEmpresa(
+                        ((UserSS) userDetails).getId()));
     }
 
     /**
@@ -144,7 +153,6 @@ public class EmpresaController {
      * @return Retorna empresa criada convertida para objeto do tipo Response
      */
     @PostMapping
-    @PreAuthorize("hasAnyRole('EMPRESA', 'ADMIN')")
     @Tag(name = "Cadastro de nova empresa")
     @Operation(summary = "Esse endpoint tem como objetivo realizar o cadastro de uma nova empresa", method = "POST")
     @ApiResponses(value = {
@@ -155,7 +163,7 @@ public class EmpresaController {
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = InvalidRequestException.class))})
     })
-    public ResponseEntity<EmpresaResponse> criaNovaEmpresa(@Valid @RequestBody EmpresaRequest empresaRequest) {
+    public ResponseEntity<EmpresaResponse> criaNovaEmpresa(@RequestBody EmpresaRequest empresaRequest) {
         log.info("Método controlador de criação de nova empresa acessado");
         return ResponseEntity.status(HttpStatus.CREATED).body(empresaService.criaNovaEmpresa(empresaRequest));
     }
