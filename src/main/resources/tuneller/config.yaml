@@ -1,0 +1,5 @@
+dev:
+  type: http
+  region: us
+  to: localhost:9090
+  reserved_domain: testelocalasaas.loclx.io

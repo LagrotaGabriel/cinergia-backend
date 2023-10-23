@@ -1,13 +1,13 @@
 package br.com.backend.modules.pagamento.repository.impl;
 
+import br.com.backend.exceptions.custom.ObjectNotFoundException;
 import br.com.backend.modules.pagamento.models.entity.PagamentoEntity;
+import br.com.backend.modules.pagamento.models.entity.id.PagamentoId;
 import br.com.backend.modules.pagamento.repository.PagamentoRepository;
-import br.com.backend.exceptions.ObjectNotFoundException;
-import br.com.backend.util.Constantes;
+import br.com.backend.modules.pagamento.utils.ConstantesPagamento;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -18,7 +18,6 @@ public class PagamentoRepositoryImpl {
     @Autowired
     PagamentoRepository pagamentoRepository;
 
-    @Transactional
     public PagamentoEntity implementaPersistencia(PagamentoEntity pagamento) {
         log.debug("Método de serviço que implementa persistência do pagamento acessado");
         PagamentoEntity pagamentoEntity = pagamentoRepository.save(pagamento);
@@ -30,7 +29,7 @@ public class PagamentoRepositoryImpl {
         log.debug("Método que implementa busca por pagamento Asaas pelo seu código de pagamento acessado");
 
         Optional<PagamentoEntity> pagamentoOptional =
-                pagamentoRepository.findByIdAsaas(codigoAsaas);
+                pagamentoRepository.findByAsaasId(codigoAsaas);
 
         PagamentoEntity pagamentoEntity;
         if (pagamentoOptional.isPresent()) {
@@ -45,18 +44,18 @@ public class PagamentoRepositoryImpl {
         return pagamentoEntity;
     }
 
-    public PagamentoEntity implementaBuscaPorId(Long id, Long idEmpresa) {
-        log.debug("Método que implementa busca de pagamento por id acessado. Id: {}", id);
+    public PagamentoEntity implementaBuscaPorId(PagamentoId pagamentoId) {
+        log.debug("Método que implementa busca de pagamento por uuid acessado. Id: {}", pagamentoId);
 
-        Optional<PagamentoEntity> pagamentoOptional = pagamentoRepository.buscaPorId(id, idEmpresa);
+        Optional<PagamentoEntity> pagamentoOptional = pagamentoRepository.findById(pagamentoId);
 
         PagamentoEntity pagamentoEntity;
         if (pagamentoOptional.isPresent()) {
             pagamentoEntity = pagamentoOptional.get();
-            log.debug(Constantes.PAGAMENTO_ENCONTRADO, pagamentoEntity);
+            log.debug(ConstantesPagamento.PAGAMENTO_ENCONTRADO, pagamentoEntity);
         } else {
-            log.warn("Nenhum pagamento foi encontrado com o id {}", id);
-            throw new ObjectNotFoundException("Nenhum pagamento foi encontrado com o id informado");
+            log.warn("Nenhum pagamento foi encontrado com o uuid {}", pagamentoId);
+            throw new ObjectNotFoundException("Nenhum pagamento foi encontrado com o uuid informado");
         }
         log.debug("Retornando o pagamento encontrado...");
         return pagamentoEntity;

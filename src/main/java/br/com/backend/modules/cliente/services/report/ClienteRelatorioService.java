@@ -1,7 +1,6 @@
 package br.com.backend.modules.cliente.services.report;
 
 import br.com.backend.modules.cliente.models.entity.ClienteEntity;
-import br.com.backend.modules.empresa.models.entity.EmpresaEntity;
 import br.com.backend.modules.cliente.repository.impl.ClienteRepositoryImpl;
 import com.lowagie.text.Font;
 import com.lowagie.text.*;
@@ -20,12 +19,13 @@ import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-
-import static br.com.backend.util.ConversorDeDados.converteDataUsParaDataBr;
+import java.util.UUID;
 
 @Slf4j
 @Service
 public class ClienteRelatorioService {
+
+    //TODO MELHORAR O CÓDIGO. POSSIVELMENTE PODE SER DIVIDIDO EM UMA CLASSE UTILITÁRIA PARA RELATÓRIOS
 
     @Autowired
     ClienteRepositoryImpl clienteRepositoryImpl;
@@ -36,30 +36,30 @@ public class ClienteRelatorioService {
     Color MEDIUM_COLOR = new Color(173, 181, 197);
     Color WEAK_COLOR = new Color(192, 198, 209);
 
-    public void exportarPdf(HttpServletResponse response, EmpresaEntity empresaEntity, List<Long> idsClientes)
+    public void exportarPdf(UUID uuidEmpresaSessao, HttpServletResponse response, List<UUID> uuidsClientes)
             throws DocumentException, IOException {
 
-        log.debug("Método responsável por encaminhar para métodos de construção de PDF de relatório de cilentes e " +
+        log.info("Método responsável por encaminhar para métodos de construção de PDF de relatório de cilentes e " +
                 "retornar PDF construído acessado");
 
-        log.debug("Verificando se listagem de ids de clientes recebidas por parâmetro é vazia...");
-        List<ClienteEntity> clientes = idsClientes.isEmpty()
-                ? clienteRepositoryImpl.implementaBuscaPorTodos(empresaEntity.getId())
-                : clienteRepositoryImpl.implementaBuscaPorIdEmMassa(idsClientes);
+        log.info("Verificando se listagem de ids de clientes recebidas por parâmetro é vazia...");
+        List<ClienteEntity> clientes = uuidsClientes == null || uuidsClientes.isEmpty()
+                ? clienteRepositoryImpl.implementaBuscaPorTodos(uuidEmpresaSessao)
+                : clienteRepositoryImpl.implementaBuscaPorIdEmMassa(uuidEmpresaSessao, uuidsClientes);
 
         Collections.reverse(clientes);
 
-        log.debug("Iniciando construção do objeto Document, que se trata da estrutura do PDF gerado...");
+        log.info("Iniciando construção do objeto Document, que se trata da estrutura do PDF gerado...");
         try (Document document = new Document(PageSize.A4)) {
             PdfWriter.getInstance(document, response.getOutputStream());
             document.open();
-            log.debug("Iniciando acesso ao método de construção do título do PDF...");
+            log.info("Iniciando acesso ao método de construção do título do PDF...");
             document.add(constroiParagrafoTitulo());
-            log.debug("Iniciando acesso ao método de construção do subtítulo com data, hora e responsável do PDF...");
-            document.add(constroiParagrafoDataHora(empresaEntity));
-            log.debug("Iniciando acesso ao método de construção da tabela do PDF...");
+            log.info("Iniciando acesso ao método de construção do subtítulo com data, hora e responsável do PDF...");
+            document.add(constroiParagrafoDataHora());
+            log.info("Iniciando acesso ao método de construção da tabela do PDF...");
             document.add(constroiTabelaObjetos(clientes));
-            log.debug("Iniciando acesso ao método de construção dos informativos do PDF...");
+            log.info("Iniciando acesso ao método de construção dos informativos do PDF...");
             document.add(constroiTabelaInformativos(clientes));
             log.info("PDF gerado com sucesso");
         } catch (Exception e) {
@@ -71,19 +71,19 @@ public class ClienteRelatorioService {
 
     private void escreveHeaderTabela(PdfPTable table) {
 
-        log.debug("Método responsável por criar o header da tabela do PDF acessado");
+        log.info("Método responsável por criar o header da tabela do PDF acessado");
 
-        log.debug("Setando estilização do header da tabela...");
+        log.info("Setando estilização do header da tabela...");
         PdfPCell cell = new PdfPCell();
         cell.setBackgroundColor(STRONG_COLOR);
         cell.setPadding(10);
         cell.setHorizontalAlignment(Element.ALIGN_CENTER);
         cell.setVerticalAlignment(Element.ALIGN_CENTER);
 
-        log.debug("Setando fonte do header da tabela...");
+        log.info("Setando fonte do header da tabela...");
         com.lowagie.text.Font font = FontFactory.getFont(FontFactory.COURIER, 7, STRONG_BLACK);
 
-        log.debug("Setando campos do header da tabela...");
+        log.info("Setando campos do header da tabela...");
 
         cell.setPhrase(new Phrase("Data", font));
         table.addCell(cell);
@@ -103,16 +103,16 @@ public class ClienteRelatorioService {
 
     private void escreveDadosTabela(PdfPTable table, List<ClienteEntity> clientes) {
 
-        log.debug("Método responsável por escrever os dados na tabela acessado");
+        log.info("Método responsável por escrever os dados na tabela acessado");
 
         int contador = 1;
 
-        log.debug("Iniciando iteração pelos clientes que devem ser exibidos no relatório...");
+        log.info("Iniciando iteração pelos clientes que devem ser exibidos no relatório...");
         for (ClienteEntity cliente : clientes) {
 
-            log.debug("Cliente de id {} em iteração", cliente.getId());
+            log.info("Cliente de id {} em iteração", cliente.getUuid());
 
-            log.debug("Setando estilização e fonte das linhas da tabela...");
+            log.info("Setando estilização e fonte das linhas da tabela...");
             PdfPCell cell = new PdfPCell();
             com.lowagie.text.Font font = FontFactory.getFont(FontFactory.COURIER, 6, WEAK_BLACK);
             cell.setPadding(5);
@@ -120,9 +120,9 @@ public class ClienteRelatorioService {
             if (contador % 2 == 1) cell.setBackgroundColor(WEAK_COLOR);
             else cell.setBackgroundColor(MEDIUM_COLOR);
 
-            log.debug("Setando campos da tabela...");
+            log.info("Setando campos da tabela...");
 
-            cell.setPhrase(new Phrase(converteDataUsParaDataBr(cliente.getDataCadastro()), font));
+            cell.setPhrase(new Phrase(cliente.getDataCriacao() + " " + cliente.getHoraCriacao(), font));
             table.addCell(cell);
 
             cell.setPhrase(new Phrase(cliente.getNome(), font));
@@ -157,38 +157,38 @@ public class ClienteRelatorioService {
     }
 
     public Paragraph constroiParagrafoTitulo() {
-        log.debug("Método responsável por criar o título do PDF acessado");
+        log.info("Método responsável por criar o título do PDF acessado");
 
-        log.debug("Setando estilização do título e setando seu conteúdo...");
+        log.info("Setando estilização do título e setando seu conteúdo...");
         com.lowagie.text.Font font = FontFactory.getFont(FontFactory.COURIER_BOLD, 10, WEAK_BLACK);
         Paragraph p = new Paragraph("Relatório de clientes", font);
         p.setAlignment(Element.ALIGN_CENTER);
         p.setSpacingBefore(0);
         p.setSpacingAfter(0);
 
-        log.debug("Título do PDF criado com sucesso");
+        log.info("Título do PDF criado com sucesso");
         return p;
     }
 
-    public Paragraph constroiParagrafoDataHora(EmpresaEntity empresaLogada) {
-        log.debug("Método responsável por criar o subtítulo com data, hora e responsável do PDF acessado");
+    public Paragraph constroiParagrafoDataHora() {
+        log.info("Método responsável por criar o subtítulo com data, hora e responsável do PDF acessado");
 
-        log.debug("Setando estilização do subtítulo e setando seu conteúdo...");
+        log.info("Setando estilização do subtítulo e setando seu conteúdo...");
         String currentDateTime = new SimpleDateFormat("dd/MM/yyyy - HH:mm:ss").format(new Date());
         com.lowagie.text.Font font = FontFactory.getFont(FontFactory.COURIER, 8, WEAK_BLACK);
-        Paragraph p = new Paragraph(currentDateTime + ", por " + empresaLogada.getNomeEmpresa(), font);
+        Paragraph p = new Paragraph(currentDateTime, font);
         p.setAlignment(Element.ALIGN_CENTER);
         p.setSpacingBefore(0);
         p.setSpacingAfter(0);
 
-        log.debug("Subtítulo do PDF criado com sucesso");
+        log.info("Subtítulo do PDF criado com sucesso");
         return p;
     }
 
     public PdfPTable constroiTabelaInformativos(List<ClienteEntity> clientes) {
-        log.debug("Método responsável por criar os informativos do PDF acessado");
+        log.info("Método responsável por criar os informativos do PDF acessado");
 
-        log.debug("Setando estilização dos informativos do PDF...");
+        log.info("Setando estilização dos informativos do PDF...");
         PdfPTable table;
         table = new PdfPTable(1);
         table.setWidthPercentage(100f);
@@ -205,30 +205,30 @@ public class ClienteRelatorioService {
         cell.setHorizontalAlignment(Element.ALIGN_RIGHT);
         cell.setVerticalAlignment(Element.ALIGN_CENTER);
 
-        log.debug("Setando conteúdo dos informativos do PDF...");
+        log.info("Setando conteúdo dos informativos do PDF...");
         cell.setPhrase(new Phrase("Total: " + clientes.size(), font));
         table.addCell(cell);
 
-        log.debug("Informativo do PDF criado com sucesso");
+        log.info("Informativo do PDF criado com sucesso");
         return table;
     }
 
     public PdfPTable constroiTabelaObjetos(List<ClienteEntity> clientes) {
-        log.debug("Método responsável por criar a tabela do PDF acessado");
+        log.info("Método responsável por criar a tabela do PDF acessado");
 
-        log.debug("Setando estilização da e tamanho da tabela do PDF...");
+        log.info("Setando estilização da e tamanho da tabela do PDF...");
         PdfPTable table = new PdfPTable(5);
         table.setWidthPercentage(100f);
         table.setWidths(new float[]{1f, 3f, 3f, 1.5f, 1.5f});
         table.setSpacingBefore(5);
 
-        log.debug("Encaminhando para método de criação do header da tabela...");
+        log.info("Encaminhando para método de criação do header da tabela...");
         escreveHeaderTabela(table);
 
-        log.debug("Encaminhando para método de inscrição dos dados na tabela...");
+        log.info("Encaminhando para método de inscrição dos dados na tabela...");
         escreveDadosTabela(table, clientes);
 
-        log.debug("Tabela do PDF criada com sucesso");
+        log.info("Tabela do PDF criada com sucesso");
         return table;
     }
 

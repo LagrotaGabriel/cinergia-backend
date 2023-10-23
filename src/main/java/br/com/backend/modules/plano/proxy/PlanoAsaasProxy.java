@@ -1,16 +1,16 @@
 package br.com.backend.modules.plano.proxy;
 
-import br.com.backend.modules.plano.proxy.models.request.atualizar.AtualizaAssinaturaAsaasRequest;
-import br.com.backend.modules.plano.proxy.models.request.criar.CriaPlanoAsaasRequest;
-import br.com.backend.modules.plano.proxy.models.response.atualizar.AtualizaAssinaturaAsaasResponse;
-import br.com.backend.modules.plano.proxy.models.response.cancelar.CancelamentoAssinaturaResponse;
-import br.com.backend.modules.plano.proxy.models.response.consultar.ConsultaAssinaturaResponse;
-import br.com.backend.modules.plano.proxy.models.response.criar.CriaPlanoAsaasResponse;
+import br.com.backend.modules.plano.proxy.operations.atualizacao.models.request.AtualizaAssinaturaAsaasRequest;
+import br.com.backend.modules.plano.proxy.operations.criacao.models.request.CriaPlanoAsaasRequest;
+import br.com.backend.modules.plano.proxy.operations.atualizacao.models.response.AtualizaAssinaturaAsaasResponse;
+import br.com.backend.modules.plano.proxy.operations.remocao.response.CancelamentoAssinaturaResponse;
+import br.com.backend.modules.plano.proxy.operations.consulta.response.ConsultaAssinaturaResponse;
+import br.com.backend.modules.plano.proxy.operations.criacao.models.response.CriaPlanoAsaasResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@FeignClient(name = "ASAAS_PLANO", url = "${URL_ASAAS}")
+@FeignClient(name = "ASAAS-PLANO", url = "${URL_ASAAS}")
 public interface PlanoAsaasProxy {
     @PostMapping(value = "api/v3/subscriptions")
     ResponseEntity<CriaPlanoAsaasResponse> cadastraNovaAssinatura(@RequestBody CriaPlanoAsaasRequest criaPlanoAsaasRequest,

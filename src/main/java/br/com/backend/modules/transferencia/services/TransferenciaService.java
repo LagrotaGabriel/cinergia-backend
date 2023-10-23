@@ -1,23 +1,24 @@
 package br.com.backend.modules.transferencia.services;
 
+import br.com.backend.exceptions.custom.FeignConnectionException;
+import br.com.backend.exceptions.custom.InvalidRequestException;
+import br.com.backend.modules.empresa.models.entity.EmpresaEntity;
+import br.com.backend.modules.empresa.repository.impl.EmpresaRepositoryImpl;
+import br.com.backend.modules.notificacao.models.entity.NotificacaoEntity;
+import br.com.backend.modules.notificacao.models.enums.TipoNotificacaoPlanoEnum;
+import br.com.backend.modules.transferencia.hook.models.AtualizacaoTransferenciaWebHook;
 import br.com.backend.modules.transferencia.models.dto.request.TransferenciaRequest;
 import br.com.backend.modules.transferencia.models.dto.response.TransferenciaPageResponse;
-import br.com.backend.modules.empresa.models.entity.EmpresaEntity;
-import br.com.backend.modules.notificacao.models.entity.NotificacaoEntity;
 import br.com.backend.modules.transferencia.models.entity.TransferenciaEntity;
 import br.com.backend.modules.transferencia.models.enums.StatusTransferenciaEnum;
 import br.com.backend.modules.transferencia.models.enums.TipoChavePixEnum;
-import br.com.backend.modules.notificacao.models.enums.TipoNotificacaoPlanoEnum;
 import br.com.backend.modules.transferencia.proxy.TransferenciaAsaasProxy;
 import br.com.backend.modules.transferencia.proxy.models.request.TransferePixAsaasRequest;
 import br.com.backend.modules.transferencia.proxy.models.response.TransferePixAsaasResponse;
-import br.com.backend.modules.transferencia.services.adapter.TransferenciaTypeConverter;
-import br.com.backend.modules.transferencia.hook.models.AtualizacaoTransferenciaWebHook;
-import br.com.backend.modules.empresa.repository.impl.EmpresaRepositoryImpl;
 import br.com.backend.modules.transferencia.repository.TransferenciaRepository;
 import br.com.backend.modules.transferencia.repository.impl.TransferenciaRepositoryImpl;
-import br.com.backend.exceptions.FeignConnectionException;
-import br.com.backend.exceptions.InvalidRequestException;
+import br.com.backend.modules.transferencia.services.adapter.TransferenciaTypeConverter;
+import br.com.backend.modules.transferencia.utils.ConstantesTransferencia;
 import br.com.backend.util.Constantes;
 import br.com.backend.util.ConversorDeDados;
 import feign.FeignException;
@@ -117,12 +118,12 @@ public class TransferenciaService {
             responseAsaas =
                     transferenciaAsaasProxy.transferirPix(transferePixAsaasRequest, System.getenv("TOKEN_ASAAS"));
         } catch (FeignException e) {
-            log.error(Constantes.ERRO_CRIACAO_TRANSFERENCIA_ASAAS
+            log.error(ConstantesTransferencia.ERRO_CRIACAO_TRANSFERENCIA_ASAAS
                     + e.getMessage());
             if (e.status() == 409)
                 throw new FeignConnectionException("Ocorreu um erro interno ao tentar realizar sua transferência. Tente novamente em 5 minutos");
             else
-                throw new InvalidRequestException(Constantes.ERRO_CRIACAO_TRANSFERENCIA_ASAAS
+                throw new InvalidRequestException(ConstantesTransferencia.ERRO_CRIACAO_TRANSFERENCIA_ASAAS
                         + e.getMessage());
         }
 
@@ -134,7 +135,7 @@ public class TransferenciaService {
         if (responseAsaas.getStatusCodeValue() != 200) {
             log.error("Ocorreu um erro no processo de criação da transferência na integradora de pagamentos: {}",
                     responseAsaas.getBody());
-            throw new InvalidRequestException(Constantes.ERRO_CRIACAO_TRANSFERENCIA_ASAAS
+            throw new InvalidRequestException(ConstantesTransferencia.ERRO_CRIACAO_TRANSFERENCIA_ASAAS
                     + responseAsaas.getBody());
         }
         log.debug("Criação de transferência ASAAS realizada com sucesso");

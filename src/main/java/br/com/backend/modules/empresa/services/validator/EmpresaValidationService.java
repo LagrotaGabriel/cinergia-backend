@@ -2,7 +2,7 @@ package br.com.backend.modules.empresa.services.validator;
 
 import br.com.backend.modules.empresa.models.dto.request.EmpresaRequest;
 import br.com.backend.modules.empresa.repository.impl.EmpresaRepositoryImpl;
-import br.com.backend.exceptions.InvalidRequestException;
+import br.com.backend.exceptions.custom.InvalidRequestException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

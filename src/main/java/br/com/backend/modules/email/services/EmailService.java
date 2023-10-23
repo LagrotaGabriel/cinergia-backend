@@ -1,11 +1,11 @@
 package br.com.backend.modules.email.services;
 
 import br.com.backend.modules.cliente.models.entity.ClienteEntity;
+import br.com.backend.modules.email.utils.ConstantesEmail;
+import br.com.backend.modules.email.utils.GeradorBodyHtmlEmail;
+import br.com.backend.modules.empresa.models.entity.EmpresaEntity;
 import br.com.backend.modules.pagamento.models.entity.PagamentoEntity;
 import br.com.backend.modules.plano.models.entity.PlanoEntity;
-import br.com.backend.modules.empresa.models.entity.EmpresaEntity;
-import br.com.backend.modules.email.utils.GeradorBodyHtmlEmail;
-import br.com.backend.util.Constantes;
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.AWSCredentialsProvider;
 import com.amazonaws.regions.Regions;
@@ -78,26 +78,26 @@ public class EmailService {
     public void enviarEmailCobranca(PagamentoEntity pagamento, PlanoEntity planoEntity, ClienteEntity clienteEntity) {
         log.debug("Método responsável por enviar e-mail de cobrança acessado");
         try {
-            log.debug(Constantes.INICIANDO_ACESSO_OBTENCAO_CLIENT_AWS_SES);
+            log.debug(ConstantesEmail.INICIANDO_ACESSO_OBTENCAO_CLIENT_AWS_SES);
             AmazonSimpleEmailService client = obtemClientAwsSes();
 
-            log.debug(Constantes.INICIANDO_CONSTRUCAO_OBJETO_REQUEST_EMAIL);
+            log.debug(ConstantesEmail.INICIANDO_CONSTRUCAO_OBJETO_REQUEST_EMAIL);
             SendEmailRequest request = new SendEmailRequest()
                     .withDestination(
                             new Destination().withToAddresses(clienteEntity.getEmail()))
                     .withMessage(new Message()
                             .withBody(new Body()
                                     .withHtml(new Content()
-                                            .withCharset(Constantes.UTF_8).withData(geradorBodyHtmlEmail.
+                                            .withCharset(ConstantesEmail.UTF_8).withData(geradorBodyHtmlEmail.
                                                     geraBodyHtmlParaCobrancaAssinatura(pagamento, planoEntity, clienteEntity)))
                                     .withText(new Content()
-                                            .withCharset(Constantes.UTF_8).withData("Fatura")))
+                                            .withCharset(ConstantesEmail.UTF_8).withData("Fatura")))
                             .withSubject(new Content()
-                                    .withCharset(Constantes.UTF_8).withData("A fatura da sua assinatura já está disponível - " + planoEntity.getDescricao())))
+                                    .withCharset(ConstantesEmail.UTF_8).withData("A fatura da sua assinatura já está disponível - " + planoEntity.getDescricao())))
                     .withSource(emailSubsyAws);
-            log.debug(Constantes.CORPO_EMAIL_CRIADO);
+            log.debug(ConstantesEmail.CORPO_EMAIL_CRIADO);
 
-            log.debug(Constantes.INICIANDO_ENVIO_EMAIL);
+            log.debug(ConstantesEmail.INICIANDO_ENVIO_EMAIL);
             client.sendEmail(request);
 
             log.info("E-mail de cobrança enviado com sucesso");
@@ -110,26 +110,26 @@ public class EmailService {
     public void enviarEmailAtrasoPagamento(PagamentoEntity pagamento, PlanoEntity planoEntity, ClienteEntity clienteEntity) {
         log.debug("Método responsável por enviar e-mail de atraso de pagamento acessado");
         try {
-            log.debug(Constantes.INICIANDO_ACESSO_OBTENCAO_CLIENT_AWS_SES);
+            log.debug(ConstantesEmail.INICIANDO_ACESSO_OBTENCAO_CLIENT_AWS_SES);
             AmazonSimpleEmailService client = obtemClientAwsSes();
 
-            log.debug(Constantes.INICIANDO_CONSTRUCAO_OBJETO_REQUEST_EMAIL);
+            log.debug(ConstantesEmail.INICIANDO_CONSTRUCAO_OBJETO_REQUEST_EMAIL);
             SendEmailRequest request = new SendEmailRequest()
                     .withDestination(
                             new Destination().withToAddresses(clienteEntity.getEmail()))
                     .withMessage(new Message()
                             .withBody(new Body()
                                     .withHtml(new Content()
-                                            .withCharset(Constantes.UTF_8).withData(geradorBodyHtmlEmail.
+                                            .withCharset(ConstantesEmail.UTF_8).withData(geradorBodyHtmlEmail.
                                                     geraBodyHtmlParaAtrasoAssinatura(pagamento, planoEntity, clienteEntity)))
                                     .withText(new Content()
-                                            .withCharset(Constantes.UTF_8).withData("Atraso")))
+                                            .withCharset(ConstantesEmail.UTF_8).withData("Atraso")))
                             .withSubject(new Content()
-                                    .withCharset(Constantes.UTF_8).withData("Não registramos o pagamento da sua assinatura - " + planoEntity.getDescricao())))
+                                    .withCharset(ConstantesEmail.UTF_8).withData("Não registramos o pagamento da sua assinatura - " + planoEntity.getDescricao())))
                     .withSource(emailSubsyAws);
-            log.debug(Constantes.CORPO_EMAIL_CRIADO);
+            log.debug(ConstantesEmail.CORPO_EMAIL_CRIADO);
 
-            log.debug(Constantes.INICIANDO_ENVIO_EMAIL);
+            log.debug(ConstantesEmail.INICIANDO_ENVIO_EMAIL);
             client.sendEmail(request);
 
             log.info("E-mail de atraso enviado com sucesso");
@@ -145,26 +145,26 @@ public class EmailService {
                                             EmpresaEntity empresaEntity) {
         log.debug("Método responsável por enviar e-mail de pagamento confirmado acessado");
         try {
-            log.debug(Constantes.INICIANDO_ACESSO_OBTENCAO_CLIENT_AWS_SES);
+            log.debug(ConstantesEmail.INICIANDO_ACESSO_OBTENCAO_CLIENT_AWS_SES);
             AmazonSimpleEmailService client = obtemClientAwsSes();
 
-            log.debug(Constantes.INICIANDO_CONSTRUCAO_OBJETO_REQUEST_EMAIL);
+            log.debug(ConstantesEmail.INICIANDO_CONSTRUCAO_OBJETO_REQUEST_EMAIL);
             SendEmailRequest request = new SendEmailRequest()
                     .withDestination(
                             new Destination().withToAddresses(clienteEntity.getEmail()))
                     .withMessage(new Message()
                             .withBody(new Body()
                                     .withHtml(new Content()
-                                            .withCharset(Constantes.UTF_8).withData(geradorBodyHtmlEmail.
+                                            .withCharset(ConstantesEmail.UTF_8).withData(geradorBodyHtmlEmail.
                                                     geraBodyHtmlParaSucessoPagamento(pagamento, planoEntity, clienteEntity, empresaEntity)))
                                     .withText(new Content()
-                                            .withCharset(Constantes.UTF_8).withData("Atraso")))
+                                            .withCharset(ConstantesEmail.UTF_8).withData("Atraso")))
                             .withSubject(new Content()
-                                    .withCharset(Constantes.UTF_8).withData("Seu pagamento foi confirmado - " + planoEntity.getDescricao())))
+                                    .withCharset(ConstantesEmail.UTF_8).withData("Seu pagamento foi confirmado - " + planoEntity.getDescricao())))
                     .withSource(emailSubsyAws);
-            log.debug(Constantes.CORPO_EMAIL_CRIADO);
+            log.debug(ConstantesEmail.CORPO_EMAIL_CRIADO);
 
-            log.debug(Constantes.INICIANDO_ENVIO_EMAIL);
+            log.debug(ConstantesEmail.INICIANDO_ENVIO_EMAIL);
             client.sendEmail(request);
 
             log.info("E-mail de pagamento confirmado enviado com sucesso");

@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
 
-@FeignClient(name = "ASAAS_PAGAMENTO", url = "${URL_ASAAS}")
+@FeignClient(name = "ASAAS-PAGAMENTO", url = "${URL_ASAAS}")
 public interface PagamentoAsaasProxy {
     @DeleteMapping(value = "/api/v3/payments/{id}")
     ResponseEntity<CancelamentoPagamentoResponse> cancelarCobranca(@PathVariable(value = "id") String id,

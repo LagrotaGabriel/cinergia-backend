@@ -2,7 +2,7 @@ package br.com.backend.modules.empresa.repository.impl;
 
 import br.com.backend.modules.empresa.models.entity.EmpresaEntity;
 import br.com.backend.modules.empresa.repository.EmpresaRepository;
-import br.com.backend.exceptions.ObjectNotFoundException;
+import br.com.backend.exceptions.custom.ObjectNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

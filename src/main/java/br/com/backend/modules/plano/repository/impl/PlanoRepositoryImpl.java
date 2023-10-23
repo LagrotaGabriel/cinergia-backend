@@ -1,16 +1,14 @@
 package br.com.backend.modules.plano.repository.impl;
 
-import br.com.backend.modules.pagamento.models.entity.PagamentoEntity;
+import br.com.backend.exceptions.custom.ObjectNotFoundException;
 import br.com.backend.modules.plano.models.entity.PlanoEntity;
+import br.com.backend.modules.plano.models.entity.id.PlanoId;
 import br.com.backend.modules.plano.repository.PlanoRepository;
-import br.com.backend.exceptions.ObjectNotFoundException;
-import br.com.backend.util.Constantes;
+import br.com.backend.modules.plano.utils.ConstantesPlano;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -20,62 +18,44 @@ public class PlanoRepositoryImpl {
     @Autowired
     PlanoRepository planoRepository;
 
-    @Transactional
     public PlanoEntity implementaPersistencia(PlanoEntity plano) {
-        log.debug("Método de serviço que implementa persistência do plano acessado");
+        log.info("Método de serviço que implementa persistência do plano acessado");
         return planoRepository.save(plano);
     }
 
-    public PlanoEntity implementaBuscaPorId(Long id, Long idEmpresa) {
-        log.debug("Método que implementa busca de plano por id acessado. Id: {}", id);
+    public PlanoEntity implementaBuscaPorId(PlanoId planoId) {
+        log.info("Método que implementa busca de plano por id acessado. Id: {}", planoId);
 
-        Optional<PlanoEntity> planoOptional = planoRepository.buscaPorId(id, idEmpresa);
+        Optional<PlanoEntity> planoOptional = planoRepository.findById(planoId);
 
         PlanoEntity planoEntity;
         if (planoOptional.isPresent()) {
             planoEntity = planoOptional.get();
-            log.debug(Constantes.PLANO_ENCONTRADO, planoEntity);
+            log.info(ConstantesPlano.PLANO_ENCONTRADO, planoEntity);
         } else {
-            log.warn("Nenhum plano foi encontrado com o id {}", id);
+            log.warn("Nenhum plano foi encontrado com o id {}", planoId);
             throw new ObjectNotFoundException("Nenhum plano foi encontrado com o id informado");
         }
-        log.debug("Retornando o plano encontrado...");
+        log.info("Retornando o plano encontrado...");
         return planoEntity;
     }
 
-    public List<PagamentoEntity> implementaBuscaDePagamentosDoPlanoPorId(Long id, Long idEmpresa) {
-        log.debug("Método que implementa busca de pagamentos de plano por id acessado. Id: {}", id);
-
-        Optional<PlanoEntity> planoOptional = planoRepository.buscaPorId(id, idEmpresa);
-
-        PlanoEntity planoEntity;
-        if (planoOptional.isPresent()) {
-            planoEntity = planoOptional.get();
-            log.debug(Constantes.PLANO_ENCONTRADO, planoEntity);
-        } else {
-            log.warn("Nenhum plano foi encontrado com o id {}", id);
-            throw new ObjectNotFoundException("Nenhum plano foi encontrado com o id informado");
-        }
-        log.debug("Retornando os pagamentos do plano encontrado...");
-        return planoEntity.getPagamentos();
-    }
-
     public PlanoEntity implementaBuscaPorCodigoPlanoAsaas(String codigoPlanoAsaas) {
-        log.debug("Método que implementa busca por plano Asaas pelo seu código de plano acessado");
+        log.info("Método que implementa busca por plano Asaas pelo seu código de plano acessado");
 
         Optional<PlanoEntity> planoOptional =
-                planoRepository.findByIdAsaas(codigoPlanoAsaas);
+                planoRepository.findByAsaasId(codigoPlanoAsaas);
 
         PlanoEntity planoEntity;
         if (planoOptional.isPresent()) {
             planoEntity = planoOptional.get();
-            log.debug(Constantes.PLANO_ENCONTRADO, planoEntity);
+            log.info(ConstantesPlano.PLANO_ENCONTRADO, planoEntity);
         } else {
             log.warn("Nenhum plano foi encontrado com o código Asaas informado: {}", codigoPlanoAsaas);
             throw new ObjectNotFoundException("Nenhum plano foi encontrado com o codigo Asaas informado");
         }
 
-        log.debug("Retornando plano...");
+        log.info("Retornando plano...");
         return planoEntity;
     }
 }

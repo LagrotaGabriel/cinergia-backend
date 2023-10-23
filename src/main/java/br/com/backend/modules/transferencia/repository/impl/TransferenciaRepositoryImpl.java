@@ -2,8 +2,8 @@ package br.com.backend.modules.transferencia.repository.impl;
 
 import br.com.backend.modules.transferencia.models.entity.TransferenciaEntity;
 import br.com.backend.modules.transferencia.repository.TransferenciaRepository;
-import br.com.backend.exceptions.ObjectNotFoundException;
-import br.com.backend.util.Constantes;
+import br.com.backend.exceptions.custom.ObjectNotFoundException;
+import br.com.backend.modules.transferencia.utils.ConstantesTransferencia;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,7 +26,7 @@ public class TransferenciaRepositoryImpl {
         TransferenciaEntity transferenciaEntity;
         if (transferenciaOptional.isPresent()) {
             transferenciaEntity = transferenciaOptional.get();
-            log.debug(Constantes.TRANSFERENCIA_ENCONTRADA, transferenciaEntity);
+            log.debug(ConstantesTransferencia.TRANSFERENCIA_ENCONTRADA, transferenciaEntity);
         } else {
             log.warn("Nenhuma transferência foi encontrada com o código Asaas informado: {}", codigoTransferenciaAsaas);
             throw new ObjectNotFoundException("Nenhuma transferência foi encontrada com o codigo Asaas informado");

@@ -1,13 +1,13 @@
 package br.com.backend.modules.plano.controllers;
 
-import br.com.backend.config.security.JWTUtil;
+import br.com.backend.config.security.user.UserSS;
+import br.com.backend.exceptions.custom.InvalidRequestException;
+import br.com.backend.exceptions.custom.ObjectNotFoundException;
 import br.com.backend.modules.cliente.models.dto.response.ClienteResponse;
 import br.com.backend.modules.plano.models.dto.request.PlanoRequest;
 import br.com.backend.modules.plano.models.dto.response.DadosPlanoResponse;
-import br.com.backend.modules.plano.models.dto.response.PlanoPageResponse;
+import br.com.backend.modules.plano.models.dto.response.page.PlanoPageResponse;
 import br.com.backend.modules.plano.models.dto.response.PlanoResponse;
-import br.com.backend.exceptions.InvalidRequestException;
-import br.com.backend.exceptions.ObjectNotFoundException;
 import br.com.backend.modules.plano.services.PlanoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -21,12 +21,15 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import java.util.UUID;
 
 @Slf4j
 @CrossOrigin
@@ -39,21 +42,17 @@ public class PlanoController {
     @Autowired
     PlanoService planoService;
 
-    @Autowired
-    JWTUtil jwtUtil;
-
-
     /**
      * Criação de novo plano
      * Este método permite que o acionamento lógico do método de criação de novo plano de assinatura para um cliente
      * seja acionado
      *
-     * @param id           Chave primária de identificação do cliente
-     * @param req          Atributo do tipo HttpServletRequest que possui as informações da requisição
+     * @param userDetails  Dados do usuário logado na sessão atual
+     * @param uuidCliente  Chave primária de identificação do cliente
      * @param planoRequest Objeto que deve conter todos os atributos necessários para a criação de um novo plano
      * @return Objeto Plano criado convertido para objeto do tipo response
      */
-    @PostMapping("/{id}")
+    @PostMapping("/{uuidCliente}")
     @PreAuthorize("hasAnyRole('EMPRESA', 'ADMIN')")
     @Tag(name = "Criação de um novo plano para um determinado cliente")
     @Operation(summary = "Esse endpoint tem como objetivo realizar a criação de um novo plano de assinatura para um " +
@@ -64,17 +63,20 @@ public class PlanoController {
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = ClienteResponse.class))}),
             @ApiResponse(responseCode = "404",
-                    description = "Nenhum cliente foi encontrado com o id informado",
+                    description = "Nenhum cliente foi encontrado com o uuidCliente informado",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = ObjectNotFoundException.class))})
     })
-    public ResponseEntity<PlanoResponse> criaNovoPlano(
-            @PathVariable(value = "id") Long id,
-            HttpServletRequest req,
-            @RequestBody PlanoRequest planoRequest) {
+    public ResponseEntity<PlanoResponse> criaNovoPlano(@AuthenticationPrincipal UserDetails userDetails,
+                                                       @PathVariable(value = "uuidCliente") UUID uuidCliente,
+                                                       @Valid @RequestBody PlanoRequest planoRequest) {
         log.info("Endpoint de criação de novo plano acessado");
-        return ResponseEntity.status(HttpStatus.CREATED).body(planoService.criaNovoPlano(
-                jwtUtil.obtemEmpresaAtiva(req), id, planoRequest));
+        return ResponseEntity.status(HttpStatus.CREATED).body(
+                planoService.criaNovoPlano(
+                        ((UserSS) userDetails).getId(),
+                        uuidCliente,
+                        planoRequest)
+        );
     }
 
 
@@ -83,13 +85,13 @@ public class PlanoController {
      * Este método tem como objetivo disponibilizar o endpoint de acionamento da lógica de busca paginada de planos
      * relacionados com o cliente encontrado através do id informado via parâmetro
      *
-     * @param idCliente Deve ser utilizado para identificar um cliente e localizar os planos cadastrados em seu perfil
-     * @param pageable  Contém especificações da paginação, como tamanho da página, página atual, etc
-     * @param req       Atributo do tipo HttpServletRequest que possui as informações da requisição
+     * @param userDetails Dados do usuário logado na sessão atual
+     * @param uuidEmpresa Deve ser utilizado para identificar um cliente e localizar os planos cadastrados em seu perfil
+     * @param pageable    Contém especificações da paginação, como tamanho da página, página atual, etc
      * @return Retorna objeto do tipo PlanoPageResponse, que possui informações da paginação e a lista de planos
      * encontrados inserida em seu body
      */
-    @GetMapping("/cliente/{idCliente}")
+    @GetMapping("/cliente/{uuidCliente}")
     @PreAuthorize("hasAnyRole('EMPRESA', 'ADMIN')")
     @Tag(name = "Busca paginada por planos cadastrados no perfil do cliente")
     @Operation(summary = "Esse endpoint tem como objetivo realizar a busca paginada de planos cadastrados no perfil de " +
@@ -100,13 +102,14 @@ public class PlanoController {
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = PlanoPageResponse.class))}),
     })
-    public ResponseEntity<PlanoPageResponse> obtemPlanosPaginadosDoCliente(
-            @PathVariable(value = "idCliente") Long idCliente,
-            Pageable pageable,
-            HttpServletRequest req) {
+    public ResponseEntity<PlanoPageResponse> obtemPlanosPaginadosDoCliente(Pageable pageable,
+                                                                           @AuthenticationPrincipal UserDetails userDetails,
+                                                                           @PathVariable(value = "uuidCliente") UUID uuidEmpresa) {
         log.info("Endpoint de busca paginada por planos acessado");
         return ResponseEntity.ok().body(planoService.realizaBuscaPaginadaPorPlanosDoCliente(
-                jwtUtil.obtemEmpresaAtiva(req), pageable, idCliente));
+                pageable,
+                ((UserSS) userDetails).getId(),
+                uuidEmpresa));
     }
 
 
@@ -115,9 +118,9 @@ public class PlanoController {
      * Este método tem como objetivo disponibilizar o endpoint de acionamento da lógica de busca paginada de planos
      * cadastrados
      *
-     * @param busca    Parâmetro opcional. Recebe uma string para busca de planos por atributos específicos
-     * @param pageable Contém especificações da paginação, como tamanho da página, página atual, etc
-     * @param req      Atributo do tipo HttpServletRequest que possui as informações da requisição
+     * @param userDetails Dados do usuário logado na sessão atual
+     * @param busca       Parâmetro opcional. Recebe uma string para busca de planos por atributos específicos
+     * @param pageable    Contém especificações da paginação, como tamanho da página, página atual, etc
      * @return Retorna objeto do tipo PlanoPageResponse, que possui informações da paginação e a lista de planos
      * encontrados inserida em seu body
      */
@@ -132,14 +135,15 @@ public class PlanoController {
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = PlanoPageResponse.class))}),
     })
-    public ResponseEntity<PlanoPageResponse> obtemPlanosPaginados(
-            @RequestParam(value = "busca", required = false) String busca,
-            Pageable pageable,
-            HttpServletRequest req) {
+    public ResponseEntity<PlanoPageResponse> obtemPlanosPaginados(Pageable pageable,
+                                                                  @AuthenticationPrincipal UserDetails userDetails,
+                                                                  @RequestParam(value = "busca", required = false) String busca) {
         log.info("Endpoint de busca paginada por planos do cliente acessado. Filtros de busca: {}",
                 busca == null ? "Nulo" : busca);
         return ResponseEntity.ok().body(planoService.realizaBuscaPaginadaPorPlanos(
-                jwtUtil.obtemEmpresaAtiva(req), pageable, busca));
+                pageable,
+                ((UserSS) userDetails).getId(),
+                busca));
     }
 
 
@@ -147,11 +151,11 @@ public class PlanoController {
      * Busca de plano por id
      * Este método tem como objetivo disponibilizar o endpoint de acionamento da lógica de busca de plano por id
      *
-     * @param req Atributo do tipo HttpServletRequest que possui as informações da requisição
-     * @param id  Id do plano a ser buscado
+     * @param userDetails Dados do usuário logado na sessão atual
+     * @param uuidPlano   Id do plano a ser buscado
      * @return Retorna objeto Plano encontrado convertido para o tipo PlanoResponse
      */
-    @GetMapping("/{id}")
+    @GetMapping("/{uuidPlano}")
     @Tag(name = "Busca de plano por id")
     @PreAuthorize("hasAnyRole('EMPRESA', 'ADMIN')")
     @Operation(summary = "Esse endpoint tem como objetivo realizar a busca de um plano pelo id recebido pelo " +
@@ -166,22 +170,24 @@ public class PlanoController {
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = ObjectNotFoundException.class))})
     })
-    public ResponseEntity<PlanoResponse> obtemPlanoPorId(@PathVariable(value = "id") Long id,
-                                                         HttpServletRequest req) {
-        log.info("Endpoint de busca de plano por id acessado. ID recebido: {}", id);
+    public ResponseEntity<PlanoResponse> obtemPlanoPorId(@AuthenticationPrincipal UserDetails userDetails,
+                                                         @PathVariable(value = "uuidPlano") UUID uuidPlano) {
+        log.info("Endpoint de busca de plano por id acessado. ID recebido: {}", uuidPlano);
         return ResponseEntity.ok().body(planoService
-                .realizaBuscaDePlanoPorId(jwtUtil.obtemEmpresaAtiva(req), id));
+                .realizaBuscaDePlanoPorId(
+                        ((UserSS) userDetails).getId(),
+                        uuidPlano));
     }
 
     /**
      * Busca de dados do plano por id
      * Este método tem como objetivo disponibilizar o endpoint de acionamento da lógica de busca de dados do plano por id
      *
-     * @param req     Atributo do tipo HttpServletRequest que possui as informações da requisição
-     * @param idPlano Id do plano a ser buscado
+     * @param userDetails Dados do usuário logado na sessão atual
+     * @param uuidPlano   Id do plano a ser buscado
      * @return Retorna objeto Plano encontrado convertido para o tipo PlanoResponse
      */
-    @GetMapping("dados/{idPlano}")
+    @GetMapping("dados/{uuidPlano}")
     @Tag(name = "Busca de dados do plano por id")
     @PreAuthorize("hasAnyRole('EMPRESA', 'ADMIN')")
     @Operation(summary = "Esse endpoint tem como objetivo realizar a busca dos dados de um plano pelo id recebido " +
@@ -196,22 +202,24 @@ public class PlanoController {
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = ObjectNotFoundException.class))})
     })
-    public ResponseEntity<DadosPlanoResponse> obtemDadosPlanoPorId(@PathVariable(value = "idPlano") Long idPlano,
-                                                                   HttpServletRequest req) {
-        log.info("Endpoint de busca de dados de plano por id acessado. ID recebido: {}", idPlano);
+    public ResponseEntity<DadosPlanoResponse> obtemDadosPlanoPorId(@AuthenticationPrincipal UserDetails userDetails,
+                                                                   @PathVariable(value = "uuidPlano") UUID uuidPlano) {
+        log.info("Endpoint de busca de dados de plano por id acessado. ID recebido: {}", uuidPlano);
         return ResponseEntity.ok().body(planoService
-                .realizaBuscaDeDadosDePlanoPorId(jwtUtil.obtemEmpresaAtiva(req), idPlano));
+                .realizaBuscaDeDadosDePlanoPorId(
+                        ((UserSS) userDetails).getId(),
+                        uuidPlano));
     }
 
     /**
      * Atualiza plano
      * Este método tem como objetivo disponibilizar o endpoint de acionamento da lógica de atualização de plano por id
      *
-     * @param req          Atributo do tipo HttpServletRequest que possui as informações da requisição
+     * @param userDetails  Dados do usuário logado na sessão atual
      * @param planoRequest objeto que deve conter todos os dados necessários para atualização do plano
      * @return Retorna objeto Plano encontrado convertido para o tipo PlanoResponse
      */
-    @PutMapping("/{id}")
+    @PutMapping("/{uuidPlano}")
     @Tag(name = "Atualização de plano de assinatura")
     @PreAuthorize("hasAnyRole('EMPRESA', 'ADMIN')")
     @Operation(summary = "Esse endpoint tem como objetivo realizar a atualização de um plano de assinatura", method = "PUT")
@@ -223,23 +231,26 @@ public class PlanoController {
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = ObjectNotFoundException.class))})
     })
-    public ResponseEntity<PlanoResponse> atualizaPlano(
-            HttpServletRequest req,
-            @RequestBody PlanoRequest planoRequest) {
+    public ResponseEntity<PlanoResponse> atualizaPlano(@AuthenticationPrincipal UserDetails userDetails,
+                                                       @PathVariable(value = "uuidPlano") UUID uuidPlano,
+                                                       @Valid @RequestBody PlanoRequest planoRequest) {
         log.info("Endpoint de atualização de plano acessado");
-        return ResponseEntity.ok().body(planoService.atualizaPlano(
-                jwtUtil.obtemEmpresaAtiva(req), planoRequest));
+        return ResponseEntity.ok().body(
+                planoService.atualizaPlano(
+                        ((UserSS) userDetails).getId(),
+                        uuidPlano,
+                        planoRequest));
     }
 
     /**
      * Exclusão de plano
      * Este método tem como objetivo disponibilizar o endpoint de acionamento da lógica de exclusão de plano por id
      *
-     * @param req     Atributo do tipo HttpServletRequest que possui as informações da requisição
-     * @param idPlano Id do plano a ser removido
+     * @param userDetails Dados do usuário logado na sessão atual
+     * @param uuidPlano   Id do plano a ser removido
      * @return Retorna objeto Plano removido convertido para o tipo PlanoResponse
      */
-    @DeleteMapping("/{idPlano}")
+    @DeleteMapping("/{uuidPlano}")
     @Tag(name = "Remoção de plano por id")
     @PreAuthorize("hasAnyRole('EMPRESA', 'ADMIN')")
     @Operation(summary = "Esse endpoint tem como objetivo realizar a exclusão de um plano através do id recebido " +
@@ -256,9 +267,12 @@ public class PlanoController {
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = InvalidRequestException.class))}),
     })
-    public ResponseEntity<PlanoResponse> realizaCancelamentoDePlanoPorId(@PathVariable(value = "idPlano") Long idPlano,
-                                                                         HttpServletRequest req) {
-        log.info("Endpoint de remoção de plano por id acessado. ID recebido: {}", idPlano);
-        return ResponseEntity.ok().body(planoService.cancelaAssinatura(idPlano, jwtUtil.obtemEmpresaAtiva(req)));
+    public ResponseEntity<PlanoResponse> realizaCancelamentoDePlanoPorId(@AuthenticationPrincipal UserDetails userDetails,
+                                                                         @PathVariable(value = "uuidPlano") UUID uuidPlano) {
+        log.info("Endpoint de remoção de plano por id acessado. ID recebido: {}", uuidPlano);
+        return ResponseEntity.ok().body(planoService
+                .cancelaAssinatura(
+                        ((UserSS) userDetails).getId(),
+                        uuidPlano));
     }
 }
