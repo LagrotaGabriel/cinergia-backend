@@ -78,4 +78,23 @@ public interface PagamentoRepository extends JpaRepository<PagamentoEntity, Paga
             "WHERE pgt.dataVencimento < ?1 " +
             "AND (pgt.statusPagamento != 'ATRASADO' AND pgt.statusPagamento != 'CANCELADO')")
     List<PagamentoEntity> buscaPagamentosAtrasadosComStatusDiferenteDeAtrasadoECancelado(String hoje);
+
+    // Cálculos informativos de pagamentos da empresa
+    @Query("SELECT COALESCE(SUM(p.valorBruto), 0) FROM PagamentoEntity p " +
+            "WHERE p.empresa.uuid = ?1 " +
+            "AND p.plano.statusPlano <> 'REMOVIDO' " +
+            "AND p.statusPagamento = 'ATRASADO'")
+    Double calculaTotalCobrancasAtrasadasDaEmpresa(UUID uuidEmpresa);
+
+    @Query("SELECT COALESCE(SUM(p.valorBruto), 0) FROM PagamentoEntity p " +
+            "WHERE p.empresa.uuid = ?1 " +
+            "AND p.plano.statusPlano <> 'REMOVIDO' " +
+            "AND p.statusPagamento = 'PENDENTE'")
+    Double calculaTotalCobrancasPendentesDaEmpresa(UUID uuidEmpresa);
+
+    @Query("SELECT COALESCE(SUM(p.valorBruto), 0) FROM PagamentoEntity p " +
+            "WHERE p.empresa.uuid = ?1 " +
+            "AND p.plano.statusPlano <> 'REMOVIDO' " +
+            "AND p.statusPagamento = 'APROVADO'")
+    Double calculaTotalCobrancasAprovadasDaEmpresa(UUID uuidEmpresa);
 }
