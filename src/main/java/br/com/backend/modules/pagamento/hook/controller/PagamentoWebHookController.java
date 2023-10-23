@@ -25,7 +25,7 @@ import javax.ws.rs.core.MediaType;
 @RequestMapping("${default.webhook.path}/cobrancas")
 @Produces({MediaType.APPLICATION_JSON, "application/json"})
 @Consumes({MediaType.APPLICATION_JSON, "application/json"})
-public class PagamentoWebHook {
+public class PagamentoWebHookController {
 
     @Autowired
     PagamentoWebhookService pagamentoWebhookService;
