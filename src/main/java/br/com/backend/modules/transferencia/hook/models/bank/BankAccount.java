@@ -1,4 +1,4 @@
-package br.com.backend.modules.transferencia.hook.models;
+package br.com.backend.modules.transferencia.hook.models.bank;
 
 import lombok.*;
 

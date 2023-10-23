@@ -1,4 +1,4 @@
-package br.com.backend.modules.transferencia.proxy.models.enums;
+package br.com.backend.modules.transferencia.proxy.operations.criacao.models.enums;
 
 import lombok.Getter;
 

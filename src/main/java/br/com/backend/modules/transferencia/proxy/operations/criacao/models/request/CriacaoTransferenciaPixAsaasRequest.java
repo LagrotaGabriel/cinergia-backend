@@ -1,4 +1,4 @@
-package br.com.backend.modules.transferencia.proxy.models.request;
+package br.com.backend.modules.transferencia.proxy.operations.criacao.models.request;
 
 import br.com.backend.modules.transferencia.models.enums.TipoChavePixEnum;
 import lombok.*;
@@ -9,7 +9,7 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class TransferePixAsaasRequest {
+public class CriacaoTransferenciaPixAsaasRequest {
     private Double value;
     private String pixAddressKey;
     private TipoChavePixEnum pixAddressKeyType;

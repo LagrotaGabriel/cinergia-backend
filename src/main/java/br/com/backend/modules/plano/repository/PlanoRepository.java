@@ -37,4 +37,14 @@ public interface PlanoRepository extends JpaRepository<PlanoEntity, PlanoId> {
             "WHERE p.dataAgendamentoRemocao <= ?1 " +
             "AND p.statusPlano != 'REMOVIDO'")
     List<PlanoEntity> buscaPlanosComAgendamentosDeRemocaoPendentes(String dataAgendamentoRemocao);
+
+    @Query("SELECT COALESCE(COUNT(p), 0) FROM PlanoEntity p " +
+            "WHERE p.empresa.uuid = ?1 " +
+            "AND p.statusPlano = 'ATIVO'")
+    Integer somaQuantidadeDeAssinaturasAtivasDaEmpresa(UUID uuidEmpresa);
+
+    @Query("SELECT COALESCE(COUNT(p), 0) FROM PlanoEntity p " +
+            "WHERE p.empresa.uuid = ?1 " +
+            "AND p.statusPlano = 'INATIVO'")
+    Integer somaQuantidadeDeAssinaturasInativasDaEmpresa(UUID uuidEmpresa);
 }

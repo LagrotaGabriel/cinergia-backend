@@ -1,4 +1,4 @@
-package br.com.backend.modules.empresa.models.dto.response;
+package br.com.backend.modules.empresa.models.dto.response.views;
 
 import lombok.*;
 

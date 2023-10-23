@@ -1,9 +1,10 @@
 package br.com.backend.modules.transferencia.controllers;
 
-import br.com.backend.config.security.JWTUtil;
-import br.com.backend.modules.transferencia.models.dto.request.TransferenciaRequest;
-import br.com.backend.modules.transferencia.models.dto.response.TransferenciaPageResponse;
+import br.com.backend.config.security.user.UserSS;
 import br.com.backend.exceptions.custom.InvalidRequestException;
+import br.com.backend.modules.transferencia.models.dto.request.TransferenciaRequest;
+import br.com.backend.modules.transferencia.models.dto.response.TransferenciaResponse;
+import br.com.backend.modules.transferencia.models.dto.response.page.TransferenciaPageResponse;
 import br.com.backend.modules.transferencia.services.TransferenciaService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -17,9 +18,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
@@ -35,16 +37,12 @@ public class TransferenciaController {
     @Autowired
     TransferenciaService transferenciaService;
 
-    @Autowired
-    JWTUtil jwtUtil;
-
-
     /**
      * Cadastro de transferência via pix
      * Este método tem como objetivo disponibilizar o endpoint de acionamento da lógica de criação de uma nova
      * transferência via pix
      *
-     * @param req                  Atributo do tipo HttpServletRequest que possui as informações da requisição
+     * @param userDetails          Dados do usuário logado na sessão atual
      * @param transferenciaRequest Objeto contendo todos os atributos necessários para a criação de uma nova
      *                             transferência via pix
      */
@@ -53,23 +51,27 @@ public class TransferenciaController {
     @Tag(name = "Criação de nova transferência via PIX")
     @Operation(summary = "Esse endpoint tem como objetivo realizar a criação de uma transferência via PIX", method = "POST")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200",
+            @ApiResponse(responseCode = "201",
                     description = "A criação da transferência foi realizada com sucesso"),
     })
-    public ResponseEntity<?> criaNovaTransferencia(
-            HttpServletRequest req,
+    public ResponseEntity<TransferenciaResponse> criaNovaTransferencia(
+            @AuthenticationPrincipal UserDetails userDetails,
             @RequestBody TransferenciaRequest transferenciaRequest) {
+
         log.info("Endpoint de criação de nova transferência acessado");
-        transferenciaService.criaTransferencia(jwtUtil.obtemEmpresaAtiva(req), transferenciaRequest);
-        return ResponseEntity.ok().build();
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(transferenciaService.criaTransferencia(
+                        ((UserSS) userDetails).getId(),
+                        transferenciaRequest));
     }
 
     /**
      * Busca paginada de transferÊncias
      * Este método tem como objetivo disponibilizar o endpoint de acionamento da lógica de busca paginada de transferências
      *
-     * @param req      Atributo do tipo HttpServletRequest que possui as informações da requisição
-     * @param pageable Contém especificações da paginação, como tamanho da página, página atual, etc
+     * @param userDetails Dados do usuário logado na sessão atual
+     * @param pageable    Contém especificações da paginação, como tamanho da página, página atual, etc
      * @return Retorna objeto do tipo TransferenciaPageResponse, que possui informações da paginação e a lista de
      * transferências encontradas inserida em seu body
      */
@@ -88,12 +90,16 @@ public class TransferenciaController {
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = InvalidRequestException.class))}),
     })
-    public ResponseEntity<TransferenciaPageResponse> obtemTransferenciasEmpresa(HttpServletRequest req,
-                                                                                Pageable pageable) {
+    public ResponseEntity<TransferenciaPageResponse> obtemTransferenciasEmpresa(
+            @AuthenticationPrincipal UserDetails userDetails,
+            Pageable pageable) {
+
         log.info("Método controlador de obtenção de transferências da empresa acessado");
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(transferenciaService.obtemTransferenciasEmpresa(jwtUtil.obtemEmpresaAtiva(req), pageable));
+                .body(transferenciaService.obtemTransferenciasPaginadas((
+                                (UserSS) userDetails).getId(),
+                        pageable));
     }
 
 }

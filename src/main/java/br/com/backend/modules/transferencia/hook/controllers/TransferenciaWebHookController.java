@@ -1,9 +1,8 @@
-package br.com.backend.modules.transferencia.hook;
+package br.com.backend.modules.transferencia.hook.controllers;
 
-import br.com.backend.modules.transferencia.hook.models.AtualizacaoTransferenciaWebHook;
 import br.com.backend.exceptions.custom.UnauthorizedAccessException;
-import br.com.backend.modules.transferencia.services.TransferenciaService;
-import br.com.backend.util.WebHookTokenValidation;
+import br.com.backend.modules.transferencia.hook.models.AtualizacaoTransferenciaWebHook;
+import br.com.backend.modules.transferencia.hook.service.TransferenciaWebHookService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -26,13 +25,10 @@ import javax.ws.rs.core.MediaType;
 @RequestMapping("${default.webhook.path}/transferencia")
 @Produces({MediaType.APPLICATION_JSON, "application/json"})
 @Consumes({MediaType.APPLICATION_JSON, "application/json"})
-public class TransferenciaWebHook {
+public class TransferenciaWebHookController {
 
     @Autowired
-    WebHookTokenValidation webHookTokenValidation;
-
-    @Autowired
-    TransferenciaService transferenciaService;
+    TransferenciaWebHookService transferenciaWebHookService;
 
     /**
      * Recebe alteração de status de pagamento
@@ -65,8 +61,7 @@ public class TransferenciaWebHook {
     public ResponseEntity<HttpStatus> recebeStatusTransferenciaAsaas(@RequestBody AtualizacaoTransferenciaWebHook atualizacaoTransferenciaWebHook,
                                                                      @RequestHeader(value = "asaas-access-token") String token) {
         log.info("Webhook ASAAS de atualização do status de transferência recebido: {}", atualizacaoTransferenciaWebHook);
-        webHookTokenValidation.realizaValidacaoToken(token);
-        transferenciaService.realizaTratamentoWebhookTransferencia(atualizacaoTransferenciaWebHook);
+        transferenciaWebHookService.realizaRedirecionamentoParaMetodoCorreto(atualizacaoTransferenciaWebHook);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 }

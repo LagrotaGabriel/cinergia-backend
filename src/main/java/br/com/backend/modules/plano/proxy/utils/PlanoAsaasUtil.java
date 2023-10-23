@@ -10,12 +10,12 @@ import org.springframework.stereotype.Service;
 public class PlanoAsaasUtil {
 
     public CycleEnum transformaPeriodicidadeEnumEmCycleEnum(PeriodicidadeEnum periodicidadeEnum) {
-        switch (periodicidadeEnum) {
-            case SEMANAL: return CycleEnum.WEEKLY;
-            case MENSAL: return CycleEnum.MONTHLY;
-            case SEMESTRAL: return CycleEnum.SEMIANNUALY;
-            default: return CycleEnum.YEARLY;
-        }
+        return switch (periodicidadeEnum) {
+            case SEMANAL -> CycleEnum.WEEKLY;
+            case MENSAL -> CycleEnum.MONTHLY;
+            case SEMESTRAL -> CycleEnum.SEMIANNUALY;
+            default -> CycleEnum.YEARLY;
+        };
     }
 
 }
