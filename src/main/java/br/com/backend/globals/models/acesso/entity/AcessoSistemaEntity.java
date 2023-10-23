@@ -1,38 +1,42 @@
 package br.com.backend.globals.models.acesso.entity;
 
 import br.com.backend.globals.models.acesso.enums.PerfilEnum;
-import javax.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Comment;
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Type;
 
+import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-@Data
+@Getter
+@Setter
 @Entity
 @Builder
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "TB_SBS_ACESSO")
+@Table(name = "tb_sbs_acesso")
 public class AcessoSistemaEntity {
 
     @Id
+    @Type(type = "uuid-char")
+    @GeneratedValue(generator = "UUID")
     @Comment("Chave primária do acesso - UUID")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "COD_ACESSO_ACS", nullable = false, updatable = false, length = 36)
+    @Column(name = "cod_acesso_acs", nullable = false, updatable = false)
+    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
     private UUID uuid;
 
     @Comment("Senha do acesso")
-    @Column(name = "STR_SENHA_ACS", nullable = false, length = 200)
+    @Column(name = "str_senha_acs", nullable = false, length = 200)
     private String senha;
 
     @ToString.Exclude
     @Builder.Default
     @Comment("Perfis de acesso")
-    @Column(name = "LST_PERFIS_ACS", nullable = false)
-    @CollectionTable(name = "PERFIS")
+    @CollectionTable(name = "tb_sbs_acesso_perfis")
     @ElementCollection(fetch = FetchType.EAGER)
     protected Set<PerfilEnum> perfis = new HashSet<>();
 }
