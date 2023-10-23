@@ -1,7 +1,7 @@
 package br.com.backend.modules.cliente.repository;
 
-import br.com.backend.modules.cliente.models.entity.ClienteEntity;
 import br.com.backend.globals.models.imagem.entity.ImagemEntity;
+import br.com.backend.modules.cliente.models.entity.ClienteEntity;
 import br.com.backend.modules.cliente.models.entity.id.ClienteId;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,17 +16,26 @@ import java.util.UUID;
 @Repository
 public interface ClienteRepository extends JpaRepository<ClienteEntity, ClienteId> {
 
-    boolean existsByEmpresaUuidAndCpfCnpj(UUID uuidEmpresaSessao, String cpfCnpj);
-    boolean existsByEmpresaUuidAndEmail(UUID uuidEmpresaSessao, String email);
+    @Query("SELECT COUNT(c)>0 FROM ClienteEntity c " +
+            "WHERE c.empresa.uuid = ?1 " +
+            "AND c.cpfCnpj = ?2 " +
+            "AND c.exclusao IS NULL")
+    boolean verificaSeClienteAtivoJaExisteComCpfCnpjInformado(UUID uuidEmpresaSessao, String cpfCnpj);
 
-    @Query("SELECT c FROM ClienteEntity c WHERE c.empresa.uuid = ?1 and c.exclusao IS NULL")
-    Page<ClienteEntity> buscaPorClientes(Pageable pageable, UUID uuidEmpresaSessao);
+    @Query("SELECT COUNT(c)>0 FROM ClienteEntity c " +
+            "WHERE c.empresa.uuid = ?1 " +
+            "AND c.email = ?2 " +
+            "AND c.exclusao IS NULL")
+    boolean verificaSeClienteAtivoJaExisteComEmailInformado(UUID uuidEmpresaSessao, String email);
 
-    @Query("SELECT c FROM ClienteEntity c WHERE " +
-            "c.empresa.uuid = ?1 and upper(c.nome) LIKE ?2% and c.exclusao IS NULL " +
-            "or c.empresa.uuid = ?1 and upper(c.email) LIKE ?2% and c.exclusao IS NULL " +
-            "or c.empresa.uuid = ?1 and upper(c.cpfCnpj) LIKE ?2% and c.exclusao IS NULL")
-    Page<ClienteEntity> buscaPorClientesTypeAhead(Pageable pageable, UUID uuidEmpresaSessao, String busca);
+    @Query("SELECT c FROM ClienteEntity c " +
+            "WHERE c.empresa.uuid = ?1 " +
+            "AND (?2 IS NULL OR (upper(c.nome) LIKE ?2% and c.exclusao IS NULL " +
+            "OR upper(c.email) LIKE ?2% and c.exclusao IS NULL " +
+            "OR upper(c.cpfCnpj) LIKE ?2% and c.exclusao IS NULL))")
+    Page<ClienteEntity> buscaPaginadaPorClientes(Pageable pageable,
+                                                 UUID uuidEmpresa,
+                                                 String busca);
 
     @Query("SELECT c FROM ClienteEntity c WHERE c.empresa.uuid = ?1 and c.uuid=?2 and c.exclusao IS NULL")
     Optional<ClienteEntity> buscaPorId(UUID uuidEmpresaSessao, UUID uuidCliente);
