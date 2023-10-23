@@ -17,8 +17,8 @@ public class EnderecoRequest {
     private String logradouro;
 
     @NotNull(message = "O campo número não pode ser nulo")
-    @Min(value = 1, message = "O valor mínimo para o campo número é {min}")
-    @Max(value = 99999, message = "O valor máximo para o campo número é {max}")
+    @Min(value = 1, message = "O valor mínimo para o campo número é {value}")
+    @Max(value = 99999, message = "O valor máximo para o campo número é {value}")
     private Integer numero;
 
     @Size(max = 80, message = "O logradouro deve conter no máximo {max} caracteres")
