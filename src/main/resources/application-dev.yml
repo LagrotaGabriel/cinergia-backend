@@ -4,11 +4,11 @@ spring:
     hibernate.ddl-auto: create-drop
     properties:
       hibernate:
-        generate_statistics: true
-        format_sql: true
+        generate_statistics: false
+        format_sql: false
         dialect=org:
           hibernate:
-            dialect: MySQL57Dialect
+            dialect: MySQL5InnoDBDialect
   datasource:
     url: ${DB_URL}
     username: ${DB_USERNAME}
@@ -16,8 +16,6 @@ spring:
 server:
   port: ${SERVER_PORT}
 logging:
-  config:
-    src/main/resources/logback.xml
   level:
     org.springframework.web: INFO
     guru.springframework.controllers: INFO
@@ -25,3 +23,5 @@ logging:
       hibernate: INFO
 
 log_context: DEVELOPMENT
+
+tuneller.path: ${LOCAL_TUNELLER_PATH}
