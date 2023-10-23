@@ -3,7 +3,11 @@ package br.com.backend.globals.models.exclusao.entity;
 import javax.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Comment;
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Type;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.UUID;
 
 @Entity
@@ -13,20 +17,29 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "TB_SBS_EXCLUSAO")
+@Table(name = "tb_sbs_exclusao")
 public class ExclusaoEntity {
 
     @Id
+    @Type(type = "uuid-char")
+    @GeneratedValue(generator = "UUID")
     @Comment("Chave primária da exclusão - UUID")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "COD_EXCLUSAO_EXC", nullable = false, updatable = false, length = 36)
+    @Column(name = "cod_exclusao_exc", nullable = false, updatable = false)
+    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
     private UUID uuid;
 
     @Comment("Data em que a exclusão foi realizada")
-    @Column(name = "DT_DATACADASTRO_EXC", nullable = false, updatable = false, length = 10)
+    @Column(name = "dt_datacadastro_exc", nullable = false, updatable = false, length = 10)
     private String dataExclusao;
 
     @Comment("Hora em que a exclusão foi realizado")
-    @Column(name = "HR_HORACADASTRO_EXC", nullable = false, updatable = false, length = 18)
+    @Column(name = "hr_horacadastro_exc", nullable = false, updatable = false, length = 18)
     private String horaExclusao;
+
+    public ExclusaoEntity constroiObjetoExclusao() {
+        return ExclusaoEntity.builder()
+                .dataExclusao(LocalDate.now().toString())
+                .horaExclusao(LocalTime.now().toString())
+                .build();
+    }
 }
