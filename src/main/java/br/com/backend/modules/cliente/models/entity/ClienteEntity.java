@@ -13,10 +13,14 @@ import br.com.backend.modules.cliente.models.enums.TipoPessoaEnum;
 import br.com.backend.modules.cliente.services.utils.ClienteUtils;
 import br.com.backend.modules.empresa.models.entity.EmpresaEntity;
 import br.com.backend.modules.plano.models.entity.PlanoEntity;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 import org.hibernate.annotations.Comment;
+import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Type;
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import javax.persistence.*;
@@ -27,18 +31,18 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 
-@Data
+@Getter
+@Setter
 @Entity
 @Builder
 @ToString
+@DynamicUpdate
 @NoArgsConstructor
 @AllArgsConstructor
 @IdClass(ClienteId.class)
 @Table(name = "tb_sbs_cliente",
         uniqueConstraints = {
                 @UniqueConstraint(name = "UK_ASAAS_CLI", columnNames = {"cod_asaas_cli"}),
-                @UniqueConstraint(name = "UK_EMAIL_EMPRESA", columnNames = {"cod_empresa_cli", "eml_email_cli"}),
-                @UniqueConstraint(name = "UK_CPFCNPJ_EMPRESA", columnNames = {"cod_empresa_cli", "cdp_cpfcnpj_cli"})
         })
 public class ClienteEntity {
 
@@ -51,22 +55,26 @@ public class ClienteEntity {
     private UUID uuid;
 
     @Id
-    @ManyToOne
+    @JsonIgnore
+    @ToString.Exclude
+    @ManyToOne(fetch = FetchType.LAZY)
     @Comment("Chave primária do cliente - ID da empresa ao qual o cliente faz parte")
     @JoinColumn(name = "cod_empresa_cli", referencedColumnName = "cod_empresa_emp", nullable = false, updatable = false)
     private EmpresaEntity empresa;
 
     @Comment("Código de identificação do cliente na integradora ASAAS")
-    @Column(name = "cod_asaas_cli", updatable = false, nullable = false)
+    @Column(name = "cod_asaas_cli", nullable = false, updatable = false)
     private String asaasId;
 
+    @CreatedDate
     @Comment("Data em que o cadastro do cliente foi realizado")
     @Column(name = "dt_datacadastro_cli", nullable = false, updatable = false, length = 10)
-    private String dataCadastro;
+    private String dataCriacao;
 
+    @CreatedDate
     @Comment("Hora em que o cadastro do cliente foi realizado")
     @Column(name = "hr_horacadastro_cli", nullable = false, updatable = false, length = 18)
-    private String horaCadastro;
+    private String horaCriacao;
 
     @Comment("Nome do cliente")
     @Column(name = "str_nome_cli", nullable = false, length = 70)
@@ -106,6 +114,7 @@ public class ClienteEntity {
     @JoinColumn(name = "cod_acesso_cli",
             referencedColumnName = "cod_acesso_acs",
             foreignKey = @ForeignKey(name = "FK_ACESSO_CLIENTE"))
+    @ToString.Exclude
     private AcessoSistemaEntity acessoSistema;
 
     @Comment("Código de exclusão do cliente")
@@ -116,6 +125,7 @@ public class ClienteEntity {
     @JoinColumn(name = "cod_exclusao_cli",
             referencedColumnName = "cod_exclusao_exc",
             foreignKey = @ForeignKey(name = "FK_EXCLUSAO_CLIENTE"))
+    @ToString.Exclude
     private ExclusaoEntity exclusao;
 
     @Comment("Código do endereço do cliente")
@@ -126,6 +136,7 @@ public class ClienteEntity {
     @JoinColumn(name = "cod_endereco_cli",
             referencedColumnName = "cod_endereco_end",
             foreignKey = @ForeignKey(name = "FK_ENDERECO_CLIENTE"))
+    @ToString.Exclude
     private EnderecoEntity endereco;
 
     @Comment("Código da imagem de perfil do cliente")
@@ -136,11 +147,13 @@ public class ClienteEntity {
     @JoinColumn(name = "cod_imagem_cli",
             referencedColumnName = "cod_imagem_img",
             foreignKey = @ForeignKey(name = "FK_IMAGEM_CLIENTE"))
+    @ToString.Exclude
     private ImagemEntity fotoPerfil;
 
     @Builder.Default
     @ToString.Exclude
     @Comment("Planos de assinatura vinculados ao cliente")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     @OneToMany(targetEntity = PlanoEntity.class, orphanRemoval = true, cascade = CascadeType.ALL)
     @JoinTable(name = "tb_sbs_cliente_planos",
             uniqueConstraints = {
@@ -169,6 +182,7 @@ public class ClienteEntity {
     @Builder.Default
     @ToString.Exclude
     @Comment("Telefones vinculados ao cadastro do cliente")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     @OneToMany(targetEntity = TelefoneEntity.class, orphanRemoval = true, cascade = CascadeType.ALL)
     @JoinTable(name = "tb_sbs_cliente_telefones",
             uniqueConstraints = @UniqueConstraint(name = "UK_TELEFONE_CLIENTE", columnNames = {"cod_telefone_tel"}),
@@ -188,13 +202,13 @@ public class ClienteEntity {
     private List<TelefoneEntity> telefones = new ArrayList<>();
 
     public ClienteEntity constroiClienteEntityParaCriacao(EmpresaEntity empresaSessao,
-                                                          String idClienteAsaas,
+                                                          String asaasId,
                                                           ClienteRequest clienteRequest) {
         return ClienteEntity.builder()
                 .empresa(empresaSessao)
-                .asaasId(idClienteAsaas)
-                .dataCadastro(LocalDate.now().toString())
-                .horaCadastro(LocalTime.now().toString())
+                .asaasId(asaasId)
+                .dataCriacao(LocalDate.now().toString())
+                .horaCriacao(LocalTime.now().toString())
                 .nome(clienteRequest.getNome().toUpperCase())
                 .email(clienteRequest.getEmail() != null
                         ? clienteRequest.getEmail().toLowerCase()
@@ -222,31 +236,52 @@ public class ClienteEntity {
                 .build();
     }
 
-    public void atualizaEntidadeComAtributosRequest(ClienteRequest clienteRequest) {
-        this.setNome(clienteRequest.getNome().toUpperCase());
-        this.setEmail(clienteRequest.getEmail() != null
-                ? clienteRequest.getEmail().toLowerCase()
-                : null);
-        this.setCpfCnpj(clienteRequest.getCpfCnpj());
-        this.setObservacoes(clienteRequest.getObservacoes());
-        this.setStatusCliente(clienteRequest.getStatusCliente());
-        this.setDataNascimento(clienteRequest.getDataNascimento());
-        this.setTipoPessoa(clienteRequest.getTipoPessoa());
-        this.setAcessoSistema(clienteRequest.getAcessoSistema() != null
-                ? AcessoSistemaEntity.builder()
-                .senha(ClienteUtils.realizaTratamentoDeSenhaAtualizacao(this, clienteRequest))
-                .perfis(new HashSet<>(List.of(PerfilEnum.CLIENTE)))
-                .build()
-                : null);
-        this.setEndereco(clienteRequest.getEndereco() == null
-                ? null
-                : new EnderecoEntity().constroiEnderecoEntity(clienteRequest.getEndereco()));
-        this.setTelefones(clienteRequest.getTelefones() == null
-                ? new ArrayList<>()
-                : new TelefoneEntity().constroiListaTelefoneEntity(clienteRequest.getTelefones()));
+    public ClienteEntity atualizaEntidadeComAtributosRequest(ClienteEntity clienteEncontrado,
+                                                             ClienteRequest clienteAtualizado) {
+        return ClienteEntity.builder()
+                .empresa(clienteEncontrado.getEmpresa())
+                .uuid(clienteEncontrado.getUuid())
+                .asaasId(clienteEncontrado.getAsaasId())
+                .dataCriacao(clienteEncontrado.getDataCriacao())
+                .horaCriacao(clienteEncontrado.getHoraCriacao())
+                .nome(clienteAtualizado.getNome().toUpperCase())
+                .email(clienteAtualizado.getEmail() != null
+                        ? clienteAtualizado.getEmail().toLowerCase()
+                        : null)
+                .cpfCnpj(clienteAtualizado.getCpfCnpj())
+                .observacoes(clienteAtualizado.getObservacoes())
+                .statusCliente(clienteAtualizado.getStatusCliente())
+                .dataNascimento(clienteAtualizado.getDataNascimento())
+                .tipoPessoa(clienteAtualizado.getTipoPessoa())
+                .acessoSistema(clienteAtualizado.getAcessoSistema() != null
+                        ? AcessoSistemaEntity.builder()
+                        .senha(ClienteUtils.realizaTratamentoDeSenhaAtualizacao(this, clienteAtualizado))
+                        .perfis(new HashSet<>(List.of(PerfilEnum.CLIENTE)))
+                        .build()
+                        : null)
+                .exclusao(clienteEncontrado.getExclusao())
+                .endereco(clienteAtualizado.getEndereco() == null
+                        ? null
+                        : new EnderecoEntity().constroiEnderecoEntity(clienteAtualizado.getEndereco()))
+                .fotoPerfil(clienteEncontrado.getFotoPerfil())
+                .planos(clienteEncontrado.getPlanos())
+                .telefones(clienteAtualizado.getTelefones() == null
+                        ? new ArrayList<>()
+                        : new TelefoneEntity().constroiListaTelefoneEntity(clienteAtualizado.getTelefones()))
+                .build();
+
     }
 
     public void criaExclusao() {
         this.setExclusao(new ExclusaoEntity().constroiObjetoExclusao());
+    }
+
+    public void addPlano(PlanoEntity planoEntity) {
+        this.planos.add(planoEntity);
+    }
+
+    public PlanoEntity obtemUltimoPlanoPersistido() {
+        int indicePlano = this.getPlanos().size() - 1;
+        return this.getPlanos().get(indicePlano);
     }
 }
