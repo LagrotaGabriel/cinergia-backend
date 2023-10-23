@@ -1,5 +1,6 @@
 package br.com.backend.modules.transferencia.hook.models;
 
+import br.com.backend.modules.transferencia.hook.models.bank.BankAccount;
 import lombok.*;
 
 @ToString
